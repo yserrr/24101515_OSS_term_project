@@ -1,5 +1,6 @@
 24101515_OSS_term_project
-오소소 텀프로젝트 repo입니다.
+오소소 텀프로젝트 repo입니다. 
+
 Project Name: Vulkan study
 1학기동안 oss term project를 진행하였습니다. 
 
