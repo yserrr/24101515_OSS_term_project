@@ -1,19 +1,10 @@
 24101515_OSS_term_project
 오소소 텀프로젝트 repo입니다.
+Project Name: Vulkan study
+1학기동안 oss term project를 진행하였습니다. 
 
-Key Features & Benefits
-This project focuses on [Describe the main purpose of the project here. Since no context is provided, make a GENERAL assumption based on common university term projects, and the presence of C/C++ and AI_Project directories]
 
-Potential Key Features:
-
-AI-powered [Specific AI Application, e.g., Image Recognition, Game Playing, Data Analysis].
-Sculpting application with KTX texture support.
-Efficient C/C++ implementation for performance.
-[Add other features if applicable based on the implied nature of the project]
-Prerequisites & Dependencies
-To run this project, you will need the following:
-
-C++ Compiler: A C++ compiler that supports C++11 or later (e.g., g++, Clang, MSVC).
+C++ Compiler: A C++ compiler that supports C++11 or later 
 CMake: For building the project.
 KTX Library: The Khronos KTX library (likely already included as a submodule).
 Python (Optional): Required if the AI project portion utilizes Python scripts.
