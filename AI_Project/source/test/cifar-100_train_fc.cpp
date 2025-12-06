@@ -10,7 +10,6 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "source/AI/Model.hpp"
 #include "extern/pybind11/pybind11.h"
 #include "pybind11/embed.h"
 #include "pybind11/stl.h"
@@ -22,6 +21,7 @@
 #include "v_opt_common.hpp"
 #include "v_opt_ctx.hpp"
 #include "v_opt_dataset.hpp"
+#include "v_util.h"
 #include <omp.h>
 
 namespace py = pybind11;
@@ -76,7 +76,7 @@ int main() {
   auto vk         = backend_vk_init(0);
   v_backend_t a[] = {vk};
 
-  auto backend_sched  = v_sched_new(*a, nullptr, 1,GGML_DEFAULT_GRAPH_SIZE, false, true);
+  auto backend_sched  = v_sched_new(*a, nullptr, 1,v_DEFAULT_GRAPH_SIZE, false, true);
   model.backend_sched = backend_sched;
 
   int num_tensors = 10;
@@ -85,7 +85,7 @@ int main() {
     /*.mem_buffer =*/ NULL,
     /*.no_alloc   =*/ true,
   };
-  const size_t size_meta = GGML_DEFAULT_GRAPH_SIZE * v_tensor_over_head() + 10 * graph_overhead();
+  const size_t size_meta = v_DEFAULT_GRAPH_SIZE * v_tensor_over_head() + 10 * graph_overhead();
   model.ctx_compute      = v_ctx_init(params);
 
   py::scoped_interpreter guard{};
@@ -94,7 +94,7 @@ int main() {
   py::module_ transforms = py::module_::import("torchvision.transforms");
   py::module_ np         = py::module_::import("numpy");
 
-  auto transform         = transforms.attr("Compose")(py::make_tuple(
+  auto transform = transforms.attr("Compose")(py::make_tuple(
     transforms.attr("ToTensor")(),
     transforms.attr("Normalize")(
       py::make_tuple(0.5071f, 0.4865f, 0.4409f),
@@ -144,8 +144,8 @@ int main() {
   }
   v_time_init();
 
-  v_opt_data_set_t dataset = v_opt_dataset_init(GGML_TYPE_F32,
-                                                GGML_TYPE_F32,
+  v_opt_data_set_t dataset = v_opt_dataset_init(v_TYPE_F32,
+                                                v_TYPE_F32,
                                                 CIFAR_NINPUT,
                                                 CIFAR_NCLASSES,
                                                 CIFAR_NTRAIN,
@@ -155,14 +155,13 @@ int main() {
   v_tensor* label = dataset->getLabels();
   float* buf      = v_get_tdata_f32(data);
   float* lbuf     = v_get_tdata_f32(label);
-  int64_t nfill = std::min<int64_t>(data->ne[1], (int64_t)images.size());
+  int64_t nfill   = std::min<int64_t>(data->ne[1], (int64_t)images.size());
 
   #pragma omp parallel for
   for (int64_t iex = 0; iex < nfill; ++iex) {
     for (int64_t i = 0; i < CIFAR_NINPUT; ++i) {
       buf[iex * CIFAR_NINPUT + i] = images[iex][i];
     }
-    // 남아있는 경우 0으로 패딩할 필요 없음(위에서 nfill로 제한)
   }
 
   #pragma omp parallel for
@@ -186,22 +185,22 @@ int main() {
     model.ctx_static = v_ctx_init(params);
   }
 
-  model.fc1_weight = v_new_tensor_2d(model.ctx_static, GGML_TYPE_F32, CIFAR_NINPUT, CIFAR_NHIDDEN);
-  model.fc1_bias   = v_new_tensor_1d(model.ctx_static, GGML_TYPE_F32, CIFAR_NHIDDEN);
-  model.fc2_weight = v_new_tensor_2d(model.ctx_static, GGML_TYPE_F32, CIFAR_NHIDDEN, CIFAR_NCLASSES);
-  model.fc2_bias   = v_new_tensor_1d(model.ctx_static, GGML_TYPE_F32, CIFAR_NCLASSES);
+  model.fc1_weight = v_new_tensor_2d(model.ctx_static, v_TYPE_F32, CIFAR_NINPUT, CIFAR_NHIDDEN);
+  model.fc1_bias   = v_new_tensor_1d(model.ctx_static, v_TYPE_F32, CIFAR_NHIDDEN);
+  model.fc2_weight = v_new_tensor_2d(model.ctx_static, v_TYPE_F32, CIFAR_NHIDDEN, CIFAR_NCLASSES);
+  model.fc2_bias   = v_new_tensor_1d(model.ctx_static, v_TYPE_F32, CIFAR_NCLASSES);
 
   init_tensors.push_back(model.fc1_weight);
   init_tensors.push_back(model.fc1_bias);
   init_tensors.push_back(model.fc2_weight);
   init_tensors.push_back(model.fc2_bias);
-  model.images = v_new_tensor_2d(model.ctx_static, GGML_TYPE_F32, CIFAR_NINPUT, CIFAR_NBATCH_PHYSICAL);
+  model.images = v_new_tensor_2d(model.ctx_static, v_TYPE_F32, CIFAR_NINPUT, CIFAR_NBATCH_PHYSICAL);
   v_set_name(model.images, "images");
   v_set_inputs(model.images);
 
   model.buf_static = v_backend_alloc_ctx_tensors(model.ctx_static, vk);
   for (v_tensor* t : init_tensors) {
-    V_ASSERT(t->type == GGML_TYPE_F32);
+    V_ASSERT(t->type == v_TYPE_F32);
     const int64_t ne = nelements(t);
     std::vector<float> tmp(ne);
     for (int64_t i = 0; i < ne; ++i) { tmp[i] = nd(gen); }
@@ -224,20 +223,81 @@ int main() {
                                 model.fc2_weight,
                                 fc1),
                        model.fc2_bias);
+  const int64_t ndata = v_opt_dataset_datas(dataset)->ne[1];
 
-  // optimizer 설정: epochs/steps 등은 v_opt_fit 내부에서 사용하는 인자임
-  v_opt_fit(model.backend_sched,
-            model.ctx_compute,
-            model.images,
-            model.logits,
-            dataset,
-            V_OPT_LOSS_CROSS_ENTROPY,
-            V_OPTIMIZER_TYPE_ADAMW,
-            v_opt_get_default_optimizer_params,
-            10000,
-            model.nbatch_logical,
-            0.05f,
-            false);
+  const int64_t nbatch_physical  = model.images->ne[1];
+  const int64_t opt_period       = model.nbatch_logical / nbatch_physical;
+  const int64_t nbatches_logical = ndata / model.nbatch_logical;
+  const int64_t ibatch_split     = int64_t(((1.0f - 0.05) * nbatches_logical)) * opt_period;
+  ///
+  int64_t idata_split = ibatch_split * nbatch_physical;
+  int64_t epoch       = 1;
 
+  v_opt_struct loss_parmas    = v_opt_default_params(backend_sched, V_OPT_LOSS_CROSS_ENTROPY);
+  loss_parmas.ctx_compute     = model.ctx_compute;
+  loss_parmas.inputs          = model.images;
+  loss_parmas.outputs         = model.logits;
+  loss_parmas.opt_period      = opt_period;
+  loss_parmas.get_opt_pars    = v_opt_get_default_optimizer_params;
+  loss_parmas.get_opt_pars_ud = &epoch;
+  loss_parmas.optimizer       = V_OPTIMIZER_TYPE_ADAMW;
+  v_opt_ctx* opt_ctx          = v_opt_init(loss_parmas);
+
+  dataset->shuffle(opt_ctx, idata_split);
+  v_opt_result_t result_train = v_opt_result_init();
+  v_opt_result_t result_val   = v_opt_result_init();
+  for (; epoch <= 10000; ++epoch) {
+    dataset->shuffle(opt_ctx, idata_split);
+    result_train->reset();
+    result_val->reset();
+    fprintf(stderr, "%s: epoch %04" PRId64 "/%04" PRId64 ":\n", __func__, epoch, 100);
+    v_tensor_t inputs = opt_ctx->getInput();
+    v_tensor_t labels = opt_ctx->getLabels();
+    v_tensor_t data   = v_opt_dataset_datas(dataset);
+
+    V_ASSERT(data->ne[0] == inputs->ne[0]);
+
+    const int64_t ndata       = data->ne[1];
+    const int64_t ndata_batch = inputs->ne[1];
+    V_ASSERT(data->ne[1] % inputs->ne[1] == 0);
+    const int64_t nbatches = ndata / ndata_batch;
+    idata_split            = idata_split < 0 ? ndata : idata_split;
+
+    V_ASSERT(idata_split % ndata_batch == 0);
+    const int64_t ibatch_split = idata_split / ndata_batch;
+    int64_t batch_idx          = 0;
+    int64_t t_loop_start       = v_time_us();
+    for (; batch_idx < ibatch_split; ++batch_idx) {
+      opt_ctx->allocate(/*backward =*/ true);
+      dataset->get_batch(inputs, labels, batch_idx);
+      v_opt_evaluate(opt_ctx, result_train);
+      v_opt_epoch_callback_progress_bar(true,
+                                        opt_ctx,
+                                        dataset,
+                                        result_train,
+                                        batch_idx + 1,
+                                        ibatch_split,
+                                        t_loop_start);
+    }
+    t_loop_start = v_time_us();
+    for (; batch_idx < nbatches; ++batch_idx) {
+      opt_ctx->allocate(/*backward =*/ false);
+      dataset->get_batch(inputs, labels, batch_idx);
+      v_opt_evaluate(opt_ctx, result_val);
+      v_opt_epoch_callback_progress_bar(false,
+                                        opt_ctx,
+                                        dataset,
+                                        result_val,
+                                        batch_idx + 1,
+                                        ibatch_split,
+                                        t_loop_start);
+    }
+
+    fprintf(stderr, "\n");
+  }
+
+  opt_ctx->free();
+  result_train->reset();
+  result_val->reset();
   return 0;
 }

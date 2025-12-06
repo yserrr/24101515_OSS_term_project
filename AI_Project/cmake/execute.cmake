@@ -1,5 +1,5 @@
 file(GLOB SRC_FILES "source/test/*.cpp")
-
+#find_package(OpenMP REQUIRED)
 foreach (SRC ${SRC_FILES})
     get_filename_component(EXE_NAME ${SRC} NAME_WE)
     add_executable(${EXE_NAME} ${SRC})

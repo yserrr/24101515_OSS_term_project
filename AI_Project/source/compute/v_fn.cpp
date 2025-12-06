@@ -2,10 +2,10 @@
 #include "v-backend.h"
 #include "ggml-impl.h"
 #include "v_vk.h"
+#include "v_util.h"
 #include "v.h"
 
 void vk_host_buffer_memset_tensor(v_backend_buffer_t buffer, struct v_tensor* tensor, uint8_t value, size_t offset, size_t size);
-
 void v_backend_tensor_memset(struct v_tensor* tensor, uint8_t value, size_t offset, size_t size) {
   V_ASSERT(tensor);
   v_backend_buffer_t buf = tensor->view_src
@@ -27,7 +27,7 @@ void v_backend_tensor_memset(struct v_tensor* tensor, uint8_t value, size_t offs
 // else if there is no gradient for tensor, set the corresponding value
 // else, just add/subtract/etc. the gradients
 
-static void v_add_or_set(struct v_ctx* ctx,
+void v_add_or_set(struct v_ctx* ctx,
                          struct v_cgraph* cgraph,
                          size_t isrc,
                          struct v_tensor* tensor) {
@@ -39,7 +39,7 @@ static void v_add_or_set(struct v_ctx* ctx,
   v_build_foward_expand(cgraph, cgraph->grads[isrc]);
 }
 
-static void v_acc_or_set(
+ void v_acc_or_set(
   struct v_ctx* ctx,
   struct v_cgraph* cgraph,
   size_t isrc,
@@ -68,7 +68,7 @@ static void v_acc_or_set(
   v_build_foward_expand(cgraph, cgraph->grads[isrc]);
 }
 
-static void v_add1_or_set(
+ void v_add1_or_set(
   struct v_ctx* ctx,
   struct v_cgraph* cgraph,
   size_t isrc,
@@ -81,7 +81,7 @@ static void v_add1_or_set(
   v_build_foward_expand(cgraph, cgraph->grads[isrc]);
 }
 
-static void v_sub_or_set(
+ void v_sub_or_set(
   struct v_ctx* ctx,
   struct v_cgraph* cgraph,
   size_t isrc,

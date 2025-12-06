@@ -38,7 +38,7 @@ include_directories(
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/library.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/execute.cmake)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp")
 
 
 

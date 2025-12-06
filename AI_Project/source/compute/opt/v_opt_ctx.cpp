@@ -4,9 +4,10 @@
 #include "v_fn.h"
 #include "v_opt_dataset.hpp"
 #include "v_opt_result.hpp"
+#include "v_util.h"
 
 void v_opt_reset(v_opt_ctx* opt_ctx,
-                    bool optimizer) {
+                 bool optimizer) {
   if (optimizer) {
     v_graph_reset(opt_ctx->gb_opt);
     opt_ctx->iter = 1;
@@ -16,15 +17,15 @@ void v_opt_reset(v_opt_ctx* opt_ctx,
 
 
 v_tensor* v_map_tensor(std::map<v_tensor*, v_tensor*>& tensor_map,
-                     v_ctx* ctx,
-                     v_tensor* tensor) {
+                       v_ctx* ctx,
+                       v_tensor* tensor) {
   if (!tensor) { return nullptr; }
   if (tensor_map.find(tensor) != tensor_map.end()) { return tensor_map[tensor]; }
   v_tensor* new_tensor = v_dup_tensor(ctx, tensor);
   tensor_map[tensor]   = new_tensor;
 
   new_tensor->op = tensor->op;
-  for (int i = 0; i < MML_MAX_DIMS; i++) { new_tensor->nb[i] = tensor->nb[i]; }
+  for (int i = 0; i < V_MAX_DIMS; i++) { new_tensor->nb[i] = tensor->nb[i]; }
   new_tensor->flags = tensor->flags;
 
   memcpy(new_tensor->op_params,
@@ -40,8 +41,8 @@ v_tensor* v_map_tensor(std::map<v_tensor*, v_tensor*>& tensor_map,
   new_tensor->view_src  = v_map_tensor(tensor_map, ctx, tensor->view_src);
   for (int i = 0; i < v_MAX_SRC; i++) {
     new_tensor->src[i] = v_map_tensor(tensor_map,
-                                    ctx,
-                                    tensor->src[i]);
+                                      ctx,
+                                      tensor->src[i]);
   }
 
   return new_tensor;
@@ -210,28 +211,28 @@ void v_opt_epoch(v_opt_ctx* opt_ctx__,
                  v_opt_epoch_callback callback_train__,
                  v_opt_epoch_callback callback_eval__) {
   V_ASSERT((opt_ctx__)->isStaticGraph() && "v_opt_epoch requires static graphs");
-
-  struct v_tensor* inputs = opt_ctx__->getInput();
-  struct v_tensor* labels = opt_ctx__->getLabels();
-  struct v_tensor* data   = v_opt_dataset_datas(dataset__);
+  v_tensor_t inputs = opt_ctx__->getInput();
+  v_tensor_t labels = opt_ctx__->getLabels();
+  v_tensor_t data   = v_opt_dataset_datas(dataset__);
 
   V_ASSERT(data->ne[0] == inputs->ne[0]);
+
   const int64_t ndata       = data->ne[1];
   const int64_t ndata_batch = inputs->ne[1];
   V_ASSERT(data->ne[1] % inputs->ne[1] == 0);
   const int64_t nbatches = ndata / ndata_batch;
-  idata_split__          = idata_split__ < 0
-                    ? ndata
-                    : idata_split__;
+
+  idata_split__          = idata_split__ < 0 ? ndata : idata_split__;
+
   V_ASSERT(idata_split__ % ndata_batch == 0);
+
   const int64_t ibatch_split = idata_split__ / ndata_batch;
-  int64_t ibatch             = 0;
+  int64_t batch_idx             = 0;
   int64_t t_loop_start       = v_time_us();
-  for (; ibatch < ibatch_split; ++ibatch) {
+  for (; batch_idx < ibatch_split; ++batch_idx) {
     opt_ctx__->allocate(/*backward =*/ true);
-    dataset__->getBatch(inputs,
-                        labels,
-                        ibatch);
+
+    dataset__->get_batch(inputs,labels,batch_idx);
 
     v_opt_evaluate(opt_ctx__,
                    result_train__);
@@ -241,23 +242,15 @@ void v_opt_epoch(v_opt_ctx* opt_ctx__,
                        opt_ctx__,
                        dataset__,
                        result_train__,
-                       ibatch + 1,
+                       batch_idx + 1,
                        ibatch_split,
                        t_loop_start);
     }
-
-    //v_print_graph(opt_ctx->allocated_graph_copy);
-    //auto t = v_graph_node(opt_ctx__->allocated_graph_copy, -1);
-    ///v_print_tensor2d(t);
-    //v_print_tensor2d(opt_ctx->labels);
-    //if (opt_ctx__->outputs)v_print_tensor2d(opt_ctx__->outputs);
-    //if (opt_ctx__->pred) v_print_tensor2d(opt_ctx__->pred);
-    //if (opt_ctx->ncorrect)v_print_tensor2d(opt_ctx->ncorrect);
   }
   t_loop_start = v_time_us();
-  for (; ibatch < nbatches; ++ibatch) {
+  for (; batch_idx < nbatches; ++batch_idx) {
     opt_ctx__->allocate(/*backward =*/ false);
-    dataset__->getBatch(inputs, labels, ibatch);
+    dataset__->get_batch(inputs, labels, batch_idx);
     v_opt_evaluate(opt_ctx__,
                    result_eval__);
     if (callback_eval__) {
@@ -265,7 +258,7 @@ void v_opt_epoch(v_opt_ctx* opt_ctx__,
                       opt_ctx__,
                       dataset__,
                       result_eval__,
-                      ibatch + 1 - ibatch_split,
+                      batch_idx + 1 - ibatch_split,
                       nbatches - ibatch_split,
                       t_loop_start);
     }
@@ -276,7 +269,7 @@ void v_opt_epoch_callback_progress_bar(bool train,
                                        v_opt_ctx* opt_ctx,
                                        v_opt_data_set_t dataset,
                                        v_opt_result_t result,
-                                       int64_t ibatch,
+                                       int64_t batch_idx,
                                        int64_t ibatch_max,
                                        int64_t t_start_us) {
   fprintf(stderr, "%s[", train
@@ -284,7 +277,7 @@ void v_opt_epoch_callback_progress_bar(bool train,
                            : "val:   ");
   // The progress bar consists of partially filled blocks, unicode has 8 separate fill levels.
   constexpr int64_t bar_length = 8;
-  const int64_t ibatch8        = 8 * ibatch;
+  const int64_t ibatch8        = 8 * batch_idx;
   for (int64_t j = 0; j < bar_length; ++j) {
     if (ibatch_max * (8 * j + 8) / bar_length < ibatch8) fprintf(stderr, "\u2588"); // full block
     else if (ibatch_max * (8 * j + 7) / bar_length < ibatch8) fprintf(stderr, "\u2589"); // 7/8 filled
@@ -298,7 +291,7 @@ void v_opt_epoch_callback_progress_bar(bool train,
   }
 
   const int64_t batch_size = (opt_ctx)->getInput()->ne[1];
-  const int64_t idata      = ibatch * batch_size;
+  const int64_t idata      = batch_idx * batch_size;
   const int64_t idata_max  = ibatch_max * batch_size;
 
   double loss;
@@ -317,7 +310,7 @@ void v_opt_epoch_callback_progress_bar(bool train,
   const int64_t t_ibatch_m = t_ibatch_s / 60;
   t_ibatch_s -= t_ibatch_m * 60;
 
-  const int64_t t_eta_us = t_ibatch_us * (ibatch_max - ibatch) / ibatch;
+  const int64_t t_eta_us = t_ibatch_us * (ibatch_max - batch_idx) / batch_idx;
   int64_t t_eta_s        = t_eta_us / 1000000;
   const int64_t t_eta_h  = t_eta_s / 3600;
   t_eta_s -= t_eta_h * 3600;
@@ -340,7 +333,7 @@ void v_opt_epoch_callback_progress_bar(bool train,
           t_eta_m,
           t_eta_s);
 
-  if (ibatch == ibatch_max) fprintf(stderr, "\n");
+  if (batch_idx == ibatch_max) fprintf(stderr, "\n");
   fflush(stderr);
 
   v_UNUSED(dataset);
@@ -373,15 +366,16 @@ void v_opt_fit(v_backend_sched_t backend_sched,
   // train <-> val split index (physical)
   const int64_t idata_split = ibatch_split * nbatch_physical;
   int64_t epoch             = 1;
-  v_opt_struct params       = v_opt_default_params(backend_sched, loss_type);
-  params.ctx_compute        = ctx_compute;
-  params.inputs             = inputs;
-  params.outputs            = outputs;
-  params.opt_period         = opt_period;
-  params.get_opt_pars       = get_opt_pars;
-  params.get_opt_pars_ud    = &epoch;
-  params.optimizer          = optimizer;
-  v_opt_ctx* opt_ctx        = v_opt_init(params);
+
+  v_opt_struct params    = v_opt_default_params(backend_sched, loss_type);
+  params.ctx_compute     = ctx_compute;
+  params.inputs          = inputs;
+  params.outputs         = outputs;
+  params.opt_period      = opt_period;
+  params.get_opt_pars    = get_opt_pars;
+  params.get_opt_pars_ud = &epoch;
+  params.optimizer       = optimizer;
+  v_opt_ctx* opt_ctx     = v_opt_init(params);
 
   if (nbatch_logical < ndata) dataset->shuffle(opt_ctx, -1);
 
@@ -691,7 +685,7 @@ void v_opt_ctx::build() {
     opt_ctx->grad_accs.resize(n_nodes);
     for (int i = 0; i < n_nodes; ++i) {
       v_tensor* node = opt_ctx->gf->nodes[i];
-      if ((accumulate && (node->flags & TENSOR_FLAG_PARAM)) || (node->flags & TENSOR_FLAG_LOSS)) { opt_ctx->grad_accs[i] = v_new_tensor(opt_ctx->ctx_static, v_TYPE_F32, MML_MAX_DIMS, node->ne); }
+      if ((accumulate && (node->flags & TENSOR_FLAG_PARAM)) || (node->flags & TENSOR_FLAG_LOSS)) { opt_ctx->grad_accs[i] = v_new_tensor(opt_ctx->ctx_static, v_TYPE_F32, V_MAX_DIMS, node->ne); }
       else { opt_ctx->grad_accs[i] = nullptr; }
     }
 
@@ -701,8 +695,8 @@ void v_opt_ctx::build() {
       for (int i = 0; i < n_nodes; ++i) {
         v_tensor* node = opt_ctx->gf->nodes[i];
         if (node->flags & TENSOR_FLAG_PARAM) {
-          opt_ctx->grad_m[i] = v_new_tensor(opt_ctx->ctx_static, v_TYPE_F32, MML_MAX_DIMS, node->ne);
-          opt_ctx->grad_v[i] = v_new_tensor(opt_ctx->ctx_static, v_TYPE_F32, MML_MAX_DIMS, node->ne);
+          opt_ctx->grad_m[i] = v_new_tensor(opt_ctx->ctx_static, v_TYPE_F32, V_MAX_DIMS, node->ne);
+          opt_ctx->grad_v[i] = v_new_tensor(opt_ctx->ctx_static, v_TYPE_F32, V_MAX_DIMS, node->ne);
         }
         else {
           opt_ctx->grad_m[i] = nullptr;

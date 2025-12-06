@@ -27,7 +27,7 @@ struct v_opt_dataset
     return ndata__;
   }
 
-  void getBatch(struct v_tensor* data_batch,
+  void get_batch(struct v_tensor* data_batch,
                 struct v_tensor* labels_batch,
                 int64_t ibatch);
   struct v_tensor* getDataset()

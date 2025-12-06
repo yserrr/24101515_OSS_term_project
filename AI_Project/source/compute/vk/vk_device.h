@@ -2,9 +2,32 @@
 #define LLAMA_CPP_VK_DEVICE_H
 #include <mutex>
 #include <map>
-#include "vk_op.h"
-#include "vk_pipeline.h"
+#include "vk_config.h"
 #include "vk_queue.h"
+#include "vk_pipeline.h"
+enum vk_device_architecture {
+  OTHER,
+  AMD_GCN,
+  AMD_RDNA1,
+  AMD_RDNA2,
+  AMD_RDNA3,
+  INTEL_XE2,
+  NVIDIA_PRE_TURING,
+};
+
+vk_device_architecture get_device_architecture(const vk::PhysicalDevice& device);
+void vk_load_shaders(vk_device& device);
+void vk_instance_init();
+vk_device v_vk_get_device(size_t idx);
+void vk_init(vk_backend_ctx* ctx, size_t idx);
+bool vk_khr_cooperative_matrix_support(const vk::PhysicalDeviceProperties& props,
+                                         const vk::PhysicalDeviceDriverProperties& driver_props,
+                                            vk_device_architecture arch);
+
+vk_buffer v_vk_create_buffer_device(vk_device& device, size_t size) ;
+int v_vk_get_device_count();
+
+void v_vk_get_device_description(int device, char* description, size_t description_size);
 
 struct vk_fa_pipeline_state
 {
@@ -143,6 +166,7 @@ private:
   std::map<std::string, std::vector<uint64_t>> timings;
   std::map<std::string, std::vector<uint64_t>> flops;
 };
+
 
 
 struct vk_device_struct
@@ -383,16 +407,19 @@ struct vk_device_struct
   ~vk_device_struct();
 };
 
-vk_device_architecture get_device_architecture(const vk::PhysicalDevice& device);
-void vk_load_shaders(vk_device& device);
-void vk_instance_init();
-vk_device v_vk_get_device(size_t idx);
-void vk_init(vk_backend_ctx* ctx, size_t idx);
 
+// GPU architecture identifier.
+// Mapping of pipeline names to their specific subgroup sizes.
+// Example: {"soft_max_f32", 64}
+// Default subgroup size for this GPU.
+// Defaults to 0 if not explicitly provided.
+struct GpuPipelineConfig {
+  vk_device_architecture arch;
+  std::unordered_map<std::string, uint32_t> pipelines;
+  uint32_t default_subgroup_size = 0;
+};
 
-bool vk_khr_cooperative_matrix_support(const vk::PhysicalDeviceProperties& props,
-                                            const vk::PhysicalDeviceDriverProperties& driver_props,
-                                            vk_device_architecture arch);
+extern std::vector<GpuPipelineConfig> gpu_pipeline_configs;
 
 
 #endif //LLAMA_CPP_VK_DEVICE_H

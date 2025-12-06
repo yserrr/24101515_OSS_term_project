@@ -2,6 +2,8 @@
 #define MYPROJECT_VK_COMMON_H
 #include "v_vk.h"
 #include <vulkan/vulkan_core.h>
+using v_tensor_t = v_tensor*;
+
 #if defined(v_VULKAN_RUN_TESTS) || defined(v_VULKAN_CHECK_RESULTS)
 #include <chrono>
 #endif
@@ -139,11 +141,11 @@ struct vk_buffer_struct;
 struct vk_pipeline_struct;
 
 struct vk_queue;
-struct MmlCommandPool;
+struct vk_command_pool;
 struct vk_backend_ctx;
 
-struct MmlVkSemaphore;
-struct MmlVkSummition;
+struct vk_semaphore;
+struct vk_summition;
 
 struct vk_context_struct;
 struct v_vk_garbage_collector;
@@ -151,10 +153,14 @@ struct v_vk_garbage_collector;
 struct vk_matmul_pipeline_struct;
 struct vk_matmul_pipeline2_struct;
 
+using vk_pipeline     = std::shared_ptr<vk_pipeline_struct>;
+using vk_pipeline_ref = std::weak_ptr<vk_pipeline_struct>;
+using vk_matmul_pipeline = std::shared_ptr<vk_matmul_pipeline_struct>;
+
 typedef std::shared_ptr<vk_context_struct> vk_context;
 typedef std::weak_ptr<vk_context_struct> vk_context_ref;
 
-typedef std::vector<MmlVkSummition> vk_sequence;
+typedef std::vector<vk_summition> vk_sequence;
 typedef std::shared_ptr<vk_device_struct> vk_device;
 typedef std::weak_ptr<vk_device_struct> vk_device_ref;
 
@@ -201,6 +207,15 @@ struct vk_op_conv_transpose_2d_push_constants;
 struct vk_op_conv2d_dw_push_constants;
 struct vk_op_upscale_push_constants;
 struct vk_op_sum_rows_push_constants;
+
+VkDeviceSize v_vk_get_max_buffer_range(const vk_backend_ctx* ctx, const vk_buffer& buf, const VkDeviceSize offset);
+void vk_buffer_memset_async(vk_context& ctx, vk_buffer& dst, size_t offset, uint32_t c, size_t size);
+void init_fastdiv_values(uint32_t d, uint32_t& mp, uint32_t& L);
+
+uint32_t get_misalign_bytes(vk_backend_ctx* ctx, const v_tensor* t);
+
+void* const vk_ptr_base = (void*)(uintptr_t)0x1000; // NOLINT
+
 
 //// number of rows/cols for flash attention shader
 //constexpr uint32_t flash_attention_num_small_rows = 32;

@@ -1,7 +1,7 @@
 #include "v_vision.hpp"
 #include "ggml-impl.h"
 #include "vk_common.h"
-
+#include "vk_util.h"
 static int64_t v_calc_conv_output_size(int64_t ins, int64_t ks, int s, int p, int d) {
   return (ins + 2 * p - d * (ks - 1) - 1) / s + 1;
 }
@@ -298,7 +298,7 @@ struct v_tensor* v_conv_2d_dw_direct(
   if (v_is_contiguous_channels(b)) {
     // Result will be permuted the same way as input (CWHN order)
     const int64_t type_size = v_type_size(result->type);
-    V_ASSERT(blockSize(result->type) == 1);
+    V_ASSERT(block_size(result->type) == 1);
     result->nb[0] = result->ne[2] * type_size;
     result->nb[1] = result->ne[0] * result->nb[0];
     result->nb[2] = type_size;

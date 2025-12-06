@@ -1,11 +1,8 @@
-#pragma once
 /// All code is adapted from ggml for educational purposes.(study, clone coding)
 /// Core code under license is sourced from ggml (https://github.com/ggerganov/ggml)
 
-
+#pragma once
 #define v_API extern
-
-// TODO: support for clang
 #ifdef __GNUC__
 #    define v_DEPRECATED(func, hint) func __attribute__((deprecated(hint)))
 #elif defined(_MSC_VER)
@@ -361,7 +358,7 @@ v_API int64_t v_nrows(const struct v_tensor* tensor);
 v_API size_t num_bytes(const struct v_tensor* tensor);
 v_API size_t v_nbytes_pad(const struct v_tensor* tensor); // same as v_nbytes() but padded to v_MEM_ALIGN
 
-v_API int64_t blockSize(enum v_data_type type);
+v_API int64_t block_size(enum v_data_type type);
 v_API size_t v_type_size(enum v_data_type type); // size in bytes for all elements in a block
 v_API size_t v_row_size(enum v_data_type type, int64_t ne); // size in bytes for all elements in a row
 
@@ -454,7 +451,7 @@ v_API struct v_tensor* v_new_tensor_3d(
   int64_t ne1,
   int64_t ne2);
 
-v_API struct v_tensor* v_new_tensor_4d(
+v_API v_tensor* v_new_tensor_4d(
   struct v_ctx* ctx,
   enum v_data_type type,
   int64_t ne0,

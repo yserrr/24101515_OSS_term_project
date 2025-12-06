@@ -1,0 +1,70 @@
+#ifndef MYPROJECT_VK_COMP_HPP
+#define MYPROJECT_VK_COMP_HPP
+#include "vk_common.h"
+#include "vk_buffer.h"
+#include "v_util.h"
+#include "v_vk.h"
+bool v_vk_compute_forward(vk_backend_ctx* ctx, v_cgraph* cgraph, v_tensor* tensor, int tensor_idx, bool use_fence, bool almost_ready);
+bool vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx, v_tensor* node_begin, int node_idx_begin, bool dryrun, bool last_node, bool almost_ready, bool submit);
+void v_vk_opt_step_adamw(vk_backend_ctx* ctx, vk_context& subctx, v_tensor* dst, bool dryrun = false);
+void v_vk_opt_step_sgd(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, const v_tensor* src2, v_tensor* dst, bool dryrun = false);
+void v_vk_concat(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, v_tensor* dst, bool dryrun = false);
+void v_vk_upscale(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_scale(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_sqr(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_sqrt(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_sin(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_cos(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_clamp(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_pad(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_roll(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_repeat(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_repeat_back(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_cpy(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_set_rows(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, v_tensor* dst, bool dryrun = false);
+void v_vk_silu_back(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, v_tensor* dst, bool dryrun = false);
+void v_vk_norm(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_group_norm(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+uint32_t v_vk_rms_num_partials(vk_backend_ctx* ctx, const v_tensor* node);
+uint32_t v_vk_rms_partials_size(vk_backend_ctx* ctx, const v_tensor* node);
+void v_vk_rms_norm(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, v_tensor* dst, float* op_params, bool dryrun = false);
+void v_vk_rms_norm_back(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, v_tensor* dst, bool dryrun = false);
+void v_vk_l2_norm(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_unary(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_glu(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, v_tensor* dst, bool dryrun = false);
+void v_vk_diag_mask_inf(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_soft_max(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, const v_tensor* src2, v_tensor* dst, bool dryrun = false);
+void v_vk_soft_max_back(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, v_tensor* dst, bool dryrun = false);
+void v_vk_topk_moe(vk_backend_ctx* ctx, vk_context& subctx, v_cgraph* cgraph, int node_idx, bool dryrun = false);
+void v_vk_rope(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, const v_tensor* src2, v_tensor* dst, bool backprop, bool dryrun = false);
+void v_vk_argsort(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_sum(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_sum_rows(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_mean(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_argmax(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_count_equal(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, v_tensor* dst, bool dryrun = false);
+void v_vk_timestep_embedding(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_conv_transpose_1d(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, v_tensor* dst, bool dryrun = false);
+void v_vk_leaky_relu(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun = false);
+void v_vk_get_rows(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, v_tensor* dst, bool dryrun = false);
+void v_vk_acc(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, v_tensor* dst, bool dryrun = false);
+void v_vk_add(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, v_tensor* dst, bool dryrun = false);
+void v_vk_sub(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, v_tensor* dst, bool dryrun = false);
+void v_vk_multi_add(vk_backend_ctx* ctx, vk_context& subctx, v_cgraph* cgraph, int node_idx, bool dryrun = false);
+void v_vk_mul(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, v_tensor* dst, bool dryrun = false);
+void v_vk_div(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, v_tensor* dst, bool dryrun = false);
+void v_vk_add_id(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, const v_tensor* src2, v_tensor* dst, bool dryrun = false);
+void v_vk_mul_mat(vk_backend_ctx* ctx, vk_context& subctx, v_tensor* src0, v_tensor* src1, v_tensor* dst, bool dryrun = false);
+void v_vk_mul_mat_id(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, const v_tensor* src2, v_tensor* dst, bool dryrun = false);
+void v_vk_flash_attn(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* q, const v_tensor* k, const v_tensor* v, const v_tensor* mask, const v_tensor* sinks, v_tensor* dst, bool dryrun = false);
+void v_vk_rwkv_wkv6(vk_backend_ctx* ctx, vk_context& subctx, v_tensor* dst, bool dryrun = false);
+void v_vk_rwkv_wkv7(vk_backend_ctx* ctx, vk_context& subctx, v_tensor* dst, bool dryrun = false);
+void v_vk_ssm_scan(vk_backend_ctx* ctx, vk_context& subctx, v_tensor* dst, bool dryrun = false);
+uint32_t v_vk_fuse_multi_add(vk_backend_ctx* ctx, const struct v_cgraph* cgraph, int node_idx);
+void v_vk_mul_mat_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, v_tensor* dst, bool disable_split_k, bool dryrun);
+void v_vk_cpy_to_contiguous(vk_backend_ctx* ctx, vk_context& subctx, vk_pipeline pipeline, const v_tensor* tensor, vk_sub_buffer&& in, vk_sub_buffer&& out);
+vk_pipeline v_vk_get_cpy_pipeline(vk_backend_ctx* ctx, const v_tensor* src, const v_tensor* dst, v_data_type to);
+void v_vk_flash_attn(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* q, const v_tensor* k, const v_tensor* v, const v_tensor* mask, const v_tensor* sinks, v_tensor* dst, bool dryrun);
+bool v_vk_flash_attn_coopmat_shmem_support(const vk_device& device, const uint32_t hsk, uint32_t hsv, bool f32acc);
+bool v_vk_flash_attn_scalar_shmem_support(const vk_device& device, const uint32_t hsk, uint32_t hsv);
+#endif //MYPROJECT_VK_COMP_HPP

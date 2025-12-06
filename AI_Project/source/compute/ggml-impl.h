@@ -63,7 +63,7 @@ static bool v_is_same_layout(const struct v_tensor* a, const struct v_tensor* b)
   {
     return false;
   }
-  for (int i = 0; i < MML_MAX_DIMS; i++)
+  for (int i = 0; i < V_MAX_DIMS; i++)
   {
     if (a->ne[i] != b->ne[i])
     {

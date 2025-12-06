@@ -1,19 +1,18 @@
 #include "v_opt_dataset.hpp"
 #include "v_opt_ctx.hpp"
-
 v_opt_data_set_t v_opt_dataset_init(enum v_data_type type_data__,
-                                   enum v_data_type type_label__,
-                                   int64_t ne_datapoint__,
-                                   int64_t ne_label__,
-                                   int64_t ndata__,
-                                   int64_t ndata_shard__) {
+                                    enum v_data_type type_label__,
+                                    int64_t ne_datapoint__,
+                                    int64_t ne_label__,
+                                    int64_t ndata__,
+                                    int64_t ndata_shard__) {
   V_ASSERT(ne_datapoint__ > 0);
   V_ASSERT(ne_label__ >= 0);
   V_ASSERT(ndata__ > 0);
   V_ASSERT(ndata_shard__ > 0);
   v_opt_data_set_t result = new v_opt_dataset;
-  result->ndata__        = ndata__;
-  result->ndata_shard    = ndata_shard__;
+  result->ndata__         = ndata__;
+  result->ndata_shard     = ndata_shard__;
   {
     struct v_init_param params = {
       .mem_size = 2 * v_tensor_over_head(),
@@ -28,7 +27,6 @@ v_opt_data_set_t v_opt_dataset_init(enum v_data_type type_data__,
                                  ndata__);
 
   result->nbs_data = num_bytes(result->data) * ndata_shard__ / ndata__;
-
   if (ne_label__ > 0) {
     result->labels = v_new_tensor_2d(result->ctx,
                                      type_label__,
@@ -84,16 +82,13 @@ void v_opt_dataset::shuffle(v_opt_ctx* ctx, int64_t idata) {
                  ctx->rng);
     return;
   }
-  V_ASSERT(idata % ndata_shard == 0);
-  const int64_t ishard_max = idata / ndata_shard;
   std::shuffle(permutation.begin(),
-               permutation.begin() + ishard_max,
+               permutation.begin() + idata,
                ctx->rng);
 }
 
-void v_opt_dataset::getBatch(struct v_tensor* data_batch, struct v_tensor* labels_batch, int64_t ibatch) {
+void v_opt_dataset::get_batch(v_tensor* data_batch, v_tensor* labels_batch, int64_t ibatch) {
   auto dataset = this;
-
   V_ASSERT(data_batch && v_is_contiguous(data_batch));
   V_ASSERT(!labels_batch || v_is_contiguous(labels_batch));
   V_ASSERT((labels_batch == nullptr) == (dataset->labels == nullptr));
@@ -110,7 +105,6 @@ void v_opt_dataset::getBatch(struct v_tensor* data_batch, struct v_tensor* label
   V_ASSERT((ibatch + 1) * shards_per_batch <= int64_t(dataset->permutation.size()));
   for (int64_t ishard_batch = 0; ishard_batch < shards_per_batch; ++ishard_batch) {
     const int64_t ishard = dataset->permutation[ibatch * shards_per_batch + ishard_batch];
-
     const char* ptr_data = (const char*)dataset->data->data + ishard * dataset->nbs_data;
     v_set_backend_tensor(data_batch,
                          ptr_data,

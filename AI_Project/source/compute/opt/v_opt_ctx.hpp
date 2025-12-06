@@ -70,7 +70,6 @@ struct v_opt_ctx {
       return "undefined";
     };
   }
-
   void free() {
     v_backend_buffer_free(this->buf_static);
     v_backend_buffer_free(this->buf_host);

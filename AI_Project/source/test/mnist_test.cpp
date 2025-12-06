@@ -119,7 +119,7 @@ int main()
   auto loader           = DataLoader(
     mnist_train,
     py::arg("batch_size") = 1,
-    py::arg("shuffle")    = false
+    py::arg("shuffle")    = true
   );
 
   std::vector<std::vector<float>> images;
@@ -230,81 +230,19 @@ int main()
                                 fc1),
                        model.fc2_bias);
 
-  const int64_t ndata      = v_opt_dataset_datas(dataset)->ne[1];
+  v_opt_fit(model.backend_sched,
+            model.ctx_compute,
+            model.images,
+            model.logits,
+            dataset,
+            V_OPT_LOSS_CROSS_ENTROPY,
+            V_OPTIMIZER_TYPE_ADAMW,
+            v_opt_get_default_optimizer_params,
+            1000,
+            model.nbatch_logical,
+            0.05f,
+            false);
 
-  const int64_t nbatch_physical  = model.images->ne[1];
-  const int64_t opt_period       = model.nbatch_logical / nbatch_physical;
-  const int64_t nbatches_logical = ndata / model.nbatch_logical;
-  const int64_t ibatch_split     = int64_t(((1.0f - 0.05) * nbatches_logical)) * opt_period;
-  int64_t idata_split            = ibatch_split * nbatch_physical;
-  int64_t epoch                  = 1;
-
-  v_opt_struct loss_parmas    = v_opt_default_params(backend_sched, V_OPT_LOSS_CROSS_ENTROPY);
-  loss_parmas.ctx_compute     = model.ctx_compute;
-  loss_parmas.inputs          = model.images;
-  loss_parmas.outputs         = model.logits;
-  loss_parmas.opt_period      = opt_period;
-  loss_parmas.get_opt_pars    = v_opt_get_default_optimizer_params;
-  loss_parmas.get_opt_pars_ud = &epoch;
-  loss_parmas.optimizer       = V_OPTIMIZER_TYPE_ADAMW;
-  v_opt_ctx* opt_ctx          = v_opt_init(loss_parmas);
-
-  dataset->shuffle(opt_ctx, -1);
-
-  v_opt_result_t result_train = v_opt_result_init();
-  v_opt_result_t result_val   = v_opt_result_init();
-  for (; epoch <= 10000; ++epoch) {
-    dataset->shuffle(opt_ctx, idata_split);
-    result_train->reset();
-    result_val->reset();
-    fprintf(stderr, "%s: epoch %04" PRId64 "/%04" PRId64 ":\n", __func__, epoch, 100);
-    v_tensor_t inputs = opt_ctx->getInput();
-    v_tensor_t labels = opt_ctx->getLabels();
-    v_tensor_t data   = v_opt_dataset_datas(dataset);
-
-    V_ASSERT(data->ne[0] == inputs->ne[0]);
-
-    const int64_t ndata       = data->ne[1];
-    const int64_t ndata_batch = inputs->ne[1];
-    V_ASSERT(data->ne[1] % inputs->ne[1] == 0);
-    const int64_t nbatches = ndata / ndata_batch;
-    idata_split            = idata_split < 0 ? ndata : idata_split;
-
-    V_ASSERT(idata_split % ndata_batch == 0);
-    const int64_t ibatch_split = idata_split / ndata_batch;
-    int64_t batch_idx          = 0;
-    int64_t t_loop_start       = v_time_us();
-    for (; batch_idx < ibatch_split; ++batch_idx) {
-      opt_ctx->allocate(/*backward =*/ true);
-      dataset->get_batch(inputs, labels, batch_idx);
-      v_opt_evaluate(opt_ctx, result_train);
-      v_opt_epoch_callback_progress_bar(true,
-                                        opt_ctx,
-                                        dataset,
-                                        result_train,
-                                        batch_idx + 1,
-                                        ibatch_split,
-                                        t_loop_start);
-    }
-    t_loop_start = v_time_us();
-    for (; batch_idx < nbatches; ++batch_idx) {
-      opt_ctx->allocate(/*backward =*/ false);
-      dataset->get_batch(inputs, labels, batch_idx);
-      v_opt_evaluate(opt_ctx, result_val);
-      v_opt_epoch_callback_progress_bar(false ,
-                                        opt_ctx,
-                                        dataset,
-                                        result_val,
-                                        batch_idx + 1,
-                                        ibatch_split,
-                                        t_loop_start);
-    }
-
-    fprintf(stderr, "\n");
-  }
-
-  opt_ctx->free();
-  result_train->reset();
-  result_val->reset();
-
+  ///not impled yet
+  ///
 }

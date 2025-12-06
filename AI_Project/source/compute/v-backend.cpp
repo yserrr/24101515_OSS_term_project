@@ -20,7 +20,6 @@
 
 #include "v_vk.h"
 const char* vk_host_buffer_name(v_backend_buffer_type_t buft);
-
 const char* v_get_backend_buffer_name(v_backend_buffer_type_t buft) {
   V_ASSERT(buft);
   return buft->host

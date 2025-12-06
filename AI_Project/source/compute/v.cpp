@@ -1,6 +1,5 @@
 #define _CRT_SECURE_NO_DEPRECATE // Disables "unsafe" warnings on Windows
 #define _USE_MATH_DEFINES // For M_PI on MSVC
-
 #include "v-backend.h"
 #include "ggml-impl.h"
 #include "v.h"
@@ -11,7 +10,6 @@
 
 #include "v_quants.h"
 #include "v_util.h"
-
 #if defined(_MSC_VER) || defined(__MINGW32__)
 #include <malloc.h> // using malloc.h with MSC/MINGW
 #elif !defined(__FreeBSD__) && !defined(__NetBSD__) && !defined(__OpenBSD__)
@@ -530,7 +528,6 @@ static wchar_t* v_mbstowcs(const char* mbs) {
 FILE* v_fopen(const char* fname, const char* mode) {
   #ifdef _WIN32
   FILE* file = NULL;
-
   // convert fname (UTF-8)
   wchar_t* wfname = v_mbstowcs(fname);
   if (wfname) {
@@ -548,7 +545,6 @@ FILE* v_fopen(const char* fname, const char* mode) {
     v_FREE(wfname);
     v_FREE(wmode);
   }
-
   return file;
   #else
   return fopen(fname, mode);
@@ -556,19 +552,9 @@ FILE* v_fopen(const char* fname, const char* mode) {
 }
 
 
-//
-// data types
-//
-
-
 static_assert(v_OP_COUNT == 90, "v_OP_COUNT != 90");
 static_assert(v_OP_POOL_COUNT == 2, "v_OP_POOL_COUNT != 2");
-// static_assert(v_UNARY_OP_COUNT == 20, "v_UNARY_OP_COUNT != 20");
-
-
 static_assert(v_GLU_OP_COUNT == 6, "v_GLU_OP_COUNT != 6");
-
-
 static_assert(sizeof(struct v_object) % v_MEM_ALIGN == 0,
               "v_object size must be a multiple of v_MEM_ALIGN");
 static_assert(sizeof(struct v_tensor) % v_MEM_ALIGN == 0,
@@ -593,23 +579,23 @@ size_t v_graph_overhead_custom(size_t size, bool grads) {
 
 
 size_t num_bytes(const struct v_tensor* tensor) {
-  for (int i = 0; i < MML_MAX_DIMS; ++i) {
+  for (int i = 0; i < V_MAX_DIMS; ++i) {
     if (tensor->ne[i] <= 0) {
       return 0;
     }
   }
 
   size_t nbytes;
-  const size_t blck_size = blockSize(tensor->type);
+  const size_t blck_size = block_size(tensor->type);
   if (blck_size == 1) {
     nbytes = v_type_size(tensor->type);
-    for (int i = 0; i < MML_MAX_DIMS; ++i) {
+    for (int i = 0; i < V_MAX_DIMS; ++i) {
       nbytes += (tensor->ne[i] - 1) * tensor->nb[i];
     }
   }
   else {
     nbytes = tensor->ne[0] * tensor->nb[0] / blck_size;
-    for (int i = 1; i < MML_MAX_DIMS; ++i) {
+    for (int i = 1; i < V_MAX_DIMS; ++i) {
       nbytes += (tensor->ne[i] - 1) * tensor->nb[i];
     }
   }
@@ -623,8 +609,8 @@ size_t v_nbytes_pad(const struct v_tensor* tensor) {
 
 
 size_t v_row_size(enum v_data_type type, int64_t ne) {
-  assert(ne % blockSize(type) == 0);
-  return v_type_size(type) * ne / blockSize(type);
+  assert(ne % block_size(type) == 0);
+  return v_type_size(type) * ne / block_size(type);
 }
 
 
@@ -648,11 +634,11 @@ size_t v_tensor_over_head(void) {
 
 bool v_is_contiguous_n(const struct v_tensor* tensor, int n) {
   size_t next_nb = v_type_size(tensor->type);
-  if (tensor->ne[0] != blockSize(tensor->type) && tensor->nb[0] != next_nb) {
+  if (tensor->ne[0] != block_size(tensor->type) && tensor->nb[0] != next_nb) {
     return false;
   }
-  next_nb *= tensor->ne[0] / blockSize(tensor->type);
-  for (int i = 1; i < MML_MAX_DIMS; i++) {
+  next_nb *= tensor->ne[0] / block_size(tensor->type);
+  for (int i = 1; i < V_MAX_DIMS; i++) {
     if (tensor->ne[i] != 1) {
       if (i > n) {
         if (tensor->nb[i] != next_nb) {
@@ -671,7 +657,7 @@ bool v_is_contiguous_n(const struct v_tensor* tensor, int n) {
 
 
 bool is_empty(const struct v_tensor* tensor) {
-  for (int i = 0; i < MML_MAX_DIMS; ++i) {
+  for (int i = 0; i < V_MAX_DIMS; ++i) {
     if (tensor->ne[i] == 0) {
       // empty if any dimension has no elements
       return true;
@@ -691,7 +677,7 @@ struct v_tensor* new_tensor_impl(struct v_ctx* ctx,
                                  struct v_tensor* view_src,
                                  size_t view_offs) {
   V_ASSERT(type >= 0 && type < v_TYPE_COUNT);
-  V_ASSERT(n_dims >= 1 && n_dims <= MML_MAX_DIMS);
+  V_ASSERT(n_dims >= 1 && n_dims <= V_MAX_DIMS);
   // find the base tensor and absolute offset
   if (view_src != nullptr && view_src->view_src != nullptr) {
     view_offs += view_src->view_offs;
@@ -751,8 +737,8 @@ struct v_tensor* new_tensor_impl(struct v_ctx* ctx,
     result->ne[i] = ne[i];
   }
   result->nb[0] = v_type_size(type);
-  result->nb[1] = result->nb[0] * (result->ne[0] / blockSize(type));
-  for (int i = 2; i < MML_MAX_DIMS; i++) {
+  result->nb[1] = result->nb[0] * (result->ne[0] / block_size(type));
+  for (int i = 2; i < V_MAX_DIMS; i++) {
     result->nb[i] = result->nb[i - 1] * result->ne[i - 1];
   }
   ctx->n_objects++;
@@ -804,9 +790,9 @@ struct v_tensor* v_format_name(struct v_tensor* tensor, const char* fmt, ...) {
 
 struct v_tensor* v_tensor_view(struct v_ctx* ctx,
                                struct v_tensor* src) {
-  struct v_tensor* result = new_tensor_impl(ctx, src->type, MML_MAX_DIMS, src->ne, src, 0);
+  struct v_tensor* result = new_tensor_impl(ctx, src->type, V_MAX_DIMS, src->ne, src, 0);
   v_format_name(result, "%s (view)", src->name);
-  for (int i = 0; i < MML_MAX_DIMS; i++) {
+  for (int i = 0; i < V_MAX_DIMS; i++) {
     result->nb[i] = src->nb[i];
   }
   return result;
@@ -964,7 +950,7 @@ struct v_tensor* v_reshape(
   // as only the shape of b is relevant, and not its memory layout, b is allowed to be non contiguous.
   V_ASSERT(nelements(a) == nelements(b));
 
-  struct v_tensor* result = new_tensor_impl(ctx, a->type, MML_MAX_DIMS, b->ne, a, 0);
+  struct v_tensor* result = new_tensor_impl(ctx, a->type, V_MAX_DIMS, b->ne, a, 0);
   v_format_name(result, "%s (reshaped)", a->name);
 
   result->op     = v_OP_RESHAPE;
@@ -1873,7 +1859,7 @@ struct v_tensor* v_argsort(struct v_ctx* ctx,
                            struct v_tensor* a,
                            enum v_sort_order order) {
   V_ASSERT(a->ne[0] <= INT32_MAX);
-  struct v_tensor* result = v_new_tensor(ctx, v_TYPE_I32, MML_MAX_DIMS, a->ne);
+  struct v_tensor* result = v_new_tensor(ctx, v_TYPE_I32, V_MAX_DIMS, a->ne);
   v_set_op_params_i32(result, 0, (int32_t)order);
   result->op     = v_OP_ARGSORT;
   result->src[0] = a;
@@ -2023,7 +2009,7 @@ struct v_tensor* v_flash_attn_back(struct v_ctx* ctx,
   const int64_t elem_v = nelements(v);
 
   enum v_data_type result_type = v_TYPE_F32;
-  V_ASSERT(blockSize(result_type) == 1);
+  V_ASSERT(block_size(result_type) == 1);
   const size_t tsize = v_type_size(result_type);
 
   const size_t offs_q = 0;
@@ -2640,21 +2626,21 @@ size_t v_hash_size(size_t min_sz) {
 }
 
 
-static struct hash_map* v_new_hash_map(size_t size) {
+struct hash_map* v_new_hash_map(size_t size) {
   struct hash_map* result = (struct hash_map*)v_MALLOC(sizeof(struct hash_map));
   result->set             = v_hash_set_new(size);
   result->vals            = (struct v_tensor**)v_CALLOC(result->set.size, sizeof(struct v_tensor *));
   return result;
 }
 
-static void v_hash_map_free(struct hash_map* map) {
+void v_hash_map_free(struct hash_map* map) {
   v_hash_set_free(&map->set);
   v_FREE(map->vals);
   v_FREE(map);
 }
 
 
-static size_t v_visit_parents(struct v_cgraph* cgraph, struct v_tensor* node) {
+size_t v_visit_parents(struct v_cgraph* cgraph, struct v_tensor* node) {
   // check if already visited
 
   size_t node_hash_pos = find_hash(&cgraph->visited_hash_set, node);
@@ -2809,7 +2795,7 @@ void v_build_backward_expend(struct v_ctx* ctx,
     }
     else if (node->flags & TENSOR_FLAG_LOSS) {
       // loss tensors always need a gradient accumulator
-      cgraph->grad_accs[ihash] = v_new_tensor(ctx, v_TYPE_F32, MML_MAX_DIMS, node->ne);
+      cgraph->grad_accs[ihash] = v_new_tensor(ctx, v_TYPE_F32, V_MAX_DIMS, node->ne);
       cgraph->grads[ihash]     = cgraph->grad_accs[ihash];
     }
     grads_needed[ihash] = true;

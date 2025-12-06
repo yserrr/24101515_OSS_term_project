@@ -2,8 +2,19 @@
 #define MYPROJECT_VK_CONSTANT_H
 #include "vk_common.h"
 
-struct vk_mat_mat_push_constants
-{
+template <typename T> size_t push_constant_size(const T& t);
+template <typename T> size_t push_constant_size(const std::vector<T>& t);
+template <typename T, uint32_t N> size_t push_constant_size(const std::array<T, N>& t);
+template <typename T> const T* push_constant_data(const std::vector<T>& t);
+template <typename T, uint32_t N> const T* push_constant_data(const std::array<T, N>& t);
+template <typename T> void init_pushconst_tensor_offsets(vk_backend_ctx* ctx, T& p, const v_tensor* src0, const v_tensor* src1, const v_tensor* src2, v_tensor* dst);
+template <typename T> void init_pushconst_fastdiv(T& p);
+
+vk_op_sum_rows_push_constants vk_op_sum_rows_push_constants_init(const v_tensor* src, const v_tensor* dst, int64_t n_cols);
+vk_op_unary_push_constants vk_op_unary_push_constants_init(const v_tensor* src0, const v_tensor* dst, int64_t ne = 0);
+vk_op_pad_push_constants vk_op_pad_push_constants_init(const v_tensor* src0, const v_tensor* dst);
+
+struct vk_mat_mat_push_constants {
   uint32_t M;
   uint32_t N;
   uint32_t K;
@@ -21,8 +32,7 @@ struct vk_mat_mat_push_constants
   uint32_t padded_N;
 };
 
-struct vk_mat_vec_push_constants
-{
+struct vk_mat_vec_push_constants {
   uint32_t ncols;
   uint32_t stride_a;
   uint32_t stride_b;
@@ -36,8 +46,7 @@ struct vk_mat_vec_push_constants
   uint32_t broadcast3;
 };
 
-struct vk_mat_mat_id_push_constants
-{
+struct vk_mat_mat_id_push_constants {
   uint32_t M;
   uint32_t N;
   uint32_t K;
@@ -54,8 +63,7 @@ struct vk_mat_mat_id_push_constants
   uint32_t padded_N;
 };
 
-struct vk_mat_vec_id_push_constants
-{
+struct vk_mat_vec_id_push_constants {
   uint32_t ncols;
   uint32_t stride_a;
   uint32_t stride_b;
@@ -67,8 +75,7 @@ struct vk_mat_vec_id_push_constants
   uint32_t ne11;
 };
 
-struct vk_flash_attn_push_constants
-{
+struct vk_flash_attn_push_constants {
   uint32_t N;
   uint32_t KV;
 
@@ -112,8 +119,7 @@ struct vk_flash_attn_push_constants
 static_assert(sizeof(vk_flash_attn_push_constants) <= 128, "sizeof(vk_flash_attn_push_constants) must be <= 128");
 
 
-struct vk_op_push_constants
-{
+struct vk_op_push_constants {
   uint32_t KX;
   uint32_t KY;
   float param1;
@@ -121,8 +127,7 @@ struct vk_op_push_constants
 };
 
 
-struct vk_op_glu_push_constants
-{
+struct vk_op_glu_push_constants {
   uint32_t N;
   uint32_t ne00;
   uint32_t ne20;
@@ -131,8 +136,7 @@ struct vk_op_glu_push_constants
   float limit;
 };
 
-struct vk_op_unary_push_constants
-{
+struct vk_op_unary_push_constants {
   uint32_t ne;
   uint32_t ne00;
   uint32_t ne01;
@@ -169,8 +173,7 @@ struct vk_op_unary_push_constants
 
 static_assert(sizeof(vk_op_unary_push_constants) <= 128, "sizeof(vk_op_unary_push_constants) must be <= 128");
 
-struct vk_op_pad_push_constants
-{
+struct vk_op_pad_push_constants {
   uint32_t ne;
   uint32_t ne00;
   uint32_t ne01;
@@ -201,8 +204,7 @@ struct vk_op_pad_push_constants
 };
 
 
-struct vk_op_binary_push_constants
-{
+struct vk_op_binary_push_constants {
   uint32_t ne;
   uint32_t ne00;
   uint32_t ne01;
@@ -234,8 +236,7 @@ struct vk_op_binary_push_constants
   int32_t param3;
 };
 
-struct vk_op_multi_add_push_constants
-{
+struct vk_op_multi_add_push_constants {
   // shape for dst
   uint32_t ne20;
   uint32_t ne21;
@@ -248,14 +249,12 @@ struct vk_op_multi_add_push_constants
   uint32_t rms_partials;
 };
 
-struct vk_op_topk_moe_push_constants
-{
+struct vk_op_topk_moe_push_constants {
   uint32_t n_rows;
   uint32_t n_expert_used;
 };
 
-struct vk_op_add_id_push_constants
-{
+struct vk_op_add_id_push_constants {
   uint32_t ne0;
   uint32_t ne1;
   uint32_t s01;
@@ -264,15 +263,13 @@ struct vk_op_add_id_push_constants
   uint32_t s21;
 };
 
-struct vk_op_diag_mask_push_constants
-{
+struct vk_op_diag_mask_push_constants {
   uint32_t ncols;
   uint32_t rows_per_channel;
   int32_t n_past;
 };
 
-struct vk_op_rope_push_constants
-{
+struct vk_op_rope_push_constants {
   uint32_t ncols;
   uint32_t n_dims;
   float freq_scale;
@@ -290,8 +287,7 @@ struct vk_op_rope_push_constants
   uint32_t is_back;
 };
 
-struct vk_op_soft_max_push_constants
-{
+struct vk_op_soft_max_push_constants {
   uint32_t KX;
   uint32_t KY;
   uint32_t ne00;
@@ -311,14 +307,12 @@ struct vk_op_soft_max_push_constants
   uint32_t has_sinks;
 };
 
-struct vk_op_argsort_push_constants
-{
+struct vk_op_argsort_push_constants {
   uint32_t ncols;
   int32_t order;
 };
 
-struct vk_op_im2col_push_constants
-{
+struct vk_op_im2col_push_constants {
   uint64_t dst_addr;
   uint32_t batch_offset;
   uint32_t offset_delta;
@@ -339,8 +333,7 @@ struct vk_op_im2col_push_constants
   int32_t d1;
 };
 
-struct vk_op_im2col_3d_push_constants
-{
+struct vk_op_im2col_3d_push_constants {
   uint64_t dst_addr;
   uint32_t nb10;
   uint32_t nb11;
@@ -372,15 +365,13 @@ struct vk_op_im2col_3d_push_constants
   uint32_t misalign_offsets;
 };
 
-struct vk_op_timestep_embedding_push_constants
-{
+struct vk_op_timestep_embedding_push_constants {
   uint32_t nb1;
   uint32_t dim;
   uint32_t max_period;
 };
 
-struct vk_op_conv_transpose_1d_push_constants
-{
+struct vk_op_conv_transpose_1d_push_constants {
   uint32_t Cout;
   uint32_t Cin;
   uint32_t K;
@@ -395,8 +386,7 @@ struct vk_op_conv_transpose_1d_push_constants
   int32_t s0;
 };
 
-struct vk_op_pool2d_push_constants
-{
+struct vk_op_pool2d_push_constants {
   uint32_t IW;
   uint32_t IH;
   uint32_t OW;
@@ -412,24 +402,21 @@ struct vk_op_pool2d_push_constants
   int32_t p1;
 };
 
-struct vk_op_rwkv_wkv6_push_constants
-{
+struct vk_op_rwkv_wkv6_push_constants {
   uint32_t B;
   uint32_t T;
   uint32_t C;
   uint32_t H;
 };
 
-struct vk_op_rwkv_wkv7_push_constants
-{
+struct vk_op_rwkv_wkv7_push_constants {
   uint32_t B;
   uint32_t T;
   uint32_t C;
   uint32_t H;
 };
 
-struct vk_op_ssm_scan_push_constants
-{
+struct vk_op_ssm_scan_push_constants {
   uint32_t nb02, nb03, nb12, nb13;
   uint32_t nb21, nb22, nb31;
   uint32_t nb42, nb43, nb52, nb53;
@@ -437,16 +424,14 @@ struct vk_op_ssm_scan_push_constants
   uint32_t n_head, d_head, n_group, n_tok;
 };
 
-struct vk_op_ssm_conv_push_constants
-{
+struct vk_op_ssm_conv_push_constants {
   uint32_t nb01, nb02;
   uint32_t nb11;
   uint32_t dst_nb0, dst_nb1, dst_nb2;
   uint32_t nc, ncs, nr, n_t, n_s;
 };
 
-struct vk_op_conv2d_push_constants
-{
+struct vk_op_conv2d_push_constants {
   uint32_t Cout;
   uint32_t Cin;
   uint32_t N;
@@ -488,8 +473,7 @@ struct vk_op_conv2d_push_constants
   uint32_t OWOHL;
 };
 
-struct vk_op_conv_transpose_2d_push_constants
-{
+struct vk_op_conv_transpose_2d_push_constants {
   uint32_t Cout;
   uint32_t Cin;
   uint32_t N;
@@ -535,8 +519,7 @@ struct vk_op_conv_transpose_2d_push_constants
   uint32_t s1L;
 };
 
-struct vk_op_conv2d_dw_push_constants
-{
+struct vk_op_conv2d_dw_push_constants {
   uint32_t ne;
   uint32_t batches;
   uint32_t channels;
@@ -554,8 +537,7 @@ struct vk_op_conv2d_dw_push_constants
   int32_t dilation_y;
 };
 
-struct vk_op_upscale_push_constants
-{
+struct vk_op_upscale_push_constants {
   uint32_t ne;
   uint32_t a_offset;
   uint32_t d_offset;
@@ -576,8 +558,7 @@ struct vk_op_upscale_push_constants
   float pixel_offset;
 };
 
-struct vk_op_sum_rows_push_constants
-{
+struct vk_op_sum_rows_push_constants {
   uint32_t n_cols;
   uint32_t ne01, ne02;
   uint32_t nb01, nb02, nb03;
@@ -588,4 +569,6 @@ struct vk_op_sum_rows_push_constants
   uint32_t ne0_1mp, ne0_1L;
 };
 
+
+#include "vk_constant.inl"
 #endif //MYPROJECT_VK_CONSTANT_H

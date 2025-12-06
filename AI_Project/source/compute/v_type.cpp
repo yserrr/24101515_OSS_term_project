@@ -2,6 +2,7 @@
 #include "v_quants.h"
 #include "v_type.hpp"
 #include <array>
+#include <cstring>
 
 MmlTypeTrait::MmlTypeTrait()
 {
@@ -637,7 +638,7 @@ const struct v_type_traits* v_get_type_traits(enum v_data_type type)
   return &trait.traits[type];
 }
 
-inline int64_t blockSize(enum v_data_type type)
+int64_t block_size(enum v_data_type type)
 {
   return trait.traits[type].blck_size;
 }
@@ -810,7 +811,7 @@ size_t v_quantize_chunk(enum v_data_type type,
     {
       size_t elemsize = sizeof(float);
       result = n * elemsize;
-      memcpy((uint8_t*)dst + start * elemsize, src + start, result);
+      std::memcpy((uint8_t*)dst + start * elemsize, src + start, result);
     }
     break;
   default:

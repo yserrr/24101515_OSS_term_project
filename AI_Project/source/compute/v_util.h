@@ -32,12 +32,12 @@ inline bool v_is_contiguous_2(const struct v_tensor* tensor)
 
 inline bool v_is_contiguously_allocated(const struct v_tensor* tensor)
 {
-  return num_bytes(tensor) == nelements(tensor) * v_type_size(tensor->type) / blockSize(tensor->type);
+  return num_bytes(tensor) == nelements(tensor) * v_type_size(tensor->type) / block_size(tensor->type);
 }
 
 inline bool v_is_permuted(const struct v_tensor* tensor)
 {
-  static_assert(MML_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
+  static_assert(V_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
 
   return tensor->nb[0] > tensor->nb[1] || tensor->nb[1] > tensor->nb[2] || tensor->nb[2] > tensor->nb[3];
 }
@@ -62,7 +62,7 @@ inline void v_print_object(const struct v_object* obj)
 
 inline bool v_are_same_shape(const struct v_tensor* t0, const struct v_tensor* t1)
 {
-  static_assert(MML_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
+  static_assert(V_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
   return
     (t0->ne[0] == t1->ne[0]) &&
     (t0->ne[1] == t1->ne[1]) &&
@@ -127,13 +127,13 @@ inline bool v_is_contiguous_channels(const struct v_tensor* tensor)
 inline bool v_is_contiguous_rows(const struct v_tensor* tensor)
 {
   return
-    tensor->ne[0] == blockSize(tensor->type) ||
+    tensor->ne[0] == block_size(tensor->type) ||
     tensor->nb[0] == v_type_size(tensor->type);
 }
 
 inline bool v_is_padded_1d(const struct v_tensor* tensor)
 {
-  static_assert(MML_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
+  static_assert(V_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
   return
     tensor->nb[0] == v_type_size(tensor->type) &&
     tensor->nb[2] == tensor->nb[1] * tensor->ne[1] &&
@@ -337,13 +337,13 @@ inline void v_hash_set_reset(struct v_hash_set* hash_set)
 
 inline int64_t nelements(const struct v_tensor* tensor)
 {
-  static_assert(MML_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
+  static_assert(V_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
   return tensor->ne[0] * tensor->ne[1] * tensor->ne[2] * tensor->ne[3];
 }
 
 inline int64_t v_nrows(const struct v_tensor* tensor)
 {
-  static_assert(MML_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
+  static_assert(V_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
   return tensor->ne[1] * tensor->ne[2] * tensor->ne[3];
 }
 
@@ -356,21 +356,21 @@ inline size_t v_element_size(const struct v_tensor* tensor)
 
 inline bool v_is_scalar(const struct v_tensor* tensor)
 {
-  static_assert(MML_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
+  static_assert(V_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
 
   return tensor->ne[0] == 1 && tensor->ne[1] == 1 && tensor->ne[2] == 1 && tensor->ne[3] == 1;
 }
 
 inline bool v_is_vector(const struct v_tensor* tensor)
 {
-  static_assert(MML_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
+  static_assert(V_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
 
   return tensor->ne[1] == 1 && tensor->ne[2] == 1 && tensor->ne[3] == 1;
 }
 
 inline bool v_is_matrix(const struct v_tensor* tensor)
 {
-  static_assert(MML_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
+  static_assert(V_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
 
   return tensor->ne[2] == 1 && tensor->ne[3] == 1;
 }
@@ -919,7 +919,7 @@ inline struct v_tensor* v_sqrt_inplace(struct v_ctx* ctx,
 
 inline bool v_are_same_stride(const struct v_tensor* t0, const struct v_tensor* t1)
 {
-  static_assert(MML_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
+  static_assert(V_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
 
   return
     (t0->nb[0] == t1->nb[0]) &&
@@ -937,14 +937,14 @@ inline void* v_new_buffer(struct v_ctx* ctx,
 
 inline bool can_repeat_rows(const struct v_tensor* t0, const struct v_tensor* t1)
 {
-  static_assert(MML_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
+  static_assert(V_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
 
   return (t0->ne[0] == t1->ne[0]) && can_repeat(t0, t1);
 }
 
 inline bool can_repeat(const struct v_tensor* t0, const struct v_tensor* t1)
 {
-  static_assert(MML_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
+  static_assert(V_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
   return is_empty(t0)
            ? is_empty(t1)
            : (t1->ne[0] % t0->ne[0] == 0) &&
@@ -963,7 +963,7 @@ inline struct v_tensor* v_unary_inplace(
 
 inline bool v_can_out_prod(const struct v_tensor* t0, const struct v_tensor* t1)
 {
-  static_assert(MML_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
+  static_assert(V_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
 
   return (t0->ne[1] == t1->ne[1]) &&
     (t1->ne[2] % t0->ne[2] == 0) && // verify t0 is broadcastable
@@ -972,7 +972,7 @@ inline bool v_can_out_prod(const struct v_tensor* t0, const struct v_tensor* t1)
 
 inline bool can_mul_mat(const struct v_tensor* t0, const struct v_tensor* t1)
 {
-  static_assert(MML_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
+  static_assert(V_MAX_DIMS == 4, "v_MAX_DIMS is not 4 - update this function");
 
   return (t0->ne[0] == t1->ne[0]) &&
     (t1->ne[2] % t0->ne[2] == 0) && // verify t0 is broadcastable
@@ -988,7 +988,7 @@ inline struct v_tensor* v_silu(
 
 inline struct v_tensor* v_dup_tensor(struct v_ctx* ctx, const struct v_tensor* src)
 {
-  return v_new_tensor(ctx, src->type, MML_MAX_DIMS, src->ne);
+  return v_new_tensor(ctx, src->type, V_MAX_DIMS, src->ne);
 }
 
 inline struct v_tensor* v_silu_inplace(
