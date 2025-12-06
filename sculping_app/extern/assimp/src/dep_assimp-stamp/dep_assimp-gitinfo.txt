@@ -1,0 +1,15 @@
+# This is a generated file and its contents are an internal implementation detail.
+# The download step will be re-executed if anything in this file changes.
+# No other meaning or use of this file is supported.
+
+method=git
+command=/usr/bin/cmake;-P;/home/ljh/workspace/opengl_course-main/projects/13_advanced_lighting/build/dep_assimp-prefix/tmp/dep_assimp-gitclone.cmake
+source_dir=/home/ljh/workspace/opengl_course-main/projects/13_advanced_lighting/build/dep_assimp-prefix/src/dep_assimp
+work_dir=/home/ljh/workspace/opengl_course-main/projects/13_advanced_lighting/build/dep_assimp-prefix/src
+repository=https://github.com/assimp/assimp
+remote=origin
+init_submodules=TRUE
+recurse_submodules=--recursive
+submodules=
+CMP0097=
+

@@ -1,0 +1,8 @@
+
+#ifndef MYPROJECT_V_VISION_HPP
+#define MYPROJECT_V_VISION_HPP
+#include "v.h"
+
+
+
+#endif //MYPROJECT_V_VISION_HPP

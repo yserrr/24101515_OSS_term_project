@@ -1,0 +1,1386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="BackendCodeEditorMiscSettings">
+    <option name="/Default/Housekeeping/FeatureSuggestion/FeatureSuggestionManager/DisabledSuggesters/=SwitchToGoToActionSuggester/@EntryIndexedValue" value="true" type="bool" />
+    <option name="/Default/Housekeeping/GlobalSettingsUpgraded/IsUpgraded/@EntryValue" value="true" type="bool" />
+    <option name="/Default/Housekeeping/LiveTemplatesHousekeeping/HotspotSessionHintIsShown/@EntryValue" value="true" type="bool" />
+    <option name="/Default/Housekeeping/OptionsDialog/SelectedPageId/@EntryValue" value="CppFormatterOtherPage" type="string" />
+    <option name="/Default/Housekeeping/RefactoringsMru/RenameRefactoring/DoRenameFile/@EntryValue" value="false" type="bool" />
+    <option name="/Default/RiderDebugger/RiderRestoreDecompile/RestoreDecompileSetting/@EntryValue" value="false" type="bool" />
+  </component>
+  <component name="CMakePresetLoader">{
+  &quot;useNewFormat&quot;: true
+}</component>
+  <component name="CMakeProjectFlavorService">
+    <option name="flavorId" value="CMakePlainProjectFlavor" />
+  </component>
+  <component name="CMakeReloadState">
+    <option name="reloaded" value="true" />
+  </component>
+  <component name="CMakeRunConfigurationManager">
+    <generated>
+      <config projectName="MyProject" targetName="compute" />
+      <config projectName="MyProject" targetName="cifar-100_train_fc" />
+      <config projectName="MyProject" targetName="vanila_gan_mnist" />
+      <config projectName="MyProject" targetName="vulkan-kernels-gen" />
+      <config projectName="MyProject" targetName="py_test" />
+      <config projectName="MyProject" targetName="python__test" />
+      <config projectName="MyProject" targetName="mnist_train" />
+      <config projectName="MyProject" targetName="cifar-10_train_fc" />
+      <config projectName="MyProject" targetName="mml" />
+      <config projectName="MyProject" targetName="cifar-10_train_cnn" />
+      <config projectName="MyProject" targetName="nan_TEST" />
+      <config projectName="MyProject" targetName="max_pool2d_back_test" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug-Visual Studio" ENABLED="true" CONFIG_NAME="Debug" TOOLCHAIN_NAME="Visual Studio" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="45d80f1d-f275-4673-86b4-2093fcbae34e" name="변경" comment="d">
+      <change afterPath="$PROJECT_DIR$/cmake/execute.cmake" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake/library.cmake" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/AI/FCModel.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/AI/FCModel.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/AI/FullyConnected.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/AI/FullyConnected.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/AI/LayerDescriptor.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/AI/LayerDescriptor.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/AI/Model.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/AI/Model.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/AI/mnist/mnist_common.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/AI/mnist/mnist_common.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/AI/mnist/mnist_eval.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/AI/mnist/mnist_train.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/AI/optimizer.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/AI/optimizer.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/AI/sam.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/AI/sam.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/Compiler/IR.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/quants.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/model/model.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/opt/v_opt_common.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/opt/v_opt_ctx.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/opt/v_opt_ctx.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/opt/v_opt_dataset.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/opt/v_opt_dataset.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/opt/v_opt_result.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/opt/v_opt_result.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v-backend.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v-backend.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v_allocator.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v_comp.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v_context.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v_ctx.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v_fn.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v_fn.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v_graph.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v_graph.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v_hash.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v_log.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v_object.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v_op.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v_quants.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v_quants.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v_tensor.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v_type.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v_type.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v_util.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v_vision.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/v_vision.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/vk/vk_test.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/vk/vk_utils.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/im2col_back.comp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/log.comp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mm_funcs.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/neg.comp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/pool2d_back.comp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/sin.comp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/physics/GeometryGraph.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/physics/GeometryGraph.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/physics/Procedure.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/physics/Procedure.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/physics/graph.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/physics/graph.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/physics/physics .h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/physics/physics.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/python/python.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/python/python.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/test/cifar-100_train_fc.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/test/cifar-10_train_cnn.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/test/cifar-10_train_fc.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/test/compute.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/test/max_pool2d_back_test.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/test/mnist_train.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/test/nan_TEST.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/test/python__test.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/source/test/vanila_gan_mnist.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/codeStyles/Project.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/editor.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/editor.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../llama-3.2-Korean-Bllossom-3B-f16.gguf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/editor.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/editor.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-alloc.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-alloc.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-backend-impl.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-backend-reg.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-backend.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-backend.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-common.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-common.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/amx/amx.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/amx/amx.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/amx/amx.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/amx/amx.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/amx/common.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/amx/common.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/amx/mmq.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/amx/mmq.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/amx/mmq.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/amx/mmq.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/arch-fallback.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/arch-fallback.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/arch/arm/cpu-feats.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/arch/arm/cpu-feats.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/arch/arm/quants.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/arch/arm/quants.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/arch/arm/repack.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/arch/arm/repack.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/arch/loongarch/quants.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/arch/loongarch/quants.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/arch/powerpc/cpu-feats.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/arch/powerpc/cpu-feats.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/arch/powerpc/quants.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/arch/powerpc/quants.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/arch/riscv/quants.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/arch/riscv/quants.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/arch/riscv/repack.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/arch/riscv/repack.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/arch/s390/quants.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/arch/s390/quants.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/arch/wasm/quants.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/arch/wasm/quants.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/arch/x86/cpu-feats.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/arch/x86/cpu-feats.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/arch/x86/quants.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/arch/x86/quants.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/arch/x86/repack.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/arch/x86/repack.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/binary-ops.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/binary-ops.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/binary-ops.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/binary-ops.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/cmake/FindSIMD.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/cmake/FindSIMD.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/common.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/common.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/ggml-cpu-impl.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/ggml-cpu-impl.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/ggml-cpu.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/ggml-cpu.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/ggml-cpu.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/ggml-cpu.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/hbm.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/hbm.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/hbm.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/hbm.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/kleidiai/kernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/kleidiai/kernels.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/kleidiai/kernels.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/kleidiai/kernels.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/kleidiai/kleidiai.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/kleidiai/kleidiai.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/kleidiai/kleidiai.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/kleidiai/kleidiai.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/llamafile/sgemm.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/llamafile/sgemm.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/llamafile/sgemm.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/llamafile/sgemm.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/ops.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/ops.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/ops.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/ops.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/quants.c" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/quants.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/quants.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/repack.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/repack.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/repack.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/repack.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/simd-mappings.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/simd-mappings.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/spacemit/ime.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/spacemit/ime.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/spacemit/ime.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/spacemit/ime.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/spacemit/ime1_kernels.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/spacemit/ime1_kernels.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/spacemit/ime_kernels.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/spacemit/ime_kernels.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/traits.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/traits.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/traits.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/traits.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/unary-ops.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/unary-ops.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/unary-ops.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/unary-ops.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/vec.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/vec.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-cpu/vec.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-cpu/vec.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-impl.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/ggml-impl.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-opt.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-opt.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-quants.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-quants.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-threading.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-threading.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-vulkan.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml-vulkan.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/ggml.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/gguf.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/gguf/gguf.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/gguf.h" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/gguf/gguf.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_buffer.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_buffer.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_common.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_constant.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_constant.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_context.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_context.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_debug.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_debug.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_device.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_device.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_g_fn.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_g_fn.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_gpu_context.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_gpu_context.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_instance.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_logger.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_logger.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_op.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_op.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_pipeline.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_pipeline.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_push_const_T_imple.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_queue.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_queue.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_shader.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_sync.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_test.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vk_test.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/acc.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/acc.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/add.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/add.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/add_id.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/add_id.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/argmax.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/argmax.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/argsort.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/argsort.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/clamp.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/clamp.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/concat.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/concat.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/contig_copy.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/contig_copy.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/conv2d_dw.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/conv2d_dw.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/conv2d_mm.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/conv2d_mm.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/conv_transpose_1d.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/conv_transpose_1d.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/copy.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/copy.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/copy_from_quant.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/copy_from_quant.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/copy_to_quant.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/copy_to_quant.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/cos.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/cos.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/count_equal.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/count_equal.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_f32.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_f32.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_funcs.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_funcs.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_funcs_cm2.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_funcs_cm2.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_head.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_head.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_iq1_m.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_iq1_m.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_iq1_s.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_iq1_s.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_iq2_s.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_iq2_s.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_iq2_xs.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_iq2_xs.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_iq2_xxs.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_iq2_xxs.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_iq3_s.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_iq3_s.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_iq3_xxs.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_iq3_xxs.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_iq4_nl.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_iq4_nl.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_iq4_xs.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_iq4_xs.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_mxfp4.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_mxfp4.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_q2_k.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_q2_k.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_q3_k.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_q3_k.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_q4_0.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_q4_0.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_q4_1.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_q4_1.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_q4_k.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_q4_k.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_q5_0.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_q5_0.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_q5_1.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_q5_1.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_q5_k.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_q5_k.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_q6_k.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_q6_k.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/dequant_q8_0.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/dequant_q8_0.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/diag_mask_inf.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/diag_mask_inf.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/div.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/div.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/exp.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/exp.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/feature-tests/bfloat16.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/feature-tests/bfloat16.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/feature-tests/coopmat.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/feature-tests/coopmat.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/feature-tests/coopmat2.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/feature-tests/coopmat2.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/feature-tests/integer_dot.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/feature-tests/integer_dot.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/flash_attn.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/flash_attn.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/flash_attn_base.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/flash_attn_base.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/flash_attn_cm1.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/flash_attn_cm1.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/flash_attn_cm2.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/flash_attn_cm2.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/flash_attn_split_k_reduce.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/flash_attn_split_k_reduce.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/geglu.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/geglu.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/geglu_erf.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/geglu_erf.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/geglu_quick.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/geglu_quick.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/gelu.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/gelu.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/gelu_erf.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/gelu_erf.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/gelu_quick.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/gelu_quick.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/generic_binary_head.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/generic_binary_head.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/generic_head.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/generic_head.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/generic_unary_head.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/generic_unary_head.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/get_rows.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/get_rows.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/get_rows_quant.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/get_rows_quant.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/glu_head.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/glu_head.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/glu_main.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/glu_main.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/group_norm.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/group_norm.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/hardsigmoid.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/hardsigmoid.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/hardswish.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/hardswish.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/im2col.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/im2col.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/im2col_3d.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/im2col_3d.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/l2_norm.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/l2_norm.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/leaky_relu.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/leaky_relu.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mat_split_k_reduce.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mat_split_k_reduce.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mat_vec.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mat_vec.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mat_vec_base.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mat_vec_base.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mat_vec_iq1_m.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mat_vec_iq1_m.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mat_vec_iq1_s.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mat_vec_iq1_s.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mat_vec_iq2_s.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mat_vec_iq2_s.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mat_vec_iq2_xs.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mat_vec_iq2_xs.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mat_vec_iq2_xxs.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mat_vec_iq2_xxs.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mat_vec_iq3_s.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mat_vec_iq3_s.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mat_vec_iq3_xxs.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mat_vec_iq3_xxs.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mat_vec_nc.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mat_vec_nc.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mat_vec_p021.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mat_vec_p021.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mat_vec_q2_k.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mat_vec_q2_k.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mat_vec_q3_k.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mat_vec_q3_k.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mat_vec_q4_k.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mat_vec_q4_k.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mat_vec_q5_k.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mat_vec_q5_k.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mat_vec_q6_k.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mat_vec_q6_k.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mat_vecq.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mat_vecq.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mm.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mm.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mm_cm2.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mm_cm2.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mm_funcs.glsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mmq.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mmq.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/mul_mmq_funcs.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/mul_mmq_funcs.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/multi_add.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/multi_add.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/norm.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/norm.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/opt_step_adamw.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/opt_step_adamw.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/opt_step_sgd.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/opt_step_sgd.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/pad.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/pad.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/pool2d.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/pool2d.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/quantize_q8_1.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/quantize_q8_1.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/reglu.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/reglu.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/relu.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/relu.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/repeat.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/repeat.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/repeat_back.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/repeat_back.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/rms_norm.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/rms_norm.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/rms_norm_back.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/rms_norm_back.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/rms_norm_partials.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/rms_norm_partials.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/roll.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/roll.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/rope_head.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/rope_head.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/rope_multi.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/rope_multi.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/rope_neox.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/rope_neox.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/rope_norm.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/rope_norm.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/rope_vision.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/rope_vision.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/rte.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/rte.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/scale.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/scale.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/sigmoid.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/sigmoid.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/silu.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/silu.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/silu_back.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/silu_back.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/sin.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/rand.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/soft_max.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/soft_max.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/soft_max_back.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/soft_max_back.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/sqrt.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/sqrt.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/square.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/square.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/ssm_conv.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/ssm_conv.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/ssm_scan.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/ssm_scan.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/sub.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/sub.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/sum_rows.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/sum_rows.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/swiglu.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/swiglu.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/swiglu_oai.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/swiglu_oai.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/tanh.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/tanh.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/timestep_embedding.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/timestep_embedding.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/topk_moe.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/topk_moe.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/types.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/types.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/upscale.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/upscale.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/utils.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/utils.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/vulkan-shaders-gen.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/vulkan-kernels-gen.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/wkv6.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/wkv6.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GPU/vulkan-shaders/wkv7.comp" beforeDir="false" afterPath="$PROJECT_DIR$/source/compute/vulkan-kernels/wkv7.comp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-adapter.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-adapter.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-arch.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-arch.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-batch.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-batch.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-chat.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-chat.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-context.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-context.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-cparams.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-cparams.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-grammar.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-grammar.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-graph.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-graph.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-hparams.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-hparams.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-impl.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-impl.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-io.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-io.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-kv-cache-iswa.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-kv-cache-iswa.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-kv-cache.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-kv-cache.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-kv-cells.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-memory-hybrid.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-memory-hybrid.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-memory-recurrent.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-memory-recurrent.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-memory.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-memory.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-mmap.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-mmap.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-model-loader.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-model-loader.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-model-saver.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-model-saver.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-model.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-model.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-quant.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-quant.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-sampling.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-sampling.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-vocab.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama-vocab.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/llama.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/unicode-data.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/unicode-data.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/unicode.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/llama/src/unicode.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/batched-bench/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/batched-bench/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/batched-bench/batched-bench.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/cvector-generator/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/cvector-generator/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/cvector-generator/completions.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/cvector-generator/cvector-generator.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/cvector-generator/mean.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/cvector-generator/negative.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/cvector-generator/pca.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/cvector-generator/positive.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/export-lora/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/export-lora/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/export-lora/export-lora.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/gguf-split/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/gguf-split/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/gguf-split/gguf-split.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/gguf-split/tests.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/imatrix/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/imatrix/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/imatrix/imatrix.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/llama-bench/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/llama-bench/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/llama-bench/llama-bench.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/main/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/main/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/main/main.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/clip-impl.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/clip.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/clip.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/deprecation-warning.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/legacy-models/convert_image_encoder_to_gguf.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/legacy-models/glmedge-convert-image-encoder-to-gguf.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/legacy-models/glmedge-surgery.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/legacy-models/llava_surgery.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/legacy-models/llava_surgery_v2.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/legacy-models/minicpmv-convert-image-encoder-to-gguf.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/legacy-models/minicpmv-surgery.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/mtmd-audio.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/mtmd-audio.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/mtmd-cli.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/mtmd-helper.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/mtmd-helper.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/mtmd.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/mtmd.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/requirements.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/test-1.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/test-2.mp3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/mtmd/tests.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/perplexity/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/perplexity/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/perplexity/perplexity.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/quantize/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/quantize/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/quantize/quantize.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/quantize/tests.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/rpc/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/rpc/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/rpc/rpc-server.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/run/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/run/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/run/linenoise.cpp/linenoise.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/run/linenoise.cpp/linenoise.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/run/run.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/bench/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/bench/bench.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/bench/prometheus.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/bench/requirements.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/bench/script.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/chat-llama2.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/chat.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/chat.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public/index.html.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public/loading.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_legacy/colorthemes.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_legacy/completion.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_legacy/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_legacy/index-new.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_legacy/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_legacy/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_legacy/json-schema-to-grammar.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_legacy/loading.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_legacy/prompt-formats.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_legacy/style.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_legacy/system-prompts.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_legacy/theme-beeninorder.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_legacy/theme-ketivah.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_legacy/theme-mangotango.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_legacy/theme-playground.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_legacy/theme-polarnight.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_legacy/theme-snowstorm.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_simplechat/datautils.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_simplechat/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_simplechat/readme.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_simplechat/simplechat.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_simplechat/simplechat.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_simplechat/simplechat_screens.webp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/public_simplechat/ui.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/server.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/conftest.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/pytest.ini" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/requirements.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/tests.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/unit/test_basic.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/unit/test_chat_completion.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/unit/test_completion.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/unit/test_ctx_shift.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/unit/test_embedding.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/unit/test_infill.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/unit/test_lora.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/unit/test_rerank.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/unit/test_security.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/unit/test_slot_save.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/unit/test_speculative.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/unit/test_template.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/unit/test_tokenize.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/unit/test_tool_call.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/unit/test_vision_api.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/tests/utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/themes/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/themes/buttons-top/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/themes/buttons-top/buttons_top.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/themes/buttons-top/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/themes/buttons-top/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/themes/wild/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/themes/wild/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/themes/wild/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/themes/wild/llama_cpp.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/themes/wild/llamapattern.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/themes/wild/wild.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/utils.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/.npmrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/.prettierignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/.prettierrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/.storybook/ModeWatcherDecorator.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/.storybook/TooltipProviderDecorator.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/.storybook/main.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/.storybook/preview.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/.storybook/vitest.setup.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/components.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/e2e/demo.test.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/eslint.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/playwright.config.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/scripts/dev.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/scripts/install-git-hooks.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/scripts/post-build.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/app.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/app.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/app.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/demo.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentFilePreview.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentImagePreview.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentPreviewDialog.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentsList.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatForm.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActionFileAttachments.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActionRecord.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormFileInputInvisible.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormHelperText.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormModelSelector.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormTextarea.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessage.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageActions.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAssistant.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageBranchingControls.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageThinkingBlock.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageUser.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessages.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatProcessingInfo.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreen.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreenDragOverlay.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreenHeader.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreenWarning.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsDialog.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsFields.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsFooter.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatSettings/ConversationSelectionDialog.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatSettings/ImportExportTab.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatSettings/ParameterSourceIndicator.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebar.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebarActions.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebarConversationItem.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebarSearch.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/chat/ChatSidebar/handle-mobile-sidebar-item-click.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/dialogs/ChatErrorDialog.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/dialogs/ConfirmationDialog.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/dialogs/ConversationTitleUpdateDialog.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/dialogs/EmptyFileAlertDialog.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/misc/ActionButton.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/misc/ActionDropdown.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/misc/KeyboardShortcutInfo.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/misc/MarkdownContent.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/server/ServerErrorSplash.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/server/ServerInfo.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/server/ServerLoadingSplash.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/app/server/ServerStatus.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-action.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-cancel.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-content.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-description.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-footer.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-header.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-overlay.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-title.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-trigger.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/alert-dialog/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/badge/badge.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/badge/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/button/button.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/button/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/card/card-action.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/card/card-content.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/card/card-description.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/card/card-footer.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/card/card-header.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/card/card-title.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/card/card.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/card/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/checkbox/checkbox.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/checkbox/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/collapsible/collapsible-content.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/collapsible/collapsible-trigger.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/collapsible/collapsible.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/collapsible/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dialog/dialog-close.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dialog/dialog-content.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dialog/dialog-description.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dialog/dialog-footer.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dialog/dialog-header.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dialog/dialog-overlay.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dialog/dialog-title.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dialog/dialog-trigger.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dialog/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-checkbox-item.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-content.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-group-heading.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-group.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-item.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-label.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-radio-group.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-radio-item.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-separator.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-shortcut.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-sub-content.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-sub-trigger.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-trigger.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/dropdown-menu/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/input/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/input/input.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/label/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/label/label.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/scroll-area/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/scroll-area/scroll-area-scrollbar.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/scroll-area/scroll-area.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/select/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/select/select-content.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/select/select-group-heading.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/select/select-group.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/select/select-item.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/select/select-label.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/select/select-scroll-down-button.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/select/select-scroll-up-button.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/select/select-separator.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/select/select-trigger.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/separator/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/separator/separator.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sheet/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sheet/sheet-close.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sheet/sheet-content.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sheet/sheet-description.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sheet/sheet-footer.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sheet/sheet-header.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sheet/sheet-overlay.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sheet/sheet-title.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sheet/sheet-trigger.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/constants.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/context.svelte.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-content.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-footer.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-group-action.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-group-content.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-group-label.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-group.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-header.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-input.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-inset.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-action.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-badge.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-button.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-item.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-skeleton.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-sub-button.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-sub-item.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-sub.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-provider.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-rail.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-separator.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar-trigger.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/sidebar/sidebar.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/skeleton/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/skeleton/skeleton.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/textarea/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/textarea/textarea.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/tooltip/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/tooltip/tooltip-content.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/tooltip/tooltip-trigger.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/components/ui/utils.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/constants/auto-scroll.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/constants/binary-detection.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/constants/debounce.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/constants/input-classes.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/constants/literal-html.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/constants/localstorage-keys.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/constants/max-bundle-size.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/constants/precision.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/constants/processing-info.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/constants/settings-config.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/constants/supported-file-types.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/constants/tooltip-config.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/constants/viewport.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/enums/files.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/hooks/is-mobile.svelte.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/hooks/use-processing-state.svelte.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/markdown/literal-html.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/services/chat.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/services/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/services/models.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/services/parameter-sync.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/services/parameter-sync.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/services/slots.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/stores/chat.svelte.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/stores/database.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/stores/models.svelte.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/stores/persisted.svelte.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/stores/server.svelte.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/stores/settings.svelte.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/types/api.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/types/chat.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/types/database.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/types/models.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/types/settings.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/api-key-validation.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/audio-recording.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/autoresize-textarea.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/branching.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/config-helpers.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/conversation-utils.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/convert-files-to-extra.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/copy.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/file-preview.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/file-type.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/is-ime-composing.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/modality-file-validation.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/model-names.test.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/model-names.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/pdf-processing.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/portal-to-body.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/precision.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/process-uploaded-files.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/svg-to-png.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/text-files.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/lib/utils/webp-to-png.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/routes/+error.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/routes/+layout.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/routes/+page.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/routes/+page.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/routes/chat/[id]/+page.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/routes/chat/[id]/+page.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/routes/page.svelte.test.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/stories/ChatForm.stories.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/stories/ChatMessage.stories.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/stories/ChatSettingsDialog.stories.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/stories/ChatSidebar.stories.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/stories/Introduction.mdx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/stories/MarkdownContent.stories.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/stories/fixtures/ai-tutorial.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/stories/fixtures/api-docs.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/stories/fixtures/assets/1.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/stories/fixtures/assets/beautiful-flowers-lotus.webp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/stories/fixtures/assets/example.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/stories/fixtures/assets/hf-logo.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/stories/fixtures/blog-post.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/stories/fixtures/data-analysis.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/stories/fixtures/empty.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/stories/fixtures/math-formulas.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/stories/fixtures/readme.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/src/stories/fixtures/storybook-mocks.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/static/favicon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/static/loading.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/svelte.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/vite.config.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/server/webui/vitest-setup-client.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/tokenize/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/tokenize/tokenize.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/tts/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/tts/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/tts/convert_pt_to_hf.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/tts/tts-outetts.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/tts/tts.cpp" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug-Visual Studio" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;yserrr&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/yserrr/MyAiProject.git&quot;,
+    &quot;accountId&quot;: &quot;cff8f528-14f4-4ece-87c6-03e25017ff89&quot;
+  }
+}</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_HOME_DIR$/bin/mingw/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/bits/fs_path.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../../../../../Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/include/filesystem" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../../../../../Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/include/iso646.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../../../../../Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/include/vector" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/source/AI/FCModel.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/source/AI/LayerDescriptor.hpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/source/AI/Model.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/source/AI/mnist/mnist_common.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/source/AI/mnist/mnist_common.hpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/source/AI/optimizer.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/source/compute/vk/vk_test.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/source/test/python__test.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../../../../../VulkanSDK/1.4.328.1/Include/vulkan/vulkan_funcs.hpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../../../../../VulkanSDK/1.4.328.1/Include/vulkan/vulkan_handles.hpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../../../../../VulkanSDK/1.4.328.1/Include/vulkan/vulkan_structs.hpp" root0="SKIP_HIGHLIGHTING" />
+  </component>
+  <component name="ProblemsViewState">
+    <hideBySeverity>
+      <option value="200" />
+    </hideBySeverity>
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectApplicationVersion">
+    <option name="ide" value="CLion" />
+    <option name="majorVersion" value="2025" />
+    <option name="minorVersion" value="2.3" />
+    <option name="productBranch" value="Classic" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="34p3GheTt7mnabq5Prminb6a1rI" />
+  <component name="ProjectStatusUIService">{
+  &quot;uiKindId&quot;: &quot;Widget&quot;
+}</component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "C/C++ 파일.python_test.cpp.executor": "Run",
+    "CMake 디버그.MyProject.executor": "Debug",
+    "CMake 디버그.Project.executor": "Debug",
+    "CMake 애플리케이션.backward_test.executor": "Run",
+    "CMake 애플리케이션.cifar-100_train_fc.executor": "Run",
+    "CMake 애플리케이션.cifar-10_train.executor": "Run",
+    "CMake 애플리케이션.cifar-10_train_cnn.executor": "Run",
+    "CMake 애플리케이션.cifar-10_train_fc.executor": "Run",
+    "CMake 애플리케이션.compute.executor": "Run",
+    "CMake 애플리케이션.exe.executor": "Run",
+    "CMake 애플리케이션.learning_test.executor": "Run",
+    "CMake 애플리케이션.mnist_test.executor": "Debug",
+    "CMake 애플리케이션.mnist_train.executor": "Run",
+    "CMake 애플리케이션.nan_TEST.executor": "Run",
+    "CMake 애플리케이션.python__test.executor": "Run",
+    "CMake 애플리케이션.t4.executor": "Run",
+    "CMake 애플리케이션.vanila_gan_mnist.executor": "Run",
+    "CMake 애플리케이션.vk_test.executor": "Run",
+    "CMake 애플리케이션.vk_test2.executor": "Run",
+    "CMake 애플리케이션.vk_test3.executor": "Run",
+    "CMake 애플리케이션.vk_test4.executor": "Run",
+    "CMake 애플리케이션.vk_test5.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.RadMigrateCodeStyle": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "RunOnceActivity.west.config.association.type.startup.service": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "C:/Users/dlwog/OneDrive/Desktop/AI_project/mySystem/source/test",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "preferences.sourceCode.C++",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\dlwog\OneDrive\Desktop\AI_project\mySystem\source\test" />
+      <recent name="C:\Users\dlwog\OneDrive\Desktop\AI_project\mySystem\source\compute\vulkan-kernels" />
+      <recent name="C:\Users\dlwog\OneDrive\Desktop\AI_project\mySystem\source\python" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\dlwog\OneDrive\Desktop\AI_project\mySystem\source\compute" />
+      <recent name="C:\Users\dlwog\OneDrive\Desktop\AI_project\mySystem\source\compute\gguf" />
+      <recent name="C:\Users\dlwog\OneDrive\Desktop\AI_project\mySystem" />
+      <recent name="C:\Users\dlwog\OneDrive\Desktop\AI_project\mySystem\source\test" />
+      <recent name="C:\Users\dlwog\OneDrive\Desktop\AI_project\mySystem\source" />
+    </key>
+  </component>
+  <component name="RunManager" selected="CMake 애플리케이션.cifar-10_train_cnn">
+    <configuration name="MyProject" type="CMakeListConfigurationType" factoryName="CMakeListConfigurationFactory" temporary="true">
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="cifar-100_train_fc" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MyProject" TARGET_NAME="cifar-100_train_fc" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="MyProject" RUN_TARGET_NAME="cifar-100_train_fc">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="cifar-10_train_cnn" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MyProject" TARGET_NAME="cifar-10_train_cnn" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="MyProject" RUN_TARGET_NAME="cifar-10_train_cnn">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="cifar-10_train_fc" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MyProject" TARGET_NAME="cifar-10_train_fc" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="MyProject" RUN_TARGET_NAME="cifar-10_train_fc">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="compute" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MyProject" TARGET_NAME="compute" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="MyProject" RUN_TARGET_NAME="compute">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="max_pool2d_back_test" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MyProject" TARGET_NAME="max_pool2d_back_test" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="MyProject" RUN_TARGET_NAME="max_pool2d_back_test">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="mml" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MyProject" TARGET_NAME="mml" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="mnist_train" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MyProject" TARGET_NAME="mnist_train" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="MyProject" RUN_TARGET_NAME="mnist_train">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="nan_TEST" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MyProject" TARGET_NAME="nan_TEST" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="MyProject" RUN_TARGET_NAME="nan_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="python__test" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MyProject" TARGET_NAME="python__test" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="MyProject" RUN_TARGET_NAME="python__test">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="vanila_gan_mnist" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MyProject" TARGET_NAME="vanila_gan_mnist" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="MyProject" RUN_TARGET_NAME="vanila_gan_mnist">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="vulkan-kernels-gen" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MyProject" TARGET_NAME="vulkan-kernels-gen" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="CMake 디버그.MyProject" />
+      <item itemvalue="CMake 애플리케이션.mml" />
+      <item itemvalue="CMake 애플리케이션.vulkan-kernels-gen" />
+      <item itemvalue="CMake 애플리케이션.cifar-100_train_fc" />
+      <item itemvalue="CMake 애플리케이션.cifar-10_train_cnn" />
+      <item itemvalue="CMake 애플리케이션.cifar-10_train_fc" />
+      <item itemvalue="CMake 애플리케이션.compute" />
+      <item itemvalue="CMake 애플리케이션.max_pool2d_back_test" />
+      <item itemvalue="CMake 애플리케이션.mnist_train" />
+      <item itemvalue="CMake 애플리케이션.nan_TEST" />
+      <item itemvalue="CMake 애플리케이션.python__test" />
+      <item itemvalue="CMake 애플리케이션.vanila_gan_mnist" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="CMake 디버그.MyProject" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="디폴트 작업">
+      <changelist id="45d80f1d-f275-4673-86b4-2093fcbae34e" name="변경" comment="" />
+      <created>1761896592411</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1761896592411</updated>
+      <workItem from="1761896593394" duration="560000" />
+      <workItem from="1761897221201" duration="191000" />
+      <workItem from="1761903871059" duration="31000" />
+      <workItem from="1762060467039" duration="24000" />
+      <workItem from="1762403268137" duration="734000" />
+      <workItem from="1762404347542" duration="3341000" />
+      <workItem from="1762407993618" duration="730000" />
+      <workItem from="1762408874713" duration="22000" />
+      <workItem from="1762409140152" duration="3895000" />
+      <workItem from="1762438498237" duration="2349000" />
+      <workItem from="1762473858556" duration="901000" />
+      <workItem from="1762508436596" duration="1275000" />
+      <workItem from="1762585832409" duration="2378000" />
+      <workItem from="1762588250158" duration="13142000" />
+      <workItem from="1762606276993" duration="2854000" />
+      <workItem from="1762613393514" duration="5296000" />
+      <workItem from="1762686982191" duration="28994000" />
+      <workItem from="1762720897781" duration="1837000" />
+      <workItem from="1762756230733" duration="9545000" />
+      <workItem from="1762765866504" duration="1331000" />
+      <workItem from="1763948650321" duration="13766000" />
+      <workItem from="1763975095236" duration="4426000" />
+      <workItem from="1763979862632" duration="1043000" />
+      <workItem from="1763984688346" duration="239000" />
+      <workItem from="1763992735905" duration="2320000" />
+      <workItem from="1764047912103" duration="242000" />
+      <workItem from="1764048172957" duration="2605000" />
+      <workItem from="1764053025765" duration="777000" />
+      <workItem from="1764225787279" duration="22000" />
+      <workItem from="1764244520063" duration="25229000" />
+      <workItem from="1764330344747" duration="789000" />
+      <workItem from="1764335283485" duration="335000" />
+      <workItem from="1764335645255" duration="11642000" />
+      <workItem from="1764347979108" duration="5449000" />
+      <workItem from="1764353521960" duration="14499000" />
+      <workItem from="1764416779032" duration="12902000" />
+      <workItem from="1764429833233" duration="10894000" />
+      <workItem from="1764440763573" duration="1583000" />
+      <workItem from="1764447355514" duration="2113000" />
+      <workItem from="1764492650937" duration="6015000" />
+      <workItem from="1764498702369" duration="16261000" />
+      <workItem from="1764519459921" duration="18166000" />
+      <workItem from="1764570460063" duration="1645000" />
+      <workItem from="1764572168716" duration="553000" />
+      <workItem from="1764652240219" duration="765000" />
+      <workItem from="1764681496269" duration="29662000" />
+      <workItem from="1764794484314" duration="3606000" />
+      <workItem from="1764827088383" duration="4325000" />
+      <workItem from="1764831482285" duration="22849000" />
+      <workItem from="1764957301593" duration="28042000" />
+    </task>
+    <task id="LOCAL-00001" summary="d">
+      <option name="closed" value="true" />
+      <created>1762473917048</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1762473917048</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VCPKGProject">
+    <isAutomaticCheckingOnLaunch value="false" />
+    <isAutomaticFoundErrors value="true" />
+    <isAutomaticReloadCMake value="true" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="d" />
+    <option name="LAST_COMMIT_MESSAGE" value="d" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/source/GPU/ggml-vulkan.cpp</url>
+          <line>7689</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/source/GPU/ggml-vulkan.cpp</url>
+          <line>15976</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/source/physics/GenNode.hpp</url>
+          <line>12</line>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/source/AI/mnist/mnist_eval.cpp</url>
+          <line>44</line>
+          <option name="timeStamp" value="49" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/source/GPU/ggml-opt.cpp</url>
+          <line>1042</line>
+          <option name="timeStamp" value="73" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/source/GPU/ggml-backend.cpp</url>
+          <line>1124</line>
+          <option name="timeStamp" value="75" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/source/GPU/ggml-backend.cpp</url>
+          <line>1192</line>
+          <option name="timeStamp" value="77" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/source/GPU/ggml-vulkan.cpp</url>
+          <line>198</line>
+          <option name="timeStamp" value="83" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/source/GPU/ggml-backend.cpp</url>
+          <line>1576</line>
+          <option name="timeStamp" value="87" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/source/GPU/ggml-backend.cpp</url>
+          <line>1343</line>
+          <option name="timeStamp" value="88" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/source/GPU/ggml-cpu/unary-ops.cpp</url>
+          <line>134</line>
+          <option name="timeStamp" value="94" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/source/GPU/ggml.c</url>
+          <line>6821</line>
+          <option name="timeStamp" value="102" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/source/GPU/ggml.c</url>
+          <line>3512</line>
+          <option name="timeStamp" value="103" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/source/GPU/ggml-vulkan.cpp</url>
+          <line>15186</line>
+          <option name="timeStamp" value="104" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/source/compute/v_type.hpp</url>
+          <option name="timeStamp" value="108" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="CMakeRunConfiguration">
+        <watch expression="datasets" />
+        <watch expression="((class pybind11::handle &amp;) ((class pybind11::object &amp;) ((class pybind11::buffer &amp;) array)))" />
+        <watch expression="buf.strides._Mypair" />
+        <watch expression="hash_set" />
+        <watch expression="(*init_tensors[0]).type" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>

@@ -1,0 +1,118 @@
+#ifndef MYPROJECT_VK_BUFFER_H
+#define MYPROJECT_VK_BUFFER_H
+#include "common.hpp"
+
+struct VKBuffer
+{
+  vk::Buffer buffer = VK_NULL_HANDLE;
+  vk::DeviceMemory device_memory = VK_NULL_HANDLE;
+  vk::MemoryPropertyFlags memory_property_flags;
+  void* ptr;
+  size_t size = 0;
+  vk::DeviceAddress bda_addr{};
+  VKDevice* device;
+  void read(size_t offset__,
+            void* dst__,
+            size_t size__);
+  void copyBuffer(VKBuffer* dst,
+                  size_t dst_offset,
+                  VKBuffer* src,
+                  size_t src_offset,
+                  size_t size);
+  void memsetBuffer(
+    size_t offset__,
+    uint32_t c__,
+    size_t size__);
+  ~VKBuffer();
+};
+
+
+struct VKSubBuffer
+{
+  VKBuffer* pBuffer;
+  uint64_t offset;
+  uint64_t size;
+  operator vk::DescriptorBufferInfo() const
+  {
+    return {
+      pBuffer->buffer,
+      offset,
+      size
+    };
+  }
+};
+
+struct VKStagingMemcpy
+{
+  VKStagingMemcpy(void* _dst,
+                  const void* _src,
+                  size_t _n) : dst(_dst), src(_src), n(_n)
+  {
+  }
+
+  void* dst;
+  const void* src;
+  size_t n;
+};
+
+struct VKStagingMemset
+{
+  VKStagingMemset(void* _dst,
+                  uint32_t _val,
+                  size_t _n) : dst(_dst), val(_val), n(_n)
+  {
+  }
+
+  void* dst;
+  uint32_t val;
+  size_t n;
+};
+
+void mmlVKBufferRead2dAsync(SubCtx subctx,
+                            VKBuffer* src,
+                            size_t offset,
+                            void* dst,
+                            size_t spitch,
+                            size_t dpitch,
+                            size_t width,
+                            size_t height,
+                            bool sync_staging = false);
+
+VKBuffer mmlVKCreateBufferCheck(UVKDevice& device,
+                                      size_t size,
+                                      vk::MemoryPropertyFlags req_flags,
+                                      vk::MemoryPropertyFlags fallback_flags = vk::MemoryPropertyFlags(0));
+VKBuffer mmlVKCreateBuffer(UVKDevice& device__,
+                                 size_t size__,
+                                 const std::initializer_list<vk::MemoryPropertyFlags>& req_flags_list__);
+void mmlVKEnsureSyncStagingBuffer(UVKDevice& device,
+                                  size_t size);
+void defferedMemcpy(void* dst,
+                    const void* src,
+                    size_t size,
+                    std::vector<VKStagingMemcpy>* memcpys = nullptr);
+void deferredMemset(void* dst,
+                    uint32_t val,
+                    size_t size,
+                    std::vector<VKStagingMemset>* memsets = nullptr);
+
+// inline void mmlVKBufferReadAsync(SubCtx subctx,
+//                                  VKBuffer* src,
+//                                  size_t offset,
+//                                  void* dst,
+//                                  size_t size,
+//                                  bool sync_staging = false)
+// {
+//   return mmlVKBufferRead2dAsync(subctx,
+//                                 src,
+//                                 offset,
+//                                 dst,
+//                                 size,
+//                                 size,
+//                                 size,
+//                                 1,
+//                                 sync_staging);
+// }
+//
+
+#endif //MYPROJECT_VK_BUFFER_H

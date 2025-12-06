@@ -1,0 +1,19 @@
+#version 450
+
+#include "types.glsl"
+#include "generic_unary_head.glsl"
+layout(local_size_x = 512, local_size_y = 1, local_size_z = 1) in;
+uint lcg(inout uint state) {
+    state = state * 1664525u + 1013904223u;
+    return state;
+}
+float rand(inout uint state) {
+    return float(lcg(state)) / 4294967296.0;
+}
+void main() {
+    uint idx = get_idx();
+    if (idx >= p.ne) {
+        return;
+    }
+    data_d[get_doffset() + dst_idx(idx)] = rand(idx);
+}

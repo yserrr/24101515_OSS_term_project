@@ -1,0 +1,28 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "TUBASA_014.moc3",
+		"Textures": [
+			"TUBASA_014.4096/texture_00.png",
+			"TUBASA_014.4096/texture_01.png",
+			"TUBASA_014.4096/texture_02.png"
+		],
+		"Physics": "TUBASA_014.physics3.json",
+		"DisplayInfo": "TUBASA_014.cdi3.json"
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": []
+		},
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": [
+				"ParamEyeLOpen",
+				"ParamEyeROpen"
+			]
+		}
+	]
+}

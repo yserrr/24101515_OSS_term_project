@@ -1,0 +1,12 @@
+#version 450
+layout(std430, binding = 0) buffer VertexDelta {
+    vec3 vertex[];
+    vec3 delta[];
+    vec3 weight[];
+    float strength;
+};
+//layout (push_constatnt ){
+//    vec3 center;
+//    float strength;
+//    uint32_t usage_flag;
+//}
