@@ -1,3 +1,4 @@
+
 #include "v.h"
 #include "v_allocator.h"
 #include "v-backend.h"
@@ -85,6 +86,7 @@ float weight_mat[rows_B * cols_B] = {
 // [ 60.00 55.00 50.00 110.00
 //  90.00 54.00 54.00 126.00
 //  42.00 29.00 28.00 64.00]
+//  ggml example의 simple backend 를 가져왔습니다. 원본 코드구조와 거의 동일합니다.
 void v_init_model(simple_model& model) {
   set_log(log_callback_default, nullptr);
   model.backend        = backend_vk_init(0);
