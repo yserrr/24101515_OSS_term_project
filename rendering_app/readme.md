@@ -44,6 +44,7 @@ naive한 frame graph가 구현되어있습니다.
 - READ -> WRITE 리소스의 경우, 자동으로 resource barrier를 삽입합니다. 
 - last_writer가 존재한다면,Write ->Write에 맞춰서barrier를 삽입합니다. 
 - write한 리소스는 명시적으로 RenderPass가 등록되어있지 않다면, 자동으로 No Clear로 pass가 삽입됩니다.
+- frame resource들은 view를 통해서 각 read,write관계를 시각화합니다. 
 --- 
 
 
@@ -51,37 +52,39 @@ naive한 frame graph가 구현되어있습니다.
 
 render pass를 추가할 수 있습니다.
 ```bash
-pass->read__.push_back(renderTargetFilm_->bloomingExtractAttachment_.get());
-    pass->write__.push_back(renderTargetFilm_->bloomingBlurAttachment_.get());
+pass->read__.push_back(renderTargetFilm_->what_need_to_read_target.get());
+    pass->write__.push_back(renderTargetFilm_->what_need_to_write_target.get());
     pass->execute = [this, pass](gpu::CommandBuffer cmd)
     {
-      gpu::cmdBindDescriptorSets(cmd,
-                                 VK_PIPELINE_BIND_POINT_GRAPHICS,
-                                 pipeline_->pipelineLayout_h,
-                                 0,
-                                 1,
-                                 &gpu::ctx__->pDescriptorAllocator->descriptorSets
-                                 [frameIndex_],
-                                 0,
-                                 nullptr);
-      gpu::cmdBeginRendering(cmd, pass);
-      renderTargetFilm_->updateFrameConstant();
-      pushFrameConstant(cmd);
-      gpu::cmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_->bloomingBlurWritePipeline__);
-      pipeline_->cmdSetPolygonMode(cmd, pipeline_->polygonMode);
-      vkCmdSetDepthTestEnable(cmd, pipeline_->depthTest);
-      gpu::cmdSetViewports(cmd,
-                           0.0,
-                           0.0,
-                           (float)gpu::ctx__->pSwapChainContext->extent__.width,
-                           (float)gpu::ctx__->pSwapChainContext->extent__.height
-                          );
-      gpu::cmdDrawQuad(cmd);
-      gpu::cmdEndRendering(cmd);
+      //실행할 내용을 lambda내에서 선언하면, graph가 barrier삽입을 하고 프레임 리소스를 할당합니다.
+      //이후 순차적으로 선언된 pass를 돌아가면서 각 commandbuffer에 삽입한 후, 실행합니다. 
     };
     uploadPasses_.push_back(pass);
   }
-``` 
+```
+
+model import example : 
+```bash
+  //example model
+  ///필요한 model 및 텍스쳐를 내부에서 코드로 올리면, 모델을 불러울 수 있습니다.
+  ///std::string test = "C:/Users/dlwog/OneDrive/Desktop/VkMain-out/assets/textures/HAND_C.jpg";
+  ///std::string test2 = "C:/Users/dlwog/OneDrive/Desktop/VkMain-out/assets/textures/HAND_N .jpg";
+  ///std::string test3 = "C:/Users/dlwog/OneDrive/Desktop/VkMain-out/assets/textures/HAND_S.jpg";
+  ///resourceManager.uploadTexture(test);
+  ///resourceManager.uploadTexture(test2);
+  ///resourceManager.uploadTexture(test3);
+  ///resourceManager.uploadMesh("C:/Users/dlwog/OneDrive/Desktop/VkMain-out/assets/models/hand.fbx");
+  ///auto& mesh = resourceManager.meshes_["C:/Users/dlwog/OneDrive/Desktop/VkMain-out/assets/models/hand.fbx"];
+  ///resourceManager.addModel(mesh.get(), "test Model");
+  ///auto& modle = resourceManager.models_["test Model"];
+  ///modle->constant.albedoTextureIndex = resourceManager.textures_[test]->descriptorArrayIndex__;
+  ///modle->constant.normalTextureIndex = resourceManager.textures_[test2]->descriptorArrayIndex__;
+  ///modle->constant.roughnessTextureIndex = resourceManager.textures_[test3]->descriptorArrayIndex__;
+  // resourceManager.uploadMesh("C:/Users/dlwog/OneDrive/Desktop/VkMain-out/assets/Iron_Man_Mark_44_Hulkbuster/Iron_Man_Mark_44_Hulkbuster_fbx.FBX");
+  // resourceManager.uploadMesh("C:/Users/dlwog/OneDrive/Desktop/VkMain-out/assets/57-estancia_comedor_obj/room.obj");
+```
+
+
 ## 🚀 Project Results
 
 <div align="center">
@@ -101,4 +104,5 @@ MRT:
 - Vulkan 기반 Rendering 구조 실험 중심 프로젝트
 - 학습 목적이며, 구조 이해 및 실습 위주로 구현
 - 향후 최적화 및 다양한 그래픽 기능 확장 계획
+
 
