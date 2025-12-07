@@ -66,7 +66,7 @@ source/core/Render  directory에서 render pass를 추가할 수 있습니다.
       VkClearColorValue clearColor__;
     } passParameter__;
     .....
-} 
+  } 
 ```
 각 pass parameter는 명시적으로 등록하지 않으면 이후 나중에 build하는 시점에서 resource usage에 맞춰서 자동으로 등록합니다.
 # Dependency:
@@ -147,6 +147,7 @@ MRT:
 - Vulkan 기반 Rendering 구조 실험 중심 프로젝트
 - 학습 목적이며, 구조 이해 및 실습 위주로 구현
 - 향후 최적화 및 다양한 그래픽 기능 확장 계획
+
 
 
 
