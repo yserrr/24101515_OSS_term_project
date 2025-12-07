@@ -41,6 +41,8 @@ cmake --build .
 모델 매쉬를 불러와서, sculpting 및 간단한 texture, lighting이 가능합니다.
 key 조작은 다음과 같습니다. 
 
+extern folder내의 모델은 UI를 통해서 불러올 수 있습니다. 
+
 F, LEFT_CRTL : model rotate 
 
 left mouse click : drawing 
