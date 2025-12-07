@@ -33,11 +33,34 @@ cd build
 
 cmake ..
 
-cmake --build .
+cmake --build . 
+
 
 ---
 ## 🚀 Project Results
 모델 매쉬를 불러와서, sculpting 및 간단한 texture, lighting이 가능합니다.
+key 조작은 다음과 같습니다. 
+
+F, LEFT_CRTL : model rotate 
+
+left mouse click : drawing 
+
+F, LEFT_CRTL : view 초기화
+
+G: smooth 
+
+LEFT_ALT : strength 조정
+
+S: symmetry Toggle 
+
+LEFT_SHIFT + mouse left : model scaling 
+
+mouse middle : model move 
+
+LEFT_CRTL + mouse right: brush size 조정
+
+
+
 ![img_3.png](img_3.png)
 
 ---
