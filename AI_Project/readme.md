@@ -68,7 +68,7 @@ SINGLE VULKAN BACKEND
 - Dependencies:
 - CMake
 - Vulkan
-- Pybind 
+- Pybind(python vision dataset을 사용한다면 필요합니다.) 
 
 
 ## Run Example : 
@@ -82,20 +82,9 @@ n_nodes = 17
  -   0: [   500,    10,     1]             NONE x
  -   1: [   784,   500,     1]             NONE x
  -   2: [   500, 15000,     1]          MUL_MAT
- -   3: [   500,     1,     1]             NONE x
- -   4: [   500, 15000,     1]              ADD
- -   5: [   500, 15000,     1]            UNARY
- -   6: [    10, 15000,     1]          MUL_MAT
- -   7: [    10,     1,     1]             NONE x
- -   8: [    10, 15000,     1]              ADD
- -   9: [    10, 15000,     1]         SOFT_MAX
- -  10: [    10, 15000,     1]            UNARY
- -  11: [    10, 15000,     1]              MUL
- -  12: [     1,     1,     1]              SUM
- -  13: [     1,     1,     1]            SCALE
- -  14: [ 15000,     1,     1]           ARGMAX
- -  15: [ 15000,     1,     1]           ARGMAX
- -  16: [     1,     1,     1]      COUNT_EQUAL
+.
+.
+.
 n_leafs = 2
  -   0: [   784, 15000]     NONE           images
  -   1: [    10, 15000]     NONE   labels_one_hot
@@ -104,33 +93,10 @@ node name: COUNT_EQUAL
 backword compute called
 node name: ARGMAX
 backword compute called
-node name: ARGMAX
-backword compute called
-node name: SCALE
-backword compute called
-node name: SUM
-backword compute called
-node name: MUL
-backword compute called
-node name: UNARY
-backword compute called
-node name: SOFT_MAX
-backword compute called
-node name: ADD
-backword compute called
-node name: NONE
-backword compute called
-node name: MUL_MAT
-backword compute called
-mat_mul called
- node name: UNARY
-backword compute called
-node name: ADD
-backword compute called
-node name: NONE
-backword compute called
-node name: MUL_MAT
-backword compute called
+.
+.
+.
+
 mat_mul called
  node name: NONE
 backword compute called
@@ -146,21 +112,6 @@ train: [██▋     ] data=0015000/0045000 loss=2.30679±nan acc=45.95±0.41% 
 train: [█████▎  ] data=0030000/0045000 loss=2.29847±0.00833 acc=46.45±0.29% t=00:00:00 ETA=00:00:00
 train: [███████▉] data=0045000/0045000 loss=2.28946±0.01021 acc=46.29±0.24% t=00:00:00 ETA=00:00:00
 val:   [████████] data=0060000/0045000 loss=2.25014±nan acc=44.61±0.41% t=00:00:00 ETA=00:00:00
-main: epoch 0003/0060:
-train: [██▋     ] data=0015000/0045000 loss=2.25002±nan acc=44.65±0.41% t=00:00:00 ETA=00:00:00
-train: [█████▎  ] data=0030000/0045000 loss=2.23765±0.01238 acc=43.71±0.29% t=00:00:00 ETA=00:00:00
-train: [███████▉] data=0045000/0045000 loss=2.22579±0.01385 acc=42.63±0.23% t=00:00:00 ETA=00:00:00
-val:   [████████] data=0060000/0045000 loss=2.17381±nan acc=39.38±0.40% t=00:00:00 ETA=00:00:00
-main: epoch 0004/0060:
-train: [██▋     ] data=0015000/0045000 loss=2.17401±nan acc=39.38±0.40% t=00:00:00 ETA=00:00:00
-train: [█████▎  ] data=0030000/0045000 loss=2.15863±0.01538 acc=39.15±0.28% t=00:00:00 ETA=00:00:00
-train: [███████▉] data=0045000/0045000 loss=2.14229±0.01860 acc=39.26±0.23% t=00:00:00 ETA=00:00:00
-val:   [████████] data=0060000/0045000 loss=2.07515±nan acc=40.64±0.40% t=00:00:00 ETA=00:00:00
-main: epoch 0005/0060:
-train: [██▋     ] data=0015000/0045000 loss=2.07760±nan acc=40.09±0.40% t=00:00:00 ETA=00:00:00
-train: [█████▎  ] data=0030000/0045000 loss=2.05536±0.02224 acc=41.69±0.28% t=00:00:00 ETA=00:00:00
-train: [███████▉] data=0045000/0045000 loss=2.03336±0.02547 acc=43.31±0.23% t=00:00:00 ETA=00:00:00
-val:   [████████] data=0060000/0045000 loss=1.94293±nan acc=50.85±0.41% t=00:00:00 ETA=00:00:00
 .
 .
 .
