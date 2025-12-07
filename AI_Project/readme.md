@@ -10,7 +10,7 @@
 
 프로젝트 대부분은 ggml을 참조하여 변형하면서 구현하고 있습니다. 
 
-본 프로젝트의 주된 목표는 **개인 학습**입니다.
+본 프로젝트의 주된 목표는 **개인 학습** 입니다.
 
 부족한 부분이 있을 수 있으며, 일부 경우 기존보다 성능이 떨어질 수도 있습니다.  
 
@@ -61,6 +61,7 @@ SINGLE VULKAN BACKEND
 - CMake
 - Vulkan
 - Pybind 
+
 
 ## Run Example : 
 [mnist_train.cpp](source/test/mnist_train.cpp)
