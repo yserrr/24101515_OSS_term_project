@@ -42,12 +42,17 @@ mkdir build
 cd build
 cmake ..
 cmake --build .
-``` 
+```
 
-test 폴더 내의 cpp파일은 실행가능하게 생성됩니다. 
+✅ 실행 예시
+이후 test 폴더 내의 cpp파일은 실행가능하도록 생성됩니다. 
+cmake build 이후 사용할 수 있습니다.
 
-예시는 mnist_train을 참고해주세요
-
+```
+./test/compute    # 기본 Vulkan 연산 테스트
+./test/mnist_train    # MNIST 데이터셋 학습 실행
+```
+코드 compute.cpp, mnist_train.cpp을 참고해주세요
 
 ## 🎯 Project Goal
 
@@ -69,6 +74,7 @@ SINGLE VULKAN BACKEND
 - CMake
 - Vulkan
 - Pybind(python vision dataset을 사용한다면 필요합니다.) 
+
 
 
 ## Run Example : 
