@@ -54,7 +54,7 @@ size_t v_get_backend_buffer_max_size(v_backend_buffer_type_t buft) {
 }
 
 size_t v_get_backend_buffer_alloc_size(v_backend_buffer_type_t buft,
-                                       const struct v_tensor* tensor) {
+                                       const v_tensor* tensor) {
   V_ASSERT(buft);
   return num_bytes(tensor);
 }
@@ -132,7 +132,7 @@ struct v_backend_sched {
   // hash map of the nodes in the graph
   struct v_hash_set hash_set;
   int* hv_tensor_backend_ids; // [hash_set.size]
-  struct v_tensor** hv_tensor_copies; // [hash_set.size][n_backends][n_copies]
+  v_tensor** hv_tensor_copies; // [hash_set.size][n_backends][n_copies]
   int* node_backend_ids; // [graph_size]
   int* leaf_backend_ids; // [graph_size]
   // copy of the graph with modified inputs
@@ -177,7 +177,7 @@ v_backend_sched_t v_sched_new(v_backend_t backend,
   sched->hash_set              = v_hash_set_new(graph_size);
   sched->hv_tensor_backend_ids = (int*)malloc(sched->hash_set.size * sizeof(sched->hv_tensor_backend_ids[0]));
   sched->hv_tensor_copies      = (v_tensor**)malloc(
-    sched->hash_set.size * sched->n_backends * sched->n_copies * sizeof(struct v_tensor*));
+    sched->hash_set.size * sched->n_backends * sched->n_copies * sizeof(v_tensor*));
 
   const size_t v_sched_max_splits = graph_size; // at most there is one split for each node in the graph
   const size_t nodes_size            = graph_size + v_sched_max_splits * v_SCHED_MAX_SPLIT_INPUTS * 2;
@@ -223,7 +223,7 @@ void v_sched_reset(v_backend_sched_t sched) {
     memset(sched->hv_tensor_backend_ids, -1, sched->hash_set.size * sizeof(sched->hv_tensor_backend_ids[0]));
     memset(sched->hv_tensor_copies,
            0,
-           sched->hash_set.size * sched->n_backends * sched->n_copies * sizeof(struct v_tensor*));
+           sched->hash_set.size * sched->n_backends * sched->n_copies * sizeof(v_tensor*));
     sched->is_reset = true;
   }
   sched->is_alloc = false;
@@ -251,12 +251,12 @@ bool v_sched_alloc_graph(v_backend_sched_t sched, struct v_cgraph* graph) {
   sched->ctx = v_ctx_init(params);
   if (sched->ctx == NULL) { v_ABORT("%s: failed to initialize context\n", __func__); }
   for (int i = 0; i < graph->n_leafs; i++) {
-    struct v_tensor* leaf = graph->leafs[i];
+    v_tensor* leaf = graph->leafs[i];
     int* leaf_backend_id  = &tensor_backend_id(leaf);
     if (*leaf_backend_id == -1) { *leaf_backend_id = 0; }
   }
   for (int i = 0; i < graph->n_nodes; i++) {
-    struct v_tensor* node = graph->nodes[i];
+    v_tensor* node = graph->nodes[i];
     int* node_backend_id  = &tensor_backend_id(node);
     // do not overwrite user assignments
     if (*node_backend_id == -1) { *node_backend_id = 0; }
@@ -291,7 +291,7 @@ v_backend_t v_sched_get_backend(v_backend_sched_t sched, int i) {
 }
 
 
-enum v_status v_backend_tensor_view_init(struct v_tensor* tensor) {
+enum v_status v_backend_tensor_view_init(v_tensor* tensor) {
   V_ASSERT(tensor);
   V_ASSERT(tensor->buffer == NULL);
   V_ASSERT(tensor->view_src != NULL);
@@ -304,7 +304,7 @@ enum v_status v_backend_tensor_view_init(struct v_tensor* tensor) {
 }
 
 enum v_status v_backend_tensor_alloc(v_backend_buffer_t buffer,
-                                     struct v_tensor* tensor,
+                                     v_tensor* tensor,
                                      void* addr) {
   V_ASSERT(tensor);
   V_ASSERT(tensor->buffer == NULL);
@@ -327,21 +327,21 @@ void* vk_host_buffer_get_base(v_backend_buffer_t buffer) {
   return (void*)data;
 }
 
-void vk_host_buffer_memset_tensor(v_backend_buffer_t buffer, struct v_tensor* tensor,
+void vk_host_buffer_memset_tensor(v_backend_buffer_t buffer, v_tensor* tensor,
                                   uint8_t value, size_t offset, size_t size) {
   V_ASSERT(tensor);
   memset((char*)tensor->data + offset, value, size);
   v_UNUSED(buffer);
 }
 
-void vk_host_buffer_set_tensor(v_backend_buffer_t buffer, struct v_tensor* tensor,
+void vk_host_buffer_set_tensor(v_backend_buffer_t buffer, v_tensor* tensor,
                                const void* data, size_t offset, size_t size) {
   V_ASSERT(tensor);
   memcpy((char*)tensor->data + offset, data, size);
   v_UNUSED(buffer);
 }
 
-void vk_host_buffer_get_tensor(v_backend_buffer_t buffer, const struct v_tensor* tensor,
+void vk_host_buffer_get_tensor(v_backend_buffer_t buffer, const v_tensor* tensor,
                                void* data, size_t offset, size_t size) {
   V_ASSERT(tensor);
   memcpy(data, (const char*)tensor->data + offset, size);

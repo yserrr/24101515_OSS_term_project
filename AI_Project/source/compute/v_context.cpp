@@ -82,7 +82,7 @@ void free_ctx(struct v_ctx* ctx) {
 
 size_t v_get_max_tensor_size(const struct v_ctx* ctx) {
   size_t max_size = 0;
-  for (struct v_tensor* tensor = v_get_first_tensor(ctx); tensor != NULL; tensor =
+  for (v_tensor* tensor = v_get_first_tensor(ctx); tensor != NULL; tensor =
        v_get_next_tensor(ctx, tensor)) {
     size_t bytes = num_bytes(tensor);
     max_size     = MAX(max_size, bytes);
@@ -91,11 +91,11 @@ size_t v_get_max_tensor_size(const struct v_ctx* ctx) {
   return max_size;
 }
 
-struct v_tensor* v_get_first_tensor(const struct v_ctx* ctx) {
+v_tensor* v_get_first_tensor(const struct v_ctx* ctx) {
   struct v_object* obj   = ctx->objects_begin;
   char* const mem_buffer = static_cast<char* const>(ctx->mem_buffer);
   while (obj != NULL) {
-    if (obj->type == MML_TENSOR) { return reinterpret_cast<struct v_tensor*>(mem_buffer + obj->offs); }
+    if (obj->type == MML_TENSOR) { return reinterpret_cast<v_tensor*>(mem_buffer + obj->offs); }
 
     obj = obj->next;
   }
@@ -103,12 +103,12 @@ struct v_tensor* v_get_first_tensor(const struct v_ctx* ctx) {
   return NULL;
 }
 
-struct v_tensor* v_get_tensor_name(struct v_ctx* ctx, const char* name) {
+v_tensor* v_get_tensor_name(struct v_ctx* ctx, const char* name) {
   struct v_object* obj   = ctx->objects_begin;
   char* const mem_buffer = (char* const)ctx->mem_buffer;
   while (obj != NULL) {
     if (obj->type == MML_TENSOR) {
-      struct v_tensor* cur = (struct v_tensor*)(mem_buffer + obj->offs);
+      v_tensor* cur = (v_tensor*)(mem_buffer + obj->offs);
       if (strcmp(cur->name, name) == 0) { return cur; }
     }
     obj = obj->next;
@@ -116,12 +116,12 @@ struct v_tensor* v_get_tensor_name(struct v_ctx* ctx, const char* name) {
   return NULL;
 }
 
-struct v_tensor* v_get_next_tensor(const struct v_ctx* ctx, struct v_tensor* tensor) {
+v_tensor* v_get_next_tensor(const struct v_ctx* ctx, v_tensor* tensor) {
   struct v_object* obj   = (struct v_object*)((char*)tensor - MML_OBJECT_SIZE);
   obj                    = obj->next;
   char* const mem_buffer = (char* const)ctx->mem_buffer;
   while (obj != NULL) {
-    if (obj->type == MML_TENSOR) { return (struct v_tensor*)(mem_buffer + obj->offs); }
+    if (obj->type == MML_TENSOR) { return (v_tensor*)(mem_buffer + obj->offs); }
 
     obj = obj->next;
   }

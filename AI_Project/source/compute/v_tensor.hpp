@@ -35,5 +35,6 @@ struct v_tensor
   void* extra; // extra things e.g. for ggml-cuda.cu
   char padding[8];
 };
-using v_tensor_t = v_tensor*;
+
+
 #endif //MYPROJECT_MML_TENSOR_HPP

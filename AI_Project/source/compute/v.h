@@ -139,8 +139,7 @@ v_API v_abort_callback_t v_set_abort_callback(v_abort_callback_t callback);
 v_NORETURN v_ATTRIBUTE_FORMAT(3, 4)
 v_API void v_abort(const char* file, int line, const char* fmt, ...);
 
-enum v_status
-{
+enum v_status {
   v_STATUS_ALLOC_FAILED = -2,
   v_STATUS_FAILED       = -1,
   v_STATUS_SUCCESS      = 0,
@@ -159,8 +158,7 @@ v_API void v_fp32_to_fp16_row(const float*, v_fp16_t*, int64_t);
 #include "v_log.hpp"
 
 // google brain half-precision bfloat16
-typedef struct
-{
+typedef struct {
   uint16_t bits;
 } v_bf16_t;
 
@@ -175,8 +173,7 @@ struct v_ctx;
 struct v_cgraph;
 
 // NOTE: always add types at the end of the enum to keep backward compatibility
-enum v_data_type
-{
+enum v_data_type {
   v_TYPE_F32  = 0,
   v_TYPE_F16  = 1,
   v_TYPE_Q4_0 = 2,
@@ -220,14 +217,12 @@ enum v_data_type
   v_TYPE_COUNT = 40,
 };
 
-enum v_prec
-{
+enum v_prec {
   v_PREC_DEFAULT = 0, // stored as v_tensor.op_params, 0 by default
   v_PREC_F32     = 10,
 };
 
-enum v_ftype
-{
+enum v_ftype {
   v_FTYPE_UNKNOWN              = -1,
   v_FTYPE_ALL_F32              = 0,
   v_FTYPE_MOSTLY_F16           = 1, // except 1d tensors
@@ -258,17 +253,10 @@ enum v_ftype
 
 // model file types
 
-struct v_tensor* new_tensor_impl(struct v_ctx* ctx,
-                                 enum v_data_type type,
-                                 int n_dims,
-                                 const int64_t* ne,
-                                 struct v_tensor* view_src,
-                                 size_t view_offs);
 #include "v_op.hpp"
 
 
-enum v_log_level
-{
+enum v_log_level {
   v_LOG_LEVEL_NONE  = 0,
   v_LOG_LEVEL_DEBUG = 1,
   v_LOG_LEVEL_INFO  = 2,
@@ -281,8 +269,7 @@ enum v_log_level
 #include "v_ctx.hpp"
 
 
-struct v_init_param
-{
+struct v_init_param {
   // memory pool
   size_t mem_size; // bytes
   void* mem_buffer; // if NULL, memory will be allocated internally
@@ -294,7 +281,7 @@ struct v_init_param
 // n-dimensional tensor
 
 
-static const size_t v_TENSOR_SIZE = sizeof(struct v_tensor);
+static const size_t v_TENSOR_SIZE = sizeof(v_tensor);
 
 // Abort callback
 // If not NULL, called before ggml computation
@@ -324,8 +311,7 @@ typedef bool (*v_abort_callback)(void* data);
 typedef void (*v_to_float_t)(const void* v_RESTRICT x, float* v_RESTRICT y, int64_t k);
 typedef void (*v_from_float_t)(const float* v_RESTRICT x, void* v_RESTRICT y, int64_t k);
 
-struct v_type_traits
-{
+struct v_type_traits {
   const char* type_name;
   int64_t blck_size;
   int64_t blck_size_interleave; // interleave elements in blocks
@@ -353,10 +339,16 @@ v_API FILE* v_fopen(const char* fname, const char* mode);
 v_API void v_print_object(const struct v_object* obj);
 v_API void v_print_objects(const struct v_ctx* ctx);
 
-v_API int64_t nelements(const struct v_tensor* tensor);
-v_API int64_t v_nrows(const struct v_tensor* tensor);
-v_API size_t num_bytes(const struct v_tensor* tensor);
-v_API size_t v_nbytes_pad(const struct v_tensor* tensor); // same as v_nbytes() but padded to v_MEM_ALIGN
+v_tensor* new_tensor_impl(struct v_ctx* ctx,
+                          enum v_data_type type,
+                          int n_dims,
+                          const int64_t* ne,
+                          v_tensor* view_src,
+                          size_t view_offs);
+v_API int64_t nelements(const v_tensor* tensor);
+v_API int64_t v_nrows(const v_tensor* tensor);
+v_API size_t num_bytes(const v_tensor* tensor);
+v_API size_t v_nbytes_pad(const v_tensor* tensor); // same as v_nbytes() but padded to v_MEM_ALIGN
 
 v_API int64_t block_size(enum v_data_type type);
 v_API size_t v_type_size(enum v_data_type type); // size in bytes for all elements in a block
@@ -373,50 +365,50 @@ v_API const char* v_op_symbol(enum v_operation op);
 
 v_API const char* v_unary_op_name(enum v_unary_op op);
 v_API const char* v_glu_op_name(enum v_glu_op op);
-v_API const char* v_op_desc(const struct v_tensor* t); // unary or op name
+v_API const char* v_op_desc(const v_tensor* t); // unary or op name
 
-v_API size_t v_element_size(const struct v_tensor* tensor);
+v_API size_t v_element_size(const v_tensor* tensor);
 
 v_API bool v_is_quantized(enum v_data_type type);
 
 // TODO: temporary until model loading of ggml examples is refactored
 v_API enum v_data_type v_ftype_to_v_type(enum v_ftype ftype);
 
-v_API bool v_is_transposed(const struct v_tensor* tensor);
-v_API bool v_is_permuted(const struct v_tensor* tensor);
-v_API bool is_empty(const struct v_tensor* tensor);
-v_API bool v_is_scalar(const struct v_tensor* tensor);
-v_API bool v_is_vector(const struct v_tensor* tensor);
-v_API bool v_is_matrix(const struct v_tensor* tensor);
-v_API bool v_is_3d(const struct v_tensor* tensor);
+v_API bool v_is_transposed(const v_tensor* tensor);
+v_API bool v_is_permuted(const v_tensor* tensor);
+v_API bool is_empty(const v_tensor* tensor);
+v_API bool v_is_scalar(const v_tensor* tensor);
+v_API bool v_is_vector(const v_tensor* tensor);
+v_API bool v_is_matrix(const v_tensor* tensor);
+v_API bool v_is_3d(const v_tensor* tensor);
 
 // returns whether the tensor elements can be iterated over with a flattened index (no gaps, no permutation)
-v_API bool v_is_contiguous(const struct v_tensor* tensor);
-v_API bool v_is_contiguous_0(const struct v_tensor* tensor); // same as v_is_contiguous()
-v_API bool v_is_contiguous_1(const struct v_tensor* tensor); // contiguous for dims >= 1
-v_API bool v_is_contiguous_2(const struct v_tensor* tensor); // contiguous for dims >= 2
+v_API bool v_is_contiguous(const v_tensor* tensor);
+v_API bool v_is_contiguous_0(const v_tensor* tensor); // same as v_is_contiguous()
+v_API bool v_is_contiguous_1(const v_tensor* tensor); // contiguous for dims >= 1
+v_API bool v_is_contiguous_2(const v_tensor* tensor); // contiguous for dims >= 2
 
 // returns whether the tensor elements are allocated as one contiguous block of memory (no gaps, but permutation ok)
-v_API bool v_is_contiguously_allocated(const struct v_tensor* tensor);
+v_API bool v_is_contiguously_allocated(const v_tensor* tensor);
 
 // true for tensor that is stored in memory as CxWxHxN and has been permuted to WxHxCxN
-v_API bool v_is_contiguous_channels(const struct v_tensor* tensor);
+v_API bool v_is_contiguous_channels(const v_tensor* tensor);
 
 // true if the elements in dimension 0 are contiguous, or there is just 1 block of elements
-v_API bool v_is_contiguous_rows(const struct v_tensor* tensor);
+v_API bool v_is_contiguous_rows(const v_tensor* tensor);
 
-v_API bool v_are_same_shape(const struct v_tensor* t0, const struct v_tensor* t1);
-v_API bool v_are_same_stride(const struct v_tensor* t0, const struct v_tensor* t1);
+v_API bool v_are_same_shape(const v_tensor* t0, const v_tensor* t1);
+v_API bool v_are_same_stride(const v_tensor* t0, const v_tensor* t1);
 
-v_API bool can_repeat(const struct v_tensor* t0, const struct v_tensor* t1);
+v_API bool can_repeat(const v_tensor* t0, const v_tensor* t1);
 
 // use this to compute the memory overhead of a tensor
 v_API size_t v_tensor_over_head(void);
 
 v_API bool v_validate_row_data(enum v_data_type type, const void* data, size_t nbytes);
 struct v_object* v_new_object(struct v_ctx* ctx,
-                                 enum v_object_type type,
-                                 size_t size);
+                              enum v_object_type type,
+                              size_t size);
 // main
 
 v_API struct v_ctx* v_ctx_init(struct v_init_param params);
@@ -427,24 +419,24 @@ v_API void* v_get_mem_buffer(const struct v_ctx* ctx);
 v_API size_t v_get_mem_size(const struct v_ctx* ctx);
 v_API size_t v_get_max_tensor_size(const struct v_ctx* ctx);
 
-v_API struct v_tensor* v_new_tensor(
+v_API v_tensor* v_new_tensor(
   struct v_ctx* ctx,
   enum v_data_type type,
   int n_dims,
   const int64_t* ne);
 
-v_API struct v_tensor* v_new_tensor_1d(
+v_API v_tensor* v_new_tensor_1d(
   struct v_ctx* ctx,
   enum v_data_type type,
   int64_t ne0);
 
-v_API struct v_tensor* v_new_tensor_2d(
+v_API v_tensor* v_new_tensor_2d(
   struct v_ctx* ctx,
   enum v_data_type type,
   int64_t ne0,
   int64_t ne1);
 
-v_API struct v_tensor* v_new_tensor_3d(
+v_API v_tensor* v_new_tensor_3d(
   struct v_ctx* ctx,
   enum v_data_type type,
   int64_t ne0,
@@ -461,365 +453,364 @@ v_API v_tensor* v_new_tensor_4d(
 
 v_API void* v_new_buffer(struct v_ctx* ctx, size_t nbytes);
 
-v_API struct v_tensor* v_dup_tensor(struct v_ctx* ctx, const struct v_tensor* src);
-v_API struct v_tensor* v_tensor_view(struct v_ctx* ctx, struct v_tensor* src);
+v_API v_tensor* v_dup_tensor(struct v_ctx* ctx, const v_tensor* src);
+v_API v_tensor* v_tensor_view(struct v_ctx* ctx, v_tensor* src);
 
 // Context tensor enumeration and lookup
-v_API struct v_tensor* v_get_first_tensor(const struct v_ctx* ctx);
-v_API struct v_tensor* v_get_next_tensor(const struct v_ctx* ctx, struct v_tensor* tensor);
-v_API struct v_tensor* v_get_tensor_name(struct v_ctx* ctx, const char* name);
+v_API v_tensor* v_get_first_tensor(const struct v_ctx* ctx);
+v_API v_tensor* v_get_next_tensor(const struct v_ctx* ctx, v_tensor* tensor);
+v_API v_tensor* v_get_tensor_name(struct v_ctx* ctx, const char* name);
 
 // Converts a flat index into coordinates
-v_API void v_unravel_index(const struct v_tensor* tensor, int64_t i, int64_t* i0, int64_t* i1, int64_t* i2,
-                                 int64_t* i3);
+v_API void v_unravel_index(const v_tensor* tensor, int64_t i, int64_t* i0, int64_t* i1, int64_t* i2,
+                           int64_t* i3);
 
-v_API enum v_unary_op v_get_unary_op(const struct v_tensor* tensor);
-v_API enum v_glu_op v_get_glu_op(const struct v_tensor* tensor);
+v_API enum v_unary_op v_get_unary_op(const v_tensor* tensor);
+v_API enum v_glu_op v_get_glu_op(const v_tensor* tensor);
 
-v_API void* v_get_data(const struct v_tensor* tensor);
-v_API float* v_get_tdata_f32(const struct v_tensor* tensor);
+v_API void* v_get_data(const v_tensor* tensor);
+v_API float* v_get_tdata_f32(const v_tensor* tensor);
 
-v_API const char* get_name(const struct v_tensor* tensor);
-v_API struct v_tensor* v_set_name(struct v_tensor* tensor, const char* name);
+v_API const char* get_name(const v_tensor* tensor);
+v_API v_tensor* v_set_name(v_tensor* tensor, const char* name);
 v_ATTRIBUTE_FORMAT(2, 3)
-v_API struct v_tensor* v_format_name(struct v_tensor* tensor, const char* fmt, ...);
+v_API v_tensor* v_format_name(v_tensor* tensor, const char* fmt, ...);
 
-// Tensor flags
-v_API void v_set_inputs(struct v_tensor* tensor);
-v_API void v_set_outputs(struct v_tensor* tensor);
-v_API void v_set_params(struct v_tensor* tensor);
-v_API void v_set_loss(struct v_tensor* tensor);
+v_API void v_set_inputs(v_tensor* tensor);
+v_API void v_set_outputs(v_tensor* tensor);
+v_API void v_set_params(v_tensor* tensor);
+v_API void v_set_loss(v_tensor* tensor);
 
 
-struct v_tensor* v_dup_impl(struct v_ctx* ctx,
-                               struct v_tensor* a,
-                               bool inplace);
+v_tensor* v_dup_impl(struct v_ctx* ctx,
+                     v_tensor* a,
+                     bool inplace);
 
-v_API struct v_tensor* v_dup(
+v_API v_tensor* v_dup(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
 // in-place, returns view(a)
-v_API struct v_tensor* v_dup_inplace(
+v_API v_tensor* v_dup_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_add(
+v_API v_tensor* v_add(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b);
+  v_tensor* a,
+  v_tensor* b);
 
-v_API struct v_tensor* v_add_inplace(
+v_API v_tensor* v_add_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b);
+  v_tensor* a,
+  v_tensor* b);
 
-v_API struct v_tensor* add_cast(
+v_API v_tensor* add_cast(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   enum v_data_type type);
 
 // dst[i0, i1, i2] = a[i0, i1, i2] + b[i0, ids[i1, i2]]
-v_API struct v_tensor* add_id(
+v_API v_tensor* add_id(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
-  struct v_tensor* ids);
+  v_tensor* a,
+  v_tensor* b,
+  v_tensor* ids);
 
-v_API struct v_tensor* add1(
+v_API v_tensor* add1(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b);
+  v_tensor* a,
+  v_tensor* b);
 
-v_API struct v_tensor* v_add1_inplace(
+v_API v_tensor* v_add1_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b);
+  v_tensor* a,
+  v_tensor* b);
 
 
-v_API struct v_tensor* v_sub(struct v_ctx* ctx,
-                                   struct v_tensor* a,
-                                   struct v_tensor* b);
+v_API v_tensor* v_sub(struct v_ctx* ctx,
+                      v_tensor* a,
+                      v_tensor* b);
 
-v_API struct v_tensor* v_sub_inplace(struct v_ctx* ctx,
-                                           struct v_tensor* a,
-                                           struct v_tensor* b);
+v_API v_tensor* v_sub_inplace(struct v_ctx* ctx,
+                              v_tensor* a,
+                              v_tensor* b);
 
-v_API struct v_tensor* v_mul(struct v_ctx* ctx,
-                                struct v_tensor* a,
-                                struct v_tensor* b);
+v_API v_tensor* v_mul(struct v_ctx* ctx,
+                      v_tensor* a,
+                      v_tensor* b);
 
-v_API struct v_tensor* v_mul_inplace(struct v_ctx* ctx,
-                                        struct v_tensor* a,
-                                        struct v_tensor* b);
+v_API v_tensor* v_mul_inplace(struct v_ctx* ctx,
+                              v_tensor* a,
+                              v_tensor* b);
 
-v_API struct v_tensor* v_div(struct v_ctx* ctx,
-                                 struct v_tensor* a,
-                                 struct v_tensor* b);
+v_API v_tensor* v_div(struct v_ctx* ctx,
+                      v_tensor* a,
+                      v_tensor* b);
 
-v_API struct v_tensor* v_div_inplace(
+v_API v_tensor* v_div_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b);
+  v_tensor* a,
+  v_tensor* b);
 
 
-struct v_tensor* set_impl(
+v_tensor* set_impl(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   size_t nb1,
   size_t nb2,
   size_t nb3,
   size_t offset,
   bool inplace);
 
-v_API struct v_tensor* v_sqr(
+v_API v_tensor* v_sqr(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_sqr_inplace(
+v_API v_tensor* v_sqr_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_sqrt(
+v_API v_tensor* v_sqrt(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_sqrt_inplace(
+v_API v_tensor* v_sqrt_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_log(
+v_API v_tensor* v_log(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_log_inplace(
+v_API v_tensor* v_log_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_sin(
+v_API v_tensor* v_sin(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_sin_inplace(
+v_API v_tensor* v_sin_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_cos(
+v_API v_tensor* v_cos(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* cos_inplace(
+v_API v_tensor* cos_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
 // return scalar
-v_API struct v_tensor* v_sum(
+v_API v_tensor* v_sum(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
 // sums along rows, with input shape [a,b,c,d] return shape [1,b,c,d]
-v_API struct v_tensor* v_sum_rows(
+v_API v_tensor* v_sum_rows(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
 // mean along rows
-v_API struct v_tensor* v_mean(
+v_API v_tensor* v_mean(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
 // argmax along rows
-v_API struct v_tensor* v_argmax(
+v_API v_tensor* v_argmax(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
 // count number of equal elements in a and b
-v_API struct v_tensor* v_count_equal(
+v_API v_tensor* v_count_equal(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b);
+  v_tensor* a,
+  v_tensor* b);
 
 // if a is the same shape as b, and a is not parameter, return a
 // otherwise, return a new tensor: repeat(a) to fit in b
-v_API struct v_tensor* v_repeat(
+v_API v_tensor* v_repeat(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b);
+  v_tensor* a,
+  v_tensor* b);
 
 // repeat a to the specified shape
-v_API struct v_tensor* v_repeat_4d(
+v_API v_tensor* v_repeat_4d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0,
   int64_t ne1,
   int64_t ne2,
   int64_t ne3);
 
 // sums repetitions in a into shape of b
-v_API struct v_tensor* v_repeat_back(
+v_API v_tensor* v_repeat_back(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b); // sum up values that are adjacent in dims > 0 instead of repeated with same stride
+  v_tensor* a,
+  v_tensor* b); // sum up values that are adjacent in dims > 0 instead of repeated with same stride
 
 // concat a and b along dim
 // used in stable-diffusion
-v_API struct v_tensor* v_concat(
+v_API v_tensor* v_concat(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   int dim);
 
-v_API struct v_tensor* v_abs(
+v_API v_tensor* v_abs(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_abs_inplace(
+v_API v_tensor* v_abs_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_sgn(
+v_API v_tensor* v_sgn(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_sgn_inplace(
+v_API v_tensor* v_sgn_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_neg(
+v_API v_tensor* v_neg(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_neg_inplace(
+v_API v_tensor* v_neg_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_step(
+v_API v_tensor* v_step(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_step_inplace(
+v_API v_tensor* v_step_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_tanh(
+v_API v_tensor* v_tanh(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_tanh_inplace(
+v_API v_tensor* v_tanh_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_elu(
+v_API v_tensor* v_elu(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_elu_inplace(
+v_API v_tensor* v_elu_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_relu(
+v_API v_tensor* v_relu(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_leaky_relu(
+v_API v_tensor* v_leaky_relu(
   struct v_ctx* ctx,
-  struct v_tensor* a, float negative_slope, bool inplace);
+  v_tensor* a, float negative_slope, bool inplace);
 
-v_API struct v_tensor* v_relu_inplace(
+v_API v_tensor* v_relu_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_sigmoid(
+v_API v_tensor* v_sigmoid(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_sigmoid_inplace(
+v_API v_tensor* v_sigmoid_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_gelu(
+v_API v_tensor* v_gelu(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_gelu_inplace(
+v_API v_tensor* v_gelu_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
 // GELU using erf (error function) when possible
 // some backends may fallback to approximation based on Abramowitz and Stegun formula
-v_API struct v_tensor* v_gelu_erf(
+v_API v_tensor* v_gelu_erf(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_gelu_erf_inplace(
+v_API v_tensor* v_gelu_erf_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_gelu_quick(
+v_API v_tensor* v_gelu_quick(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_gelu_quick_inplace(
+v_API v_tensor* v_gelu_quick_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_silu(
+v_API v_tensor* v_silu(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_silu_inplace(
+v_API v_tensor* v_silu_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
 // a - x
 // b - dy
-v_API struct v_tensor* v_silu_back(
+v_API v_tensor* v_silu_back(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b);
+  v_tensor* a,
+  v_tensor* b);
 
 // hardswish(x) = x * relu6(x + 3) / 6
-v_API struct v_tensor* v_hardswish(
+v_API v_tensor* v_hardswish(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
 // hardsigmoid(x) = relu6(x + 3) / 6
-v_API struct v_tensor* v_hardsigmoid(
+v_API v_tensor* v_hardsigmoid(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_exp(
+v_API v_tensor* v_exp(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_exp_inplace(
+v_API v_tensor* v_exp_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_floor(
+v_API v_tensor* v_floor(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_floor_inplace(
+v_API v_tensor* v_floor_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_ceil(
+v_API v_tensor* v_ceil(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_ceil_inplace(
+v_API v_tensor* v_ceil_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_round(
+v_API v_tensor* v_round(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_round_inplace(
+v_API v_tensor* v_round_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
 /**
 * Truncates the fractional part of each element in the tensor (towards zero).
@@ -827,22 +818,22 @@ v_API struct v_tensor* v_round_inplace(
 * Similar to std::trunc in C/C++.
 */
 
-v_API struct v_tensor* v_trunc(
+v_API v_tensor* v_trunc(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_trunc_inplace(
+v_API v_tensor* v_trunc_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
 
 // xIELU activation function
 // x = x * (c_a(alpha_n) + c_b(alpha_p, beta) * sigmoid(beta * x)) + eps * (x > 0)
 // where c_a = softplus and c_b(a, b) = softplus(a) + b are constraining functions
 // that constrain the positive and negative source alpha values respectively
-v_API struct v_tensor* v_xielu(
+v_API v_tensor* v_xielu(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   float alpha_n,
   float alpha_p,
   float beta,
@@ -852,297 +843,297 @@ v_API struct v_tensor* v_xielu(
 // A: n columns, r rows,
 // result is n / 2 columns, r rows,
 // expects gate in second half of row, unless swapped is true
-v_API struct v_tensor* v_glu(
+v_API v_tensor* v_glu(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   enum v_glu_op op,
   bool swapped);
 
-v_API struct v_tensor* v_reglu(
+v_API v_tensor* v_reglu(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_reglu_swapped(
+v_API v_tensor* v_reglu_swapped(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_geglu(
+v_API v_tensor* v_geglu(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_geglu_swapped(
+v_API v_tensor* v_geglu_swapped(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_swiglu(
+v_API v_tensor* v_swiglu(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_swiglu_swapped(
+v_API v_tensor* v_swiglu_swapped(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_geglu_erf(
+v_API v_tensor* v_geglu_erf(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_geglu_erf_swapped(
+v_API v_tensor* v_geglu_erf_swapped(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_geglu_quick(
+v_API v_tensor* v_geglu_quick(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
-v_API struct v_tensor* v_geglu_quick_swapped(
+v_API v_tensor* v_geglu_quick_swapped(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
 // A: n columns, r rows,
 // B: n columns, r rows,
-v_API struct v_tensor* v_glu_split(
+v_API v_tensor* v_glu_split(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   enum v_glu_op op);
 
-v_API struct v_tensor* v_reglu_split(
+v_API v_tensor* v_reglu_split(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b);
+  v_tensor* a,
+  v_tensor* b);
 
-v_API struct v_tensor* v_geglu_split(
+v_API v_tensor* v_geglu_split(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b);
+  v_tensor* a,
+  v_tensor* b);
 
-v_API struct v_tensor* v_swiglu_split(
+v_API v_tensor* v_swiglu_split(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b);
+  v_tensor* a,
+  v_tensor* b);
 
-v_API struct v_tensor* v_geglu_erf_split(
+v_API v_tensor* v_geglu_erf_split(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b);
+  v_tensor* a,
+  v_tensor* b);
 
-v_API struct v_tensor* v_geglu_quick_split(
+v_API v_tensor* v_geglu_quick_split(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b);
+  v_tensor* a,
+  v_tensor* b);
 
-v_API struct v_tensor* v_swiglu_oai(
+v_API v_tensor* v_swiglu_oai(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   float alpha,
   float limit);
 
 // normalize along rows
-v_API struct v_tensor* v_norm(
+v_API v_tensor* v_norm(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   float eps);
 
-v_API struct v_tensor* mmlNormInplace(
+v_API v_tensor* mmlNormInplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   float eps);
 
-v_API struct v_tensor* v_rms_norm(
+v_API v_tensor* v_rms_norm(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   float eps);
 
-v_API struct v_tensor* v_rms_norm_inplace(
+v_API v_tensor* v_rms_norm_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   float eps);
 
 // group normalize along ne0*ne1*n_groups
 // used in stable-diffusion
-v_API struct v_tensor* v_group_norm(
+v_API v_tensor* v_group_norm(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int n_groups,
   float eps);
 
-v_API struct v_tensor* v_group_norm_inplace(
+v_API v_tensor* v_group_norm_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int n_groups,
   float eps);
 
 // l2 normalize along rows
 // used in rwkv v7
-v_API struct v_tensor* v_norm_l2(
+v_API v_tensor* v_norm_l2(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   float eps);
 
-v_API struct v_tensor* v_l2_norm_inplace(
+v_API v_tensor* v_l2_norm_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   float eps);
 
 // a - x
 // b - dy
-v_API struct v_tensor* v_rms_norm_back(
+v_API v_tensor* v_rms_norm_back(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   float eps);
 
 // A: k columns, n rows => [ne03, ne02, n, k]
 // B: k columns, m rows  (i.e. we transpose it internally) => [ne03 * x, ne02 * y, m, k]
 // result is n columns, m rows => [ne03 * x, ne02 * y, m, n]
-v_API struct v_tensor* v_matmul(
+v_API v_tensor* v_matmul(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b);
+  v_tensor* a,
+  v_tensor* b);
 
 // change the precision of a matrix multiplication
 // set to v_PREC_F32 for higher precision (useful for phi-2)
 v_API void v_mul_mat_set_prec(
-  struct v_tensor* a,
+  v_tensor* a,
   enum v_prec prec);
 
 // indirect matrix multiplication
-v_API struct v_tensor* mmlMatrixMulId(
+v_API v_tensor* mmlMatrixMulId(
   struct v_ctx* ctx,
-  struct v_tensor* as,
-  struct v_tensor* b,
-  struct v_tensor* ids);
+  v_tensor* as,
+  v_tensor* b,
+  v_tensor* ids);
 
 // A: m columns, n rows,
 // B: p columns, n rows,
 // result is m columns, p rows
-v_API struct v_tensor* v_out_prod(
+v_API v_tensor* v_out_prod(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b);
+  v_tensor* a,
+  v_tensor* b);
 
 //
 // operations on tensors without backpropagation
 //
 
-v_API struct v_tensor* v_scale(
+v_API v_tensor* v_scale(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   float s);
 
 // in-place, returns view(a)
-v_API struct v_tensor* v_scale_inplace(
+v_API v_tensor* v_scale_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   float s);
 
 // x = s * a + b
-v_API struct v_tensor* v_scale_bias(
+v_API v_tensor* v_scale_bias(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   float s,
   float b);
 
-v_API struct v_tensor* v_scale_bias_inplace(
+v_API v_tensor* v_scale_bias_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   float s,
   float b);
 
 // b -> view(a,offset,nb1,nb2,3), return modified a
-v_API struct v_tensor* v_set(
+v_API v_tensor* v_set(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   size_t nb1,
   size_t nb2,
   size_t nb3,
   size_t offset); // in bytes
-bool v_is_contiguous_n(const struct v_tensor* tensor, int n);
-struct v_tensor* v_group_norm_impl(struct v_ctx* ctx,
-                                   struct v_tensor* a,
-                                   int n_groups,
-                                   float eps,
-                                   bool inplace);
+bool v_is_contiguous_n(const v_tensor* tensor, int n);
+v_tensor* v_group_norm_impl(struct v_ctx* ctx,
+                            v_tensor* a,
+                            int n_groups,
+                            float eps,
+                            bool inplace);
 
 // b -> view(a,offset,nb1,nb2,3), return view(a)
-v_API struct v_tensor* v_set_inplace(
+v_API v_tensor* v_set_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   size_t nb1,
   size_t nb2,
   size_t nb3,
   size_t offset); // in bytes
 
-v_API struct v_tensor* v_set_1d(
+v_API v_tensor* v_set_1d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   size_t offset); // in bytes
 
-v_API struct v_tensor* v_set_1d_inplace(
+v_API v_tensor* v_set_1d_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   size_t offset); // in bytes
 
 // b -> view(a,offset,nb1,nb2,3), return modified a
-v_API struct v_tensor* v_set_2d(
+v_API v_tensor* v_set_2d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   size_t nb1,
   size_t offset); // in bytes
 
 // b -> view(a,offset,nb1,nb2,3), return view(a)
-v_API struct v_tensor* v_set_2d_inplace(
+v_API v_tensor* v_set_2d_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   size_t nb1,
   size_t offset); // in bytes
 
 // a -> b, return view(b)
-v_API struct v_tensor* v_cpy(
+v_API v_tensor* v_cpy(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b);
+  v_tensor* a,
+  v_tensor* b);
 
 // note: casting from f32 to i32 will discard the fractional part
-v_API struct v_tensor* v_cast(
+v_API v_tensor* v_cast(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   enum v_data_type type);
 
 // make contiguous
-v_API struct v_tensor* v_mem_cont(
+v_API v_tensor* v_mem_cont(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
 // make contiguous, with new shape
-v_API struct v_tensor* v_cont_1d(
+v_API v_tensor* v_cont_1d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0);
 
-v_API struct v_tensor* v_cont_2d(
+v_API v_tensor* v_cont_2d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0,
   int64_t ne1);
 
-v_API struct v_tensor* v_cont_3d(
+v_API v_tensor* v_cont_3d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0,
   int64_t ne1,
   int64_t ne2);
 
-v_API struct v_tensor* v_cont_4d(
+v_API v_tensor* v_cont_4d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0,
   int64_t ne1,
   int64_t ne2,
@@ -1150,59 +1141,59 @@ v_API struct v_tensor* v_cont_4d(
 
 // return view(a), b specifies the new shape
 // TODO: when we start computing gradient, make a copy instead of view
-v_API struct v_tensor* v_reshape(
+v_API v_tensor* v_reshape(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b);
+  v_tensor* a,
+  v_tensor* b);
 
 // return view(a)
 // TODO: when we start computing gradient, make a copy instead of view
-v_API struct v_tensor* v_reshape_1d(
+v_API v_tensor* v_reshape_1d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0);
 
-v_API struct v_tensor* v_reshape_2d(
+v_API v_tensor* v_reshape_2d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0,
   int64_t ne1);
 
 // return view(a)
 // TODO: when we start computing gradient, make a copy instead of view
-v_API struct v_tensor* v_reshape_3d(
+v_API v_tensor* v_reshape_3d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0,
   int64_t ne1,
   int64_t ne2);
 
-v_API struct v_tensor* v_reshape_4d(
+v_API v_tensor* v_reshape_4d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0,
   int64_t ne1,
   int64_t ne2,
   int64_t ne3);
 
 // offset in bytes
-v_API struct v_tensor* v_view_1d(
+v_API v_tensor* v_view_1d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0,
   size_t offset);
 
-v_API struct v_tensor* v_view_2d(
+v_API v_tensor* v_view_2d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0,
   int64_t ne1,
   size_t nb1, // row stride in bytes
   size_t offset);
 
-v_API struct v_tensor* v_view_3d(
+v_API v_tensor* v_view_3d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0,
   int64_t ne1,
   int64_t ne2,
@@ -1210,9 +1201,9 @@ v_API struct v_tensor* v_view_3d(
   size_t nb2, // slice stride in bytes
   size_t offset);
 
-v_API struct v_tensor* v_view_4d(
+v_API v_tensor* v_view_4d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0,
   int64_t ne1,
   int64_t ne2,
@@ -1222,34 +1213,34 @@ v_API struct v_tensor* v_view_4d(
   size_t nb3,
   size_t offset);
 
-v_API struct v_tensor* v_permute(
+v_API v_tensor* v_permute(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int axis0,
   int axis1,
   int axis2,
   int axis3);
 
 // alias for v_permute(ctx, a, 1, 0, 2, 3)
-v_API struct v_tensor* v_transpose(
+v_API v_tensor* v_transpose(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
 // supports 4D a:
 // a     [n_embd, ne1, ne2, ne3]
 // b I32 [n_rows, ne2, ne3, 1]
 //
 // return [n_embd, n_rows, ne2, ne3]
-v_API struct v_tensor* v_get_rows(
+v_API v_tensor* v_get_rows(
   struct v_ctx* ctx,
-  struct v_tensor* a, // data
-  struct v_tensor* b); // row indices
+  v_tensor* a, // data
+  v_tensor* b); // row indices
 
-v_API struct v_tensor* v_get_rows_back(
+v_API v_tensor* v_get_rows_back(
   struct v_ctx* ctx,
-  struct v_tensor* a, // gradients of v_get_rows result
-  struct v_tensor* b, // row indices
-  struct v_tensor* c); // data for v_get_rows, only used for its shape
+  v_tensor* a, // gradients of v_get_rows result
+  v_tensor* b, // row indices
+  v_tensor* c); // data for v_get_rows, only used for its shape
 
 // a TD  [n_embd, ne1,    ne2,    ne3]
 // b TS  [n_embd, n_rows, ne02,   ne03] | ne02 == ne2, ne03 == ne3
@@ -1262,66 +1253,66 @@ v_API struct v_tensor* v_get_rows_back(
 //   ne3 % ne12 == 0
 //
 // return view(a)
-v_API struct v_tensor* v_set_rows(struct v_ctx* ctx,
-                                        struct v_tensor* a, // destination
-                                        struct v_tensor* b, // source
-                                        struct v_tensor* c); // row indices
-struct v_tensor* v_glu_impl(struct v_ctx* ctx,
-                               struct v_tensor* a,
-                               struct v_tensor* b,
-                               enum v_glu_op op,
-                               bool swapped);
+v_API v_tensor* v_set_rows(struct v_ctx* ctx,
+                           v_tensor* a, // destination
+                           v_tensor* b, // source
+                           v_tensor* c); // row indices
+v_tensor* v_glu_impl(struct v_ctx* ctx,
+                     v_tensor* a,
+                     v_tensor* b,
+                     enum v_glu_op op,
+                     bool swapped);
 
-struct v_tensor* v_norm_impl(struct v_ctx* ctx,
-                                struct v_tensor* a,
-                                float eps,
-                                bool inplace);
+v_tensor* v_norm_impl(struct v_ctx* ctx,
+                      v_tensor* a,
+                      float eps,
+                      bool inplace);
 
-struct v_tensor* v_rms_norm_impl(struct v_ctx* ctx,
-                                    struct v_tensor* a,
-                                    float eps,
-                                    bool inplace);
+v_tensor* v_rms_norm_impl(struct v_ctx* ctx,
+                          v_tensor* a,
+                          float eps,
+                          bool inplace);
 
-struct v_tensor* v_l2_norm_impl(struct v_ctx* ctx,
-                                   struct v_tensor* a,
-                                   float eps,
-                                   bool inplace);
-v_API struct v_tensor* v_diag(
+v_tensor* v_l2_norm_impl(struct v_ctx* ctx,
+                         v_tensor* a,
+                         float eps,
+                         bool inplace);
+v_API v_tensor* v_diag(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
 // set elements above the diagonal to -INF
-v_API struct v_tensor* v_diag_mask_inf(
+v_API v_tensor* v_diag_mask_inf(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int n_past);
 
 // in-place, returns view(a)
-v_API struct v_tensor* v_diag_mask_inf_inplace(
+v_API v_tensor* v_diag_mask_inf_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int n_past);
 
 // set elements above the diagonal to 0
-v_API struct v_tensor* v_diag_mask_zero(
+v_API v_tensor* v_diag_mask_zero(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int n_past);
 
 // in-place, returns view(a)
-v_API struct v_tensor* v_diag_mask_zero_inplace(
+v_API v_tensor* v_diag_mask_zero_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int n_past);
 
-v_API struct v_tensor* v_soft_max(
+v_API v_tensor* v_soft_max(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
 // in-place, returns view(a)
-v_API struct v_tensor* v_soft_max_inplace(
+v_API v_tensor* v_soft_max_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a);
+  v_tensor* a);
 
 // a    [ne0, ne01, ne02, ne03]
 // mask [ne0, ne11, ne12, ne13] | ne11 >= ne01, F16 or F32, optional
@@ -1332,36 +1323,36 @@ v_API struct v_tensor* v_soft_max_inplace(
 //
 // fused soft_max(a*scale + mask*(ALiBi slope))
 // max_bias = 0.0f for no ALiBi
-v_API struct v_tensor* v_soft_max_ext(
+v_API v_tensor* v_soft_max_ext(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* mask,
+  v_tensor* a,
+  v_tensor* mask,
   float scale,
   float max_bias);
 
-v_API struct v_tensor* v_soft_max_ext_inplace(
+v_API v_tensor* v_soft_max_ext_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* mask,
+  v_tensor* a,
+  v_tensor* mask,
   float scale,
   float max_bias);
 
 v_API void v_soft_max_add_sinks(
-  struct v_tensor* a,
-  struct v_tensor* sinks);
+  v_tensor* a,
+  v_tensor* sinks);
 
-v_API struct v_tensor* v_soft_max_ext_back(
+v_API v_tensor* v_soft_max_ext_back(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   float scale,
   float max_bias);
 
 // in-place, returns view(a)
-v_API struct v_tensor* v_soft_max_ext_back_inplace(
+v_API v_tensor* v_soft_max_ext_back_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   float scale,
   float max_bias);
 
@@ -1370,28 +1361,28 @@ v_API struct v_tensor* v_soft_max_ext_back_inplace(
 // if (mode & v_ROPE_TYPE_NEOX) - GPT-NeoX style
 //
 // b is an int32 vector with size a->ne[2], it contains the positions
-v_API struct v_tensor* v_rope(
+v_API v_tensor* v_rope(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   int n_dims,
   int mode);
 
 // in-place, returns view(a)
-v_API struct v_tensor* v_rope_inplace(
+v_API v_tensor* v_rope_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   int n_dims,
   int mode);
 
 // custom RoPE
 // c is freq factors (e.g. phi3-128k), (optional)
-v_API struct v_tensor* v_rope_ext(
+v_API v_tensor* v_rope_ext(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
-  struct v_tensor* c,
+  v_tensor* a,
+  v_tensor* b,
+  v_tensor* c,
   int n_dims,
   int mode,
   int n_ctx_orig,
@@ -1402,11 +1393,11 @@ v_API struct v_tensor* v_rope_ext(
   float beta_fast,
   float beta_slow);
 
-v_API struct v_tensor* v_rope_multi(
+v_API v_tensor* v_rope_multi(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
-  struct v_tensor* c,
+  v_tensor* a,
+  v_tensor* b,
+  v_tensor* c,
   int n_dims,
   int sections[v_MROPE_SECTIONS],
   int mode,
@@ -1419,11 +1410,11 @@ v_API struct v_tensor* v_rope_multi(
   float beta_slow);
 
 // in-place, returns view(a)
-v_API struct v_tensor* v_rope_ext_inplace(
+v_API v_tensor* v_rope_ext_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
-  struct v_tensor* c,
+  v_tensor* a,
+  v_tensor* b,
+  v_tensor* c,
   int n_dims,
   int mode,
   int n_ctx_orig,
@@ -1434,11 +1425,11 @@ v_API struct v_tensor* v_rope_ext_inplace(
   float beta_fast,
   float beta_slow);
 
-v_API struct v_tensor* v_rope_multi_inplace(
+v_API v_tensor* v_rope_multi_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
-  struct v_tensor* c,
+  v_tensor* a,
+  v_tensor* b,
+  v_tensor* c,
   int n_dims,
   int sections[v_MROPE_SECTIONS],
   int mode,
@@ -1450,35 +1441,35 @@ v_API struct v_tensor* v_rope_multi_inplace(
   float beta_fast,
   float beta_slow);
 
-v_DEPRECATED(v_API struct v_tensor * v_rope_custom(
-                  struct v_ctx * ctx,
-                  struct v_tensor * a,
-                  struct v_tensor * b,
-                  int n_dims,
-                  int mode,
-                  int n_ctx_orig,
-                  float freq_base,
-                  float freq_scale,
-                  float ext_factor,
-                  float attn_factor,
-                  float beta_fast,
-                  float beta_slow),
-                "use v_rope_ext instead");
+v_DEPRECATED(v_API v_tensor * v_rope_custom(
+               struct v_ctx * ctx,
+               v_tensor * a,
+               v_tensor * b,
+               int n_dims,
+               int mode,
+               int n_ctx_orig,
+               float freq_base,
+               float freq_scale,
+               float ext_factor,
+               float attn_factor,
+               float beta_fast,
+               float beta_slow),
+             "use v_rope_ext instead");
 
-v_DEPRECATED(v_API struct v_tensor * v_rope_custom_inplace(
-                  struct v_ctx * ctx,
-                  struct v_tensor * a,
-                  struct v_tensor * b,
-                  int n_dims,
-                  int mode,
-                  int n_ctx_orig,
-                  float freq_base,
-                  float freq_scale,
-                  float ext_factor,
-                  float attn_factor,
-                  float beta_fast,
-                  float beta_slow),
-                "use v_rope_ext_inplace instead");
+v_DEPRECATED(v_API v_tensor * v_rope_custom_inplace(
+               struct v_ctx * ctx,
+               v_tensor * a,
+               v_tensor * b,
+               int n_dims,
+               int mode,
+               int n_ctx_orig,
+               float freq_base,
+               float freq_scale,
+               float ext_factor,
+               float attn_factor,
+               float beta_fast,
+               float beta_slow),
+             "use v_rope_ext_inplace instead");
 
 // compute correction dims for YaRN RoPE scaling
 v_API void v_rope_yarn_corr_dims(
@@ -1486,11 +1477,11 @@ v_API void v_rope_yarn_corr_dims(
 
 // rotary position embedding backward, i.e compute dx from dy
 // a - dy
-v_API struct v_tensor* v_rope_ext_back(
+v_API v_tensor* v_rope_ext_back(
   struct v_ctx* ctx,
-  struct v_tensor* a, // gradients of v_rope result
-  struct v_tensor* b, // positions
-  struct v_tensor* c, // freq factors
+  v_tensor* a, // gradients of v_rope result
+  v_tensor* b, // positions
+  v_tensor* c, // freq factors
   int n_dims,
   int mode,
   int n_ctx_orig,
@@ -1501,11 +1492,11 @@ v_API struct v_tensor* v_rope_ext_back(
   float beta_fast,
   float beta_slow);
 
-v_API struct v_tensor* v_rope_multi_back(
+v_API v_tensor* v_rope_multi_back(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
-  struct v_tensor* c,
+  v_tensor* a,
+  v_tensor* b,
+  v_tensor* c,
   int n_dims,
   int sections[4],
   int mode,
@@ -1520,18 +1511,18 @@ v_API struct v_tensor* v_rope_multi_back(
 
 // clamp
 // in-place, returns view(a)
-v_API struct v_tensor* v_clamp(
+v_API v_tensor* v_clamp(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   float min,
   float max);
 
 // im2col
 // converts data into a format that effectively results in a convolution when combined with matrix multiplication
-v_API struct v_tensor* v_im2col(
+v_API v_tensor* v_im2col(
   struct v_ctx* ctx,
-  struct v_tensor* a, // convolution kernel
-  struct v_tensor* b, // data
+  v_tensor* a, // convolution kernel
+  v_tensor* b, // data
   int s0, // stride dimension 0
   int s1, // stride dimension 1
   int p0, // padding dimension 0
@@ -1541,10 +1532,10 @@ v_API struct v_tensor* v_im2col(
   bool is_2D,
   enum v_data_type dst_type);
 
-v_API struct v_tensor* v_im2col_back(
+v_API v_tensor* v_im2col_back(
   struct v_ctx* ctx,
-  struct v_tensor* a, // convolution kernel
-  struct v_tensor* b, // gradient of im2col output
+  v_tensor* a, // convolution kernel
+  v_tensor* b, // gradient of im2col output
   int64_t* ne, // shape of im2col input
   int s0, // stride dimension 0
   int s1, // stride dimension 1
@@ -1554,55 +1545,55 @@ v_API struct v_tensor* v_im2col_back(
   int d1, // dilation dimension 1
   bool is_2D);
 
-v_API struct v_tensor* v_conv_1d(
+v_API v_tensor* v_conv_1d(
   struct v_ctx* ctx,
-  struct v_tensor* a, // convolution kernel
-  struct v_tensor* b, // data
+  v_tensor* a, // convolution kernel
+  v_tensor* b, // data
   int s0, // stride
   int p0, // padding
   int d0); // dilation
 
 // conv_1d with padding = half
 // alias for v_conv_1d(a, b, s, a->ne[0]/2, d)
-v_API struct v_tensor* v_conv_1d_ph(
+v_API v_tensor* v_conv_1d_ph(
   struct v_ctx* ctx,
-  struct v_tensor* a, // convolution kernel
-  struct v_tensor* b, // data
+  v_tensor* a, // convolution kernel
+  v_tensor* b, // data
   int s, // stride
   int d); // dilation
 
 // depthwise
 // TODO: this is very likely wrong for some cases! - needs more testing
-v_API struct v_tensor* v_conv_1d_dw(
+v_API v_tensor* v_conv_1d_dw(
   struct v_ctx* ctx,
-  struct v_tensor* a, // convolution kernel
-  struct v_tensor* b, // data
+  v_tensor* a, // convolution kernel
+  v_tensor* b, // data
   int s0, // stride
   int p0, // padding
   int d0); // dilation
 
-v_API struct v_tensor* v_conv_1d_dw_ph(
+v_API v_tensor* v_conv_1d_dw_ph(
   struct v_ctx* ctx,
-  struct v_tensor* a, // convolution kernel
-  struct v_tensor* b, // data
+  v_tensor* a, // convolution kernel
+  v_tensor* b, // data
   int s0, // stride
   int d0); // dilation
 
-v_API struct v_tensor* v_conv_transpose_1d(
+v_API v_tensor* v_conv_transpose_1d(
   struct v_ctx* ctx,
-  struct v_tensor* a, // convolution kernel
-  struct v_tensor* b, // data
+  v_tensor* a, // convolution kernel
+  v_tensor* b, // data
   int s0, // stride
   int p0, // padding
   int d0); // dilation
-struct v_tensor* v_log_impl(struct v_ctx* ctx,
-                               struct v_tensor* a,
-                               bool inplace);
+v_tensor* v_log_impl(struct v_ctx* ctx,
+                     v_tensor* a,
+                     bool inplace);
 
-v_API struct v_tensor* v_conv_2d(
+v_API v_tensor* v_conv_2d(
   struct v_ctx* ctx,
-  struct v_tensor* a, // convolution kernel
-  struct v_tensor* b, // data
+  v_tensor* a, // convolution kernel
+  v_tensor* b, // data
   int s0, // stride dimension 0
   int s1, // stride dimension 1
   int p0, // padding dimension 0
@@ -1610,10 +1601,10 @@ v_API struct v_tensor* v_conv_2d(
   int d0, // dilation dimension 0
   int d1); // dilation dimension 1
 
-v_API struct v_tensor* v_im2col_3d(
+v_API v_tensor* v_im2col_3d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   int64_t IC,
   int s0, // stride width
   int s1, // stride height
@@ -1629,10 +1620,10 @@ v_API struct v_tensor* v_im2col_3d(
 // a: [OC*IC, KD, KH, KW]
 // b: [N*IC, ID, IH, IW]
 // result: [N*OC, OD, OH, OW]
-v_API struct v_tensor* v_conv_3d(
+v_API v_tensor* v_conv_3d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   int64_t IC,
   int s0, // stride width
   int s1, // stride height
@@ -1653,10 +1644,10 @@ v_API struct v_tensor* v_conv_3d(
 // b:   1024 1024    3    1
 // res:   64   64  768    1
 // used in sam
-v_API struct v_tensor* v_conv_2d_sk_p0(
+v_API v_tensor* v_conv_2d_sk_p0(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b);
+  v_tensor* a,
+  v_tensor* b);
 
 // kernel size is a->ne[0] x a->ne[1]
 // stride is 1
@@ -1666,16 +1657,16 @@ v_API struct v_tensor* v_conv_2d_sk_p0(
 // b:     64   64    256    1
 // res:   64   64    256    1
 // used in sam
-v_API struct v_tensor* v_conv_2d_s1_ph(
+v_API v_tensor* v_conv_2d_s1_ph(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b);
+  v_tensor* a,
+  v_tensor* b);
 
 // depthwise (via im2col and mul_mat)
-v_API struct v_tensor* v_conv_2d_dw(
+v_API v_tensor* v_conv_2d_dw(
   struct v_ctx* ctx,
-  struct v_tensor* a, // convolution kernel
-  struct v_tensor* b, // data
+  v_tensor* a, // convolution kernel
+  v_tensor* b, // data
   int s0, // stride dimension 0
   int s1, // stride dimension 1
   int p0, // padding dimension 0
@@ -1688,10 +1679,10 @@ v_API struct v_tensor* v_conv_2d_dw(
 // a:   KW    KH    1    C    convolution kernel
 // b:   W     H     C    N    input data
 // res: W_out H_out C    N
-v_API struct v_tensor* v_conv_2d_dw_direct(
+v_API v_tensor* v_conv_2d_dw_direct(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   int stride0,
   int stride1,
   int pad0,
@@ -1699,16 +1690,16 @@ v_API struct v_tensor* v_conv_2d_dw_direct(
   int dilation0,
   int dilation1);
 
-v_API struct v_tensor* v_conv_transpose_2d_p0(
+v_API v_tensor* v_conv_transpose_2d_p0(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   int stride);
 
-v_API struct v_tensor* v_conv_2d_direct(
+v_API v_tensor* v_conv_2d_direct(
   struct v_ctx* ctx,
-  struct v_tensor* a, // convolution kernel [KW, KH, IC, OC]
-  struct v_tensor* b, // input data [W, H, C, N]
+  v_tensor* a, // convolution kernel [KW, KH, IC, OC]
+  v_tensor* b, // input data [W, H, C, N]
   int s0, // stride dimension 0
   int s1, // stride dimension 1
   int p0, // padding dimension 0
@@ -1716,10 +1707,10 @@ v_API struct v_tensor* v_conv_2d_direct(
   int d0, // dilation dimension 0
   int d1); // dilation dimension 1
 
-v_API struct v_tensor* v_conv_3d_direct(
+v_API v_tensor* v_conv_3d_direct(
   struct v_ctx* ctx,
-  struct v_tensor* a, // kernel [KW, KH, KD, IC * OC]
-  struct v_tensor* b, // input  [W, H, D, C * N]
+  v_tensor* a, // kernel [KW, KH, KD, IC * OC]
+  v_tensor* b, // input  [W, H, D, C * N]
   int s0, // stride
   int s1,
   int s2,
@@ -1733,16 +1724,15 @@ v_API struct v_tensor* v_conv_3d_direct(
   int n_batch,
   int n_channels_out);
 
-enum v_op_pool
-{
+enum v_op_pool {
   V_OP_POOL_MAX,
   V_OP_POOL_AVG,
   v_OP_POOL_COUNT,
 };
 
-v_API struct v_tensor* v_pool_1d(
+v_API v_tensor* v_pool_1d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   enum v_op_pool op,
   int k0, // kernel size
   int s0, // stride
@@ -1750,9 +1740,9 @@ v_API struct v_tensor* v_pool_1d(
 
 // the result will have 2*p0 padding for the first dimension
 // and 2*p1 padding for the second dimension
-v_API struct v_tensor* v_pool_2d(
+v_API v_tensor* v_pool_2d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   enum v_op_pool op,
   int k0,
   int k1,
@@ -1761,10 +1751,10 @@ v_API struct v_tensor* v_pool_2d(
   float p0,
   float p1);
 
-v_API struct v_tensor* v_pool_2d_back(
+v_API v_tensor* v_pool_2d_back(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* af, // "a"/input used in forward pass
+  v_tensor* a,
+  v_tensor* af, // "a"/input used in forward pass
   enum v_op_pool op,
   int k0,
   int k1,
@@ -1773,44 +1763,42 @@ v_API struct v_tensor* v_pool_2d_back(
   float p0,
   float p1);
 
-enum v_scale_mode
-{
+enum v_scale_mode {
   v_SCALE_MODE_NEAREST  = 0,
   v_SCALE_MODE_BILINEAR = 1,
 
   v_SCALE_MODE_COUNT
 };
 
-enum v_scale_flag
-{
+enum v_scale_flag {
   v_SCALE_FLAG_ALIGN_CORNERS = (1 << 8)
 };
 
 // interpolate
 // multiplies ne0 and ne1 by scale factor
-v_API struct v_tensor* v_upscale(
+v_API v_tensor* v_upscale(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int scale_factor,
   enum v_scale_mode mode);
 
 // interpolate
 // interpolate scale to specified dimensions
-v_DEPRECATED(v_API struct v_tensor * v_upscale_ext(
-                  struct v_ctx * ctx,
-                  struct v_tensor * a,
-                  int ne0,
-                  int ne1,
-                  int ne2,
-                  int ne3,
-                  enum v_scale_mode mode),
-                "use v_interpolate instead");
+v_DEPRECATED(v_API v_tensor * v_upscale_ext(
+               struct v_ctx * ctx,
+               v_tensor * a,
+               int ne0,
+               int ne1,
+               int ne2,
+               int ne3,
+               enum v_scale_mode mode),
+             "use v_interpolate instead");
 
 // Up- or downsamples the input to the specified size.
 // 2D scale modes (eg. bilinear) are applied to the first two dimensions.
-v_API struct v_tensor* v_interpolate(
+v_API v_tensor* v_interpolate(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0,
   int64_t ne1,
   int64_t ne2,
@@ -1818,17 +1806,17 @@ v_API struct v_tensor* v_interpolate(
   uint32_t mode); // v_scale_mode [ | v_scale_flag...]
 
 // pad each dimension with zeros: [x, ..., x] -> [x, ..., x, 0, ..., 0]
-v_API struct v_tensor* v_pad(
+v_API v_tensor* v_pad(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int p0,
   int p1,
   int p2,
   int p3);
 
-v_API struct v_tensor* v_pad_ext(
+v_API v_tensor* v_pad_ext(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int lp0,
   int rp0,
   int lp1,
@@ -1840,17 +1828,17 @@ v_API struct v_tensor* v_pad_ext(
 );
 
 // pad each dimension with reflection: [a, b, c, d] -> [b, a, b, c, d, c]
-v_API struct v_tensor* v_pad_reflect_1d(
+v_API v_tensor* v_pad_reflect_1d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int p0,
   int p1);
 
 // Move tensor elements by an offset given for each dimension. Elements that
 // are shifted beyond the last position are wrapped around to the beginning.
-v_API struct v_tensor* v_roll(
+v_API v_tensor* v_roll(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int shift0,
   int shift1,
   int shift2,
@@ -1860,34 +1848,33 @@ v_API struct v_tensor* v_roll(
 // Ref: https://github.com/CompVis/stable-diffusion/blob/main/ldm/modules/diffusionmodules/util.py#L151
 // timesteps: [N,]
 // return: [N, dim]
-v_API struct v_tensor* v_timestep_embedding(
+v_API v_tensor* v_timestep_embedding(
   struct v_ctx* ctx,
-  struct v_tensor* timesteps,
+  v_tensor* timesteps,
   int dim,
   int max_period);
 
 // sort rows
-enum v_sort_order
-{
+enum v_sort_order {
   v_SORT_ORDER_ASC,
   v_SORT_ORDER_DESC,
 };
 
-v_API struct v_tensor* v_argsort(
+v_API v_tensor* v_argsort(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   enum v_sort_order order);
 
-v_API struct v_tensor* v_arange(
+v_API v_tensor* v_arange(
   struct v_ctx* ctx,
   float start,
   float stop,
   float step);
 
 // top k elements per row
-v_API struct v_tensor* v_top_k(
+v_API v_tensor* v_top_k(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int k);
 
 #define v_KQ_MASK_PAD 64
@@ -1903,50 +1890,50 @@ v_API struct v_tensor* v_top_k(
 //   n_head % ne32      == 0
 //   ne3    % ne33      == 0
 //
-v_API struct v_tensor* v_flash_attn_ext(
+v_API v_tensor* v_flash_attn_ext(
   struct v_ctx* ctx,
-  struct v_tensor* q,
-  struct v_tensor* k,
-  struct v_tensor* v,
-  struct v_tensor* mask,
+  v_tensor* q,
+  v_tensor* k,
+  v_tensor* v,
+  v_tensor* mask,
   float scale,
   float max_bias,
   float logit_softcap);
 
 v_API void v_flash_attn_ext_set_prec(
-  struct v_tensor* a,
+  v_tensor* a,
   enum v_prec prec);
 
 v_API enum v_prec v_flash_attn_ext_get_prec(
-  const struct v_tensor* a);
+  const v_tensor* a);
 
 v_API void v_flash_attn_ext_add_sinks(
-  struct v_tensor* a,
-  struct v_tensor* sinks);
+  v_tensor* a,
+  v_tensor* sinks);
 
 // TODO: needs to be adapted to v_flash_attn_ext
-v_API struct v_tensor* v_flash_attn_back(
+v_API v_tensor* v_flash_attn_back(
   struct v_ctx* ctx,
-  struct v_tensor* q,
-  struct v_tensor* k,
-  struct v_tensor* v,
-  struct v_tensor* d,
+  v_tensor* q,
+  v_tensor* k,
+  v_tensor* v,
+  v_tensor* d,
   bool masked);
 
-v_API struct v_tensor* v_ssm_conv(
+v_API v_tensor* v_ssm_conv(
   struct v_ctx* ctx,
-  struct v_tensor* sx,
-  struct v_tensor* c);
+  v_tensor* sx,
+  v_tensor* c);
 
-v_API struct v_tensor* v_ssm_scan(
+v_API v_tensor* v_ssm_scan(
   struct v_ctx* ctx,
-  struct v_tensor* s,
-  struct v_tensor* x,
-  struct v_tensor* dt,
-  struct v_tensor* A,
-  struct v_tensor* B,
-  struct v_tensor* C,
-  struct v_tensor* ids);
+  v_tensor* s,
+  v_tensor* x,
+  v_tensor* dt,
+  v_tensor* A,
+  v_tensor* B,
+  v_tensor* C,
+  v_tensor* ids);
 
 // partition into non-overlapping windows with padding if needed
 // example:
@@ -1954,157 +1941,157 @@ v_API struct v_tensor* v_ssm_scan(
 // w:    14
 // res: 768   14   14    25
 // used in sam
-v_API struct v_tensor* v_win_part(
+v_API v_tensor* v_win_part(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int w);
 
 // reverse of v_win_part
 // used in sam
-v_API struct v_tensor* v_win_unpart(
+v_API v_tensor* v_win_unpart(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int w0,
   int h0,
   int w);
 
-v_API struct v_tensor* v_unary(
+v_API v_tensor* v_unary(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   enum v_unary_op op);
 
-v_API struct v_tensor* v_unary_inplace(
+v_API v_tensor* v_unary_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   enum v_unary_op op);
 
 // used in sam
-v_API struct v_tensor* v_get_rel_pos(
+v_API v_tensor* v_get_rel_pos(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int qh,
   int kh);
 
 // used in sam
-v_API struct v_tensor* v_add_rel_pos(
+v_API v_tensor* v_add_rel_pos(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* pw,
-  struct v_tensor* ph);
+  v_tensor* a,
+  v_tensor* pw,
+  v_tensor* ph);
 
-v_API struct v_tensor* v_add_rel_pos_inplace(
+v_API v_tensor* v_add_rel_pos_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* pw,
-  struct v_tensor* ph);
+  v_tensor* a,
+  v_tensor* pw,
+  v_tensor* ph);
 
-v_API struct v_tensor* v_rwkv_wkv6(
+v_API v_tensor* v_rwkv_wkv6(
   struct v_ctx* ctx,
-  struct v_tensor* k,
-  struct v_tensor* v,
-  struct v_tensor* r,
-  struct v_tensor* tf,
-  struct v_tensor* td,
-  struct v_tensor* state);
+  v_tensor* k,
+  v_tensor* v,
+  v_tensor* r,
+  v_tensor* tf,
+  v_tensor* td,
+  v_tensor* state);
 
-v_API struct v_tensor* v_gated_linear_attn(
+v_API v_tensor* v_gated_linear_attn(
   struct v_ctx* ctx,
-  struct v_tensor* k,
-  struct v_tensor* v,
-  struct v_tensor* q,
-  struct v_tensor* g,
-  struct v_tensor* state,
+  v_tensor* k,
+  v_tensor* v,
+  v_tensor* q,
+  v_tensor* g,
+  v_tensor* state,
   float scale);
 
-v_API struct v_tensor* v_rwkv_wkv7(
+v_API v_tensor* v_rwkv_wkv7(
   struct v_ctx* ctx,
-  struct v_tensor* r,
-  struct v_tensor* w,
-  struct v_tensor* k,
-  struct v_tensor* v,
-  struct v_tensor* a,
-  struct v_tensor* b,
-  struct v_tensor* state);
+  v_tensor* r,
+  v_tensor* w,
+  v_tensor* k,
+  v_tensor* v,
+  v_tensor* a,
+  v_tensor* b,
+  v_tensor* state);
 
 // custom operators
 
-typedef void (*v_custom1_op_t)(struct v_tensor* dst, const struct v_tensor* a, int ith, int nth,
-                                  void* userdata);
-typedef void (*v_custom2_op_t)(struct v_tensor* dst, const struct v_tensor* a, const struct v_tensor* b,
-                                  int ith, int nth, void* userdata);
-typedef void (*v_custom3_op_t)(struct v_tensor* dst, const struct v_tensor* a, const struct v_tensor* b,
-                                  const struct v_tensor* c, int ith, int nth, void* userdata);
+typedef void (*v_custom1_op_t)(v_tensor* dst, const v_tensor* a, int ith, int nth,
+                               void* userdata);
+typedef void (*v_custom2_op_t)(v_tensor* dst, const v_tensor* a, const v_tensor* b,
+                               int ith, int nth, void* userdata);
+typedef void (*v_custom3_op_t)(v_tensor* dst, const v_tensor* a, const v_tensor* b,
+                               const v_tensor* c, int ith, int nth, void* userdata);
 
 #define v_N_TASKS_MAX (-1)
 // n_tasks == v_N_TASKS_MAX means to use max number of tasks
 
-v_API struct v_tensor* v_map_custom1(
+v_API v_tensor* v_map_custom1(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   v_custom1_op_t fun,
   int n_tasks,
   void* userdata);
 
-v_API struct v_tensor* v_map_custom1_inplace(
+v_API v_tensor* v_map_custom1_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   v_custom1_op_t fun,
   int n_tasks,
   void* userdata);
 
-v_API struct v_tensor* v_map_custom2(
+v_API v_tensor* v_map_custom2(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   v_custom2_op_t fun,
   int n_tasks,
   void* userdata);
 
-v_API struct v_tensor* v_map_custom2_inplace(
+v_API v_tensor* v_map_custom2_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   v_custom2_op_t fun,
   int n_tasks,
   void* userdata);
 
-v_API struct v_tensor* v_map_custom3(
+v_API v_tensor* v_map_custom3(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
-  struct v_tensor* c,
+  v_tensor* a,
+  v_tensor* b,
+  v_tensor* c,
   v_custom3_op_t fun,
   int n_tasks,
   void* userdata);
 
-v_API struct v_tensor* v_map_custom3_inplace(
+v_API v_tensor* v_map_custom3_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
-  struct v_tensor* c,
+  v_tensor* a,
+  v_tensor* b,
+  v_tensor* c,
   v_custom3_op_t fun,
   int n_tasks,
   void* userdata);
 
-typedef void (*v_custom_op_t)(struct v_tensor* dst, int ith, int nth, void* userdata);
+typedef void (*v_custom_op_t)(v_tensor* dst, int ith, int nth, void* userdata);
 
-v_API struct v_tensor* v_custom_4d(
+v_API v_tensor* v_custom_4d(
   struct v_ctx* ctx,
   enum v_data_type type,
   int64_t ne0,
   int64_t ne1,
   int64_t ne2,
   int64_t ne3,
-  struct v_tensor** args,
+  v_tensor* * args,
   int n_args,
   v_custom_op_t fun,
   int n_tasks,
   void* userdata);
 
-v_API struct v_tensor* v_custom_inplace(
+v_API v_tensor* v_custom_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor** args,
+  v_tensor* a,
+  v_tensor* * args,
   int n_args,
   v_custom_op_t fun,
   int n_tasks,
@@ -2112,74 +2099,74 @@ v_API struct v_tensor* v_custom_inplace(
 
 // loss function
 
-v_API struct v_tensor* v_cross_entropy_loss(
+v_API v_tensor* v_cross_entropy_loss(
   struct v_ctx* ctx,
-  struct v_tensor* a, // logits
-  struct v_tensor* b); // labels
+  v_tensor* a, // logits
+  v_tensor* b); // labels
 
-v_API struct v_tensor* v_cross_entropy_loss_back(
+v_API v_tensor* v_cross_entropy_loss_back(
   struct v_ctx* ctx,
-  struct v_tensor* a, // logits
-  struct v_tensor* b, // labels
-  struct v_tensor* c); // gradients of cross_entropy_loss result
+  v_tensor* a, // logits
+  v_tensor* b, // labels
+  v_tensor* c); // gradients of cross_entropy_loss result
 
 // AdamW optimizer step
 // Paper: https://arxiv.org/pdf/1711.05101v3.pdf
 // PyTorch: https://pytorch.org/docs/stable/generated/torch.optim.AdamW.html
-v_API struct v_tensor* v_opt_step_adamw(
+v_API v_tensor* v_opt_step_adamw(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* grad,
-  struct v_tensor* m,
-  struct v_tensor* v,
-  struct v_tensor* adamw_params); // parameters such as the learning rate
+  v_tensor* a,
+  v_tensor* grad,
+  v_tensor* m,
+  v_tensor* v,
+  v_tensor* adamw_params); // parameters such as the learning rate
 
 // stochastic gradient descent step (with weight decay)
-v_API struct v_tensor* v_opt_step_sgd(
+v_API v_tensor* v_opt_step_sgd(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* grad,
-  struct v_tensor* sgd_params); // alpha, weight decay
+  v_tensor* a,
+  v_tensor* grad,
+  v_tensor* sgd_params); // alpha, weight decay
 
 
 //
 // automatic differentiation
 //
 
-void v_build_foward_expand(struct v_cgraph* cgraph, struct v_tensor* tensor);
+void v_build_foward_expand(struct v_cgraph* cgraph, v_tensor* tensor);
 v_API void v_build_backward_expend(
   struct v_ctx* ctx, // context for gradient computation
   struct v_cgraph* cgraph,
-  struct v_tensor** grad_accs);
+  v_tensor* * grad_accs);
 
 // graph allocation in a context
 v_API struct v_cgraph* new_graph(struct v_ctx* ctx);
 // size = v_DEFAULT_GRAPH_SIZE, grads = false
 v_API struct v_cgraph* v_graph_duplicate(struct v_ctx* ctx, struct v_cgraph* cgraph,
-                                            bool force_grads);
+                                         bool force_grads);
 v_API void v_graph_reset(struct v_cgraph* cgraph);
 // set regular grads + optimizer momenta to 0, set loss grad to 1
 v_API void v_graph_clear(struct v_cgraph* cgraph);
 
 v_API int v_graph_size(struct v_cgraph* cgraph);
-v_API struct v_tensor* v_graph_node(struct v_cgraph* cgraph, int i);
+v_API v_tensor* v_graph_node(struct v_cgraph* cgraph, int i);
 // if i < 0, returns nodes[n_nodes + i]
-v_API struct v_tensor** v_graph_nodes(struct v_cgraph* cgraph);
+v_API v_tensor* * v_graph_nodes(struct v_cgraph* cgraph);
 v_API int v_graph_n_nodes(struct v_cgraph* cgraph);
 
-v_API void v_graph_add_node(struct v_cgraph* cgraph, struct v_tensor* tensor);
+v_API void v_graph_add_node(struct v_cgraph* cgraph, v_tensor* tensor);
 
 v_API size_t graph_overhead(void);
-v_API struct v_tensor* v_graph_get_tensor(const struct v_cgraph* cgraph, const char* name);
-v_API struct v_tensor* v_graph_get_grad(const struct v_cgraph* cgraph, const struct v_tensor* node);
-v_API struct v_tensor* v_graph_get_grad_acc(const struct v_cgraph* cgraph, const struct v_tensor* node);
+v_API v_tensor* v_graph_get_tensor(const struct v_cgraph* cgraph, const char* name);
+v_API v_tensor* v_graph_get_grad(const struct v_cgraph* cgraph, const v_tensor* node);
+v_API v_tensor* v_graph_get_grad_acc(const struct v_cgraph* cgraph, const v_tensor* node);
 
 // print info and performance information for the graph
 v_API void v_print_graph(const struct v_cgraph* cgraph);
 
 // dump the graph into a file using the dot format
 v_API void v_graph_dump_dot(const struct v_cgraph* gb, const struct v_cgraph* gf,
-                                  const char* filename);
+                            const char* filename);
 
 // TODO these functions were sandwiched in the old optimization interface, is there a better place for them?
 typedef void (*v_log_callback)(enum v_log_level level, const char* text, void* user_data);
@@ -2187,7 +2174,7 @@ typedef void (*v_log_callback)(enum v_log_level level, const char* text, void* u
 // Set callback for all future logging events.
 // If this is not called, or NULL is supplied, everything is output on stderr.
 v_API void set_log(v_log_callback log_callback, void* user_data);
-v_API struct v_tensor* v_set_zero(struct v_tensor* tensor);
+v_API v_tensor* v_set_zero(v_tensor* tensor);
 
 
 // quantization
@@ -2219,71 +2206,71 @@ v_API size_t v_quantize_chunk(
 
 
 static const size_t MML_OBJECT_SIZE = sizeof(struct v_object);
-struct v_tensor* mmlSubImpl(struct v_ctx* ctx,
-                            struct v_tensor* a,
-                            struct v_tensor* b,
-                            bool inplace);
+v_tensor* mmlSubImpl(struct v_ctx* ctx,
+                     v_tensor* a,
+                     v_tensor* b,
+                     bool inplace);
 
-struct v_tensor* v_acc_imple(struct v_ctx* ctx,
-                           struct v_tensor* a,
-                           struct v_tensor* b,
-                           size_t nb1,
-                           size_t nb2,
-                           size_t nb3,
-                           size_t offset,
-                           bool inplace);
-struct v_tensor* v_cos_impl(struct v_ctx* ctx,
-                               struct v_tensor* a,
-                               bool inplace);
+v_tensor* v_acc_imple(struct v_ctx* ctx,
+                      v_tensor* a,
+                      v_tensor* b,
+                      size_t nb1,
+                      size_t nb2,
+                      size_t nb3,
+                      size_t offset,
+                      bool inplace);
+v_tensor* v_cos_impl(struct v_ctx* ctx,
+                     v_tensor* a,
+                     bool inplace);
 
-struct v_tensor* v_sin_impl(struct v_ctx* ctx,
-                               struct v_tensor* a,
-                               bool inplace);
-void v_compute_backword(struct v_ctx* ctx,
+v_tensor* v_sin_impl(struct v_ctx* ctx,
+                     v_tensor* a,
+                     bool inplace);
+void v_compute_backward(struct v_ctx* ctx,
                         struct v_cgraph* cgraph,
                         int i,
                         const bool* grads_needed);
-struct v_tensor* v_mul_impl(struct v_ctx* ctx,
-                               struct v_tensor* a,
-                               struct v_tensor* b,
-                               bool inplace);
+v_tensor* v_mul_impl(struct v_ctx* ctx,
+                     v_tensor* a,
+                     v_tensor* b,
+                     bool inplace);
 
-struct v_tensor* add_cast_impl(struct v_ctx* ctx,
-                               struct v_tensor* a,
-                               struct v_tensor* b,
-                               enum v_data_type type);
-struct v_tensor* add1_impl(struct v_ctx* ctx,
-                           struct v_tensor* a,
-                           struct v_tensor* b,
-                           bool inplace);
+v_tensor* add_cast_impl(struct v_ctx* ctx,
+                        v_tensor* a,
+                        v_tensor* b,
+                        enum v_data_type type);
+v_tensor* add1_impl(struct v_ctx* ctx,
+                    v_tensor* a,
+                    v_tensor* b,
+                    bool inplace);
 
-struct v_tensor* v_div_impl(struct v_ctx* ctx,
-                               struct v_tensor* a,
-                               struct v_tensor* b,
-                               bool inplace);
-struct v_tensor* v_add_imple(struct v_ctx* ctx,
-                           struct v_tensor* a,
-                           struct v_tensor* b,
-                           bool inplace);
-struct v_tensor* v_map_custom3_impl(struct v_ctx* ctx,
-                                       struct v_tensor* a,
-                                       struct v_tensor* b,
-                                       struct v_tensor* c,
-                                       const v_custom3_op_t fun,
-                                       int n_tasks,
-                                       void* userdata,
-                                       bool inplace);
-struct v_tensor* v_scale_impl(struct v_ctx* ctx,
-                                 struct v_tensor* a,
-                                 float s,
-                                 float b,
-                                 bool inplace);
-struct v_tensor* v_diag(struct v_ctx* ctx,
-                           struct v_tensor* a);
-struct v_tensor* v_diag_mask_zero_impl(struct v_ctx* ctx,
-                                          struct v_tensor* a,
-                                          int n_past,
-                                          bool inplace);
+v_tensor* v_div_impl(struct v_ctx* ctx,
+                     v_tensor* a,
+                     v_tensor* b,
+                     bool inplace);
+v_tensor* v_add_imple(struct v_ctx* ctx,
+                      v_tensor* a,
+                      v_tensor* b,
+                      bool inplace);
+v_tensor* v_map_custom3_impl(struct v_ctx* ctx,
+                             v_tensor* a,
+                             v_tensor* b,
+                             v_tensor* c,
+                             const v_custom3_op_t fun,
+                             int n_tasks,
+                             void* userdata,
+                             bool inplace);
+v_tensor* v_scale_impl(struct v_ctx* ctx,
+                       v_tensor* a,
+                       float s,
+                       float b,
+                       bool inplace);
+v_tensor* v_diag(struct v_ctx* ctx,
+                 v_tensor* a);
+v_tensor* v_diag_mask_zero_impl(struct v_ctx* ctx,
+                                v_tensor* a,
+                                int n_past,
+                                bool inplace);
 
 v_API const struct v_type_traits* v_get_type_traits(enum v_data_type type);
 
@@ -2291,8 +2278,7 @@ v_API const struct v_type_traits* v_get_type_traits(enum v_data_type type);
 // TODO: currently, only a few functions are in the base ggml API, while the rest are in the CPU backend
 // the goal should be to create an API that other backends can use move everything to the ggml base
 // scheduling priorities
-enum v_sched_priority
-{
+enum v_sched_priority {
   v_SCHED_PRIO_LOW = -1,
   v_SCHED_PRIO_NORMAL,
   v_SCHED_PRIO_MEDIUM,
@@ -2300,34 +2286,34 @@ enum v_sched_priority
   v_SCHED_PRIO_REALTIME
 };
 
-struct v_tensor* v_unary_impl(struct v_ctx* ctx,
-                            struct v_tensor* a,
-                            enum v_unary_op op,
-                            bool inplace);
-struct v_tensor* v_map_custom1_impl(struct v_ctx* ctx,
-                                       struct v_tensor* a,
-                                       const v_custom1_op_t fun,
-                                       int n_tasks,
-                                       void* userdata,
-                                       bool inplace);
-struct v_tensor* v_map_custom2_impl(struct v_ctx* ctx,
-                                       struct v_tensor* a,
-                                       struct v_tensor* b,
-                                       const v_custom2_op_t fun,
-                                       int n_tasks,
-                                       void* userdata,
-                                       bool inplace);
-struct v_tensor* v_sqr_impl(struct v_ctx* ctx,
-                               struct v_tensor* a,
-                               bool inplace);
-struct v_tensor* v_sqrt_impl(struct v_ctx* ctx,
-                                struct v_tensor* a,
-                                bool inplace);
+v_tensor* v_unary_impl(struct v_ctx* ctx,
+                       v_tensor* a,
+                       enum v_unary_op op,
+                       bool inplace);
+v_tensor* v_map_custom1_impl(struct v_ctx* ctx,
+                             v_tensor* a,
+                             const v_custom1_op_t fun,
+                             int n_tasks,
+                             void* userdata,
+                             bool inplace);
+v_tensor* v_map_custom2_impl(struct v_ctx* ctx,
+                             v_tensor* a,
+                             v_tensor* b,
+                             const v_custom2_op_t fun,
+                             int n_tasks,
+                             void* userdata,
+                             bool inplace);
+v_tensor* v_sqr_impl(struct v_ctx* ctx,
+                     v_tensor* a,
+                     bool inplace);
+v_tensor* v_sqrt_impl(struct v_ctx* ctx,
+                      v_tensor* a,
+                      bool inplace);
 
-struct v_tensor* v_interpolate_impl(struct v_ctx* ctx,
-                                       struct v_tensor* a,
-                                       int64_t ne0,
-                                       int64_t ne1,
-                                       int64_t ne2,
-                                       int64_t ne3,
-                                       uint32_t mode);
+v_tensor* v_interpolate_impl(struct v_ctx* ctx,
+                             v_tensor* a,
+                             int64_t ne0,
+                             int64_t ne1,
+                             int64_t ne2,
+                             int64_t ne3,
+                             uint32_t mode);

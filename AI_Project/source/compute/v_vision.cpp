@@ -615,8 +615,8 @@ struct v_tensor* v_im2col_back(struct v_ctx* ctx,
   //t_b= src0
   //t_W=  im2col (grad^T, dY_col)
   struct v_tensor* result = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
-  v_tensor_t t_a = v_mem_cont(ctx, v_transpose(ctx,a));
-  v_tensor_t t_b = v_mem_cont(ctx, v_transpose(ctx,b));
+  v_tensor* t_a = v_mem_cont(ctx, v_transpose(ctx,a));
+  v_tensor* t_b = v_mem_cont(ctx, v_transpose(ctx,b));
 
   int32_t params[]        = {
     s0, s1, p0, p1, d0, d1, (is_2D

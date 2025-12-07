@@ -9,11 +9,9 @@ bool vk_instance_initialized = false;
 vk_instance_struct vk_instance;
 bool vk_perf_logger_enabled = false;
 
-void vk_begin_ctx(vk_device& device, vk_context& subctx)
-{
+void vk_begin_ctx(vk_device& device, vk_context& subctx) {
   VK_LOG_DEBUG("v_vk_ctx_begin(" << device->name << ")");
-  if (subctx->s != nullptr)
-  {
+  if (subctx->s != nullptr) {
     vk_ctx_end(subctx);
   }
 
@@ -21,11 +19,9 @@ void vk_begin_ctx(vk_device& device, vk_context& subctx)
   subctx->s = subctx->seqs[subctx->seqs.size() - 1].data();
 }
 
-void vk_ctx_end(vk_context& ctx)
-{
+void vk_ctx_end(vk_context& ctx) {
   VK_LOG_DEBUG("v_vk_ctx_end(" << ctx << ", " << ctx->seqs.size() << ")");
-  if (ctx->s == nullptr)
-  {
+  if (ctx->s == nullptr) {
     return;
   }
 
@@ -33,8 +29,7 @@ void vk_ctx_end(vk_context& ctx)
   ctx->s = nullptr;
 }
 
-vk_context vk_create_temp_ctx(vk_command_pool& p)
-{
+vk_context vk_create_temp_ctx(vk_command_pool& p) {
   vk_context result = std::make_shared<vk_context_struct>();
   VK_LOG_DEBUG("v_vk_create_temporary_context(" << result << ")");
   result->p = &p;
@@ -127,6 +122,7 @@ const char* vk_name(v_backend_t backend) {
 
   return ctx->name.c_str();
 }
+
 void vk_backend_free(v_backend_t backend) {
   vk_backend_ctx* ctx = (vk_backend_ctx*)backend->context;
   VK_LOG_DEBUG("v_backend_vk_free(" << ctx->name << ")");
@@ -134,11 +130,13 @@ void vk_backend_free(v_backend_t backend) {
   delete ctx;
   delete backend;
 }
+
 v_backend_buffer_type_t vk_get_device_buffer(v_backend_t backend) {
   vk_backend_ctx* ctx = (vk_backend_ctx*)backend->context;
 
   return &ctx->device->buffer_type;
 }
+
 void v_backend_vk_set_tensor_async(v_backend_t backend, v_tensor* tensor, const void* data, size_t offset, size_t size) {
   VK_LOG_DEBUG("v_backend_vk_set_tensor_async(" << size << ")");
   vk_backend_ctx* ctx = (vk_backend_ctx*)backend->context;
@@ -162,7 +160,8 @@ void v_backend_vk_set_tensor_async(v_backend_t backend, v_tensor* tensor, const 
 
   v_vk_buffer_write_async(transfer_ctx, buf, vk_tensor_offset(tensor) + tensor->view_offs + offset, data, size);
 }
-void v_backend_vk_get_tensor_async(v_backend_t backend, const v_tensor* tensor, void* data, size_t offset, size_t size) {
+
+void v_backend_vk_get_tensor_async(v_backend_t backend, v_tensor* const tensor, void* data, size_t offset, size_t size) {
   VK_LOG_DEBUG("v_backend_vk_get_tensor_async(" << size << ")");
   vk_backend_ctx* ctx = (vk_backend_ctx*)backend->context;
   V_ASSERT(
@@ -185,24 +184,29 @@ void v_backend_vk_get_tensor_async(v_backend_t backend, const v_tensor* tensor, 
 
   vk_buffer_read_async(transfer_ctx, buf, vk_tensor_offset(tensor) + tensor->view_offs + offset, data, size);
 }
+
 bool v_backend_buffer_is_vk(v_backend_buffer_t buffer) { return true; }
+
 void vk_free_buffer(v_backend_buffer_t buffer) {
   VK_LOG_MEMORY("v_backend_vk_buffer_free_buffer()");
   v_backend_vk_buffer_ctx* ctx = (v_backend_vk_buffer_ctx*)buffer->context;
   vk_destroy_buffer(ctx->dev_buffer);
   delete ctx;
 }
+
 void* vk_device_buffer_get_base(v_backend_buffer_t buffer) {
   return vk_ptr_base;
   UNUSED(buffer);
 }
-v_status vk_buffer_init_tensor(v_backend_buffer_t buffer, const v_tensor* tensor) {
+
+v_status vk_buffer_init_tensor(v_backend_buffer_t buffer, const v_tensor*  tensor) {
   V_ASSERT(buffer);
   VK_LOG_DEBUG("v_backend_vk_buffer_init_tensor(" << buffer << " (" << buffer->context << "), " << tensor << ")");
   if (tensor->view_src != nullptr) { V_ASSERT(tensor->view_src->buffer->buft == buffer->buft); }
   return v_STATUS_SUCCESS;
 }
-void vk_device_buffer_set_tensor(v_backend_buffer_t buffer, struct v_tensor* tensor, const void* data, size_t offset, size_t size) {
+
+void vk_device_buffer_set_tensor(v_backend_buffer_t buffer, v_tensor* tensor, const void* data, size_t offset, size_t size) {
   VK_LOG_DEBUG(
     "v_backend_vk_buffer_set_tensor(" << buffer << ", " << tensor << ", " << data << ", " << offset << ", " << size
     << ")");
@@ -210,7 +214,8 @@ void vk_device_buffer_set_tensor(v_backend_buffer_t buffer, struct v_tensor* ten
   vk_buffer buf                    = buf_ctx->dev_buffer;
   v_vk_buffer_write(buf, vk_tensor_offset(tensor) + tensor->view_offs + offset, data, size);
 }
-void vk_device_buffer_get_tensor(v_backend_buffer_t buffer, const struct v_tensor* tensor, void* data, size_t offset, size_t size) {
+
+void vk_device_buffer_get_tensor(v_backend_buffer_t buffer, const v_tensor*  tensor, void* data, size_t offset, size_t size) {
   VK_LOG_DEBUG(
     "vk_buffer_get_tensor(" << buffer << ", " << tensor << ", " << data << ", " << offset << ", " << size
     << ")");
@@ -222,11 +227,13 @@ void vk_device_buffer_get_tensor(v_backend_buffer_t buffer, const struct v_tenso
     size
     << ")");
 }
+
 void vk_buffer_clear(v_backend_buffer_t buffer, uint8_t value) {
   v_backend_vk_buffer_ctx* ctx = (v_backend_vk_buffer_ctx*)buffer->context;
   vk_buffer_memset(ctx->dev_buffer, 0, value, buffer->size);
 }
-bool v_backend_vk_cpy_tensor_async(v_backend_t backend, const v_tensor* src, v_tensor* dst) {
+
+bool v_backend_vk_cpy_tensor_async(v_backend_t backend, v_tensor* const src, v_tensor* dst) {
   VK_LOG_DEBUG("v_backend_vk_cpy_tensor_async()");
   vk_backend_ctx* ctx = backend->context;
   if ((dst->buffer->buft == vk_get_device_buffer(backend) || dst->buffer->buft ==
@@ -258,9 +265,10 @@ bool v_backend_vk_cpy_tensor_async(v_backend_t backend, const v_tensor* src, v_t
 
   return false;
 }
+
 void v_backend_vk_synchronize(v_backend_t backend) {
   VK_LOG_DEBUG("v_backend_vk_synchronize()");
-  vk_backend_ctx* ctx = (vk_backend_ctx*)backend->context;
+  vk_backend_ctx* ctx = backend->context;
   if (ctx->transfer_ctx.expired()) { return; }
   vk_context transfer_ctx = ctx->transfer_ctx.lock();
   vk_ctx_end(transfer_ctx);
@@ -280,12 +288,15 @@ v_backend_t backend_vk_init(size_t dev_num) {
     vk_backend->context  = ctx;
   return vk_backend;
 }
+
 int vk_get_device_count() { return v_vk_get_device_count(); }
+
 void vk_get_device_description(int device, char* description, size_t description_size) {
   V_ASSERT(device < (int) vk_instance.device_indices.size());
   int dev_idx = vk_instance.device_indices[device];
   v_vk_get_device_description(dev_idx, description, description_size);
 }
+
 void vk_get_device_memory(int device, size_t* free, size_t* total) {
   V_ASSERT(device < (int) vk_instance.device_indices.size());
   V_ASSERT(device < (int) vk_instance.device_supports_membudget.size());
@@ -310,6 +321,7 @@ void vk_get_device_memory(int device, size_t* free, size_t* total) {
     }
   }
 }
+
 vk::PhysicalDeviceType v_backend_vk_get_device_type(int device_idx) {
   V_ASSERT(device_idx >= 0 && device_idx < (int) vk_instance.device_indices.size());
 
@@ -320,6 +332,7 @@ vk::PhysicalDeviceType v_backend_vk_get_device_type(int device_idx) {
 
   return props.properties.deviceType;
 }
+
 std::string v_backend_vk_get_device_pci_id(int device_idx) {
   V_ASSERT(device_idx >= 0 && device_idx < (int) vk_instance.device_indices.size());
 
@@ -355,11 +368,13 @@ std::string v_backend_vk_get_device_pci_id(int device_idx) {
   snprintf(pci_bus_id, sizeof(pci_bus_id), "%04x:%02x:%02x.%x", pci_domain, pci_bus, pci_device, pci_function);
   return std::string(pci_bus_id);
 }
+
 bool vk_device_supports_buft(struct vk_device_ctx* dev, v_backend_buffer_type_t buft) {
   vk_device_ctx* ctx               = (vk_device_ctx*)dev;
   vk_buffer_type_context* buft_ctx = (vk_buffer_type_context*)buft->context;
   return buft_ctx->device->idx == ctx->device;
 }
+
 v_backend_buffer_t vk_device_buffer_alloc(v_backend_buffer_type_t buft, size_t size) {
   VK_LOG_MEMORY("v_backend_vk_buffer_type_alloc_buffer(" << size << ")");
   vk_buffer_type_context* ctx = (vk_buffer_type_context*)buft->context;
@@ -373,6 +388,7 @@ v_backend_buffer_t vk_device_buffer_alloc(v_backend_buffer_type_t buft, size_t s
 
   return v_backend_buffer_init(buft, bufctx, size);
 }
+
 struct vk_device_ctx* v_backend_vk_reg_get_device(size_t index) {
   std::vector<struct vk_device_ctx*> devices;
   bool initialized = false;

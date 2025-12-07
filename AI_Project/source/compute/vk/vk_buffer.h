@@ -26,9 +26,9 @@ void v_vk_buffer_write_2d(vk_buffer& dst, size_t offset, const void* src, size_t
 void v_vk_buffer_write_2d_async(vk_context subctx, vk_buffer& dst, size_t offset, const void* src, size_t spitch, size_t width, size_t height, bool sync_staging = false);
 void* vk_host_malloc(vk_device& device, size_t size);
 void vk_host_free(vk_device& device, void* ptr);
-void v_vk_buffer_write_nc_async(vk_backend_ctx* ctx, vk_context& subctx, vk_buffer& dst, size_t offset, const v_tensor* tensor, bool sync_staging = false);
+void v_vk_buffer_write_nc_async(vk_backend_ctx* ctx, vk_context& subctx, vk_buffer& dst, size_t offset, v_tensor* const tensor, bool sync_staging = false);
 void vk_host_buffer_free(v_backend_buffer_t buffer);
-bool vk_buffer_cpy_tensor(v_backend_buffer_t buffer, const v_tensor* src, v_tensor* dst);
+bool vk_buffer_cpy_tensor(v_backend_buffer_t buffer, v_tensor* const src, v_tensor* dst);
 void vk_destroy_buffer(vk_buffer& buf);
 const char* vk_host_buffer_name(v_backend_buffer_type_t buft);
 

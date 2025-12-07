@@ -833,7 +833,7 @@ void v_vk_mul_mat_vec_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_ten
 }
 
 void v_vk_mul_mat_vec_p021_f16_f32(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0,
-                                   const v_tensor* src1, v_tensor* dst, bool dryrun) {
+                                   v_tensor* const src1, v_tensor* dst, bool dryrun) {
   VK_LOG_DEBUG(
     "v_vk_mul_mat_p021_f16_f32(" << src0 << ", name=" << src0->name << ", type=" << src0->type << ", ne0=" << src0->
     ne[0] << ", ne1=" << src0->ne[1] << ", ne2=" << src0->ne[2] << ", ne3=" << src0->ne[3] << ", nb0=" << src0->nb[0] <<
@@ -943,8 +943,8 @@ void v_vk_mul_mat_vec_p021_f16_f32(vk_backend_ctx* ctx, vk_context& subctx, cons
                          {1, (uint32_t)ne01, workgroups_z});
 }
 
-void v_vk_mul_mat_vec_nc_f16_f32(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0,
-                                 const v_tensor* src1, v_tensor* dst, bool dryrun) {
+void v_vk_mul_mat_vec_nc_f16_f32(vk_backend_ctx* ctx, vk_context& subctx, v_tensor* const src0,
+                                 v_tensor* const src1, v_tensor* dst, bool dryrun) {
   VK_LOG_DEBUG(
     "v_vk_mul_mat_nc_f16_f32((" << src0 << ", name=" << src0->name << ", type=" << src0->type << ", ne0=" << src0->ne
     [0] << ", ne1=" << src0->ne[1] << ", ne2=" << src0->ne[2] << ", ne3=" << src0->ne[3] << ", nb0=" << src0->nb[0] <<

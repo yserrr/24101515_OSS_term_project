@@ -5,8 +5,9 @@
 #include "v_util.h"
 #include "v.h"
 
-void vk_host_buffer_memset_tensor(v_backend_buffer_t buffer, struct v_tensor* tensor, uint8_t value, size_t offset, size_t size);
-void v_backend_tensor_memset(struct v_tensor* tensor, uint8_t value, size_t offset, size_t size) {
+void vk_host_buffer_memset_tensor(v_backend_buffer_t buffer, v_tensor* tensor, uint8_t value, size_t offset, size_t size);
+
+void v_backend_tensor_memset(v_tensor* tensor, uint8_t value, size_t offset, size_t size) {
   V_ASSERT(tensor);
   v_backend_buffer_t buf = tensor->view_src
                              ? tensor->view_src->buffer
@@ -28,10 +29,10 @@ void v_backend_tensor_memset(struct v_tensor* tensor, uint8_t value, size_t offs
 // else, just add/subtract/etc. the gradients
 
 void v_add_or_set(struct v_ctx* ctx,
-                         struct v_cgraph* cgraph,
-                         size_t isrc,
-                         struct v_tensor* tensor) {
-  struct v_tensor* src = cgraph->visited_hash_set.keys[isrc];
+                  struct v_cgraph* cgraph,
+                  size_t isrc,
+                  v_tensor* tensor) {
+  v_tensor* src = cgraph->visited_hash_set.keys[isrc];
   V_ASSERT(src);
   if (cgraph->grads[isrc]) { cgraph->grads[isrc] = v_add_imple(ctx, cgraph->grads[isrc], tensor, /*inplace =*/ cgraph->grad_accs[isrc]); }
   else { cgraph->grads[isrc] = tensor; }
@@ -39,16 +40,16 @@ void v_add_or_set(struct v_ctx* ctx,
   v_build_foward_expand(cgraph, cgraph->grads[isrc]);
 }
 
- void v_acc_or_set(
+void v_acc_or_set(
   struct v_ctx* ctx,
   struct v_cgraph* cgraph,
   size_t isrc,
-  struct v_tensor* tensor,
+  v_tensor* tensor,
   const size_t nb1,
   const size_t nb2,
   const size_t nb3,
   const size_t offset) {
-  struct v_tensor* src = cgraph->visited_hash_set.keys[isrc];
+  v_tensor* src = cgraph->visited_hash_set.keys[isrc];
   V_ASSERT(src);
   if (cgraph->grads[isrc]) {
     cgraph->grads[isrc] = v_acc_imple(ctx,
@@ -61,19 +62,19 @@ void v_add_or_set(struct v_ctx* ctx,
                                       cgraph->grad_accs[isrc]);
   }
   else {
-    struct v_tensor* a_zero = v_scale(ctx, src, 0.0f); // FIXME this is going to produce NaN if a contains inf/NaN
-    cgraph->grads[isrc]     = v_acc_imple(ctx, a_zero, tensor, nb1, nb2, nb3, offset, false);
+    v_tensor* a_zero    = v_scale(ctx, src, 0.0f); // FIXME this is going to produce NaN if a contains inf/NaN
+    cgraph->grads[isrc] = v_acc_imple(ctx, a_zero, tensor, nb1, nb2, nb3, offset, false);
   }
   v_format_name(cgraph->grads[isrc], "grad for %s", cgraph->visited_hash_set.keys[isrc]->name);
   v_build_foward_expand(cgraph, cgraph->grads[isrc]);
 }
 
- void v_add1_or_set(
+void v_add1_or_set(
   struct v_ctx* ctx,
   struct v_cgraph* cgraph,
   size_t isrc,
-  struct v_tensor* tensor) {
-  struct v_tensor* src = cgraph->visited_hash_set.keys[isrc];
+  v_tensor* tensor) {
+  v_tensor* src = cgraph->visited_hash_set.keys[isrc];
   V_ASSERT(src);
   if (cgraph->grads[isrc]) { cgraph->grads[isrc] = add1_impl(ctx, cgraph->grads[isrc], tensor, cgraph->grad_accs[isrc]); }
   else { cgraph->grads[isrc] = v_repeat(ctx, tensor, src); }
@@ -81,12 +82,12 @@ void v_add_or_set(struct v_ctx* ctx,
   v_build_foward_expand(cgraph, cgraph->grads[isrc]);
 }
 
- void v_sub_or_set(
+void v_sub_or_set(
   struct v_ctx* ctx,
   struct v_cgraph* cgraph,
   size_t isrc,
-  struct v_tensor* tensor) {
-  struct v_tensor* src = cgraph->visited_hash_set.keys[isrc];
+  v_tensor* tensor) {
+  v_tensor* src = cgraph->visited_hash_set.keys[isrc];
   V_ASSERT(src);
   //if (cgraph->grads[isrc])
   //{
@@ -132,20 +133,18 @@ void v_print_t_buffer(v_tensor* t) {
   //  printf("%.2f ",((const char*)t->data + 4 * i));
 }
 
-void v_compute_backword(struct v_ctx* ctx,
-                        struct v_cgraph* cgraph,
+void v_compute_backward(v_ctx* ctx,
+                        v_cgraph* cgraph,
                         int i,
                         const bool* grads_needed) {
   printf("backword compute called\n");
-
-  struct v_tensor* tensor = cgraph->nodes[i];
-  struct v_tensor* grad   = v_graph_get_grad(cgraph, tensor);
+  v_tensor* tensor = cgraph->nodes[i];
+  v_tensor* grad   = v_graph_get_grad(cgraph, tensor);
 
   if (!grad) return;
-
-  struct v_tensor* src0       = tensor->src[0];
-  struct v_tensor* src1       = tensor->src[1];
-  struct v_tensor* src2       = tensor->src[2];
+  v_tensor* src0              = tensor->src[0];
+  v_tensor* src1              = tensor->src[1];
+  v_tensor* src2              = tensor->src[2];
   struct v_hash_set* hash_set = &cgraph->visited_hash_set;
   const size_t isrc0          = src0
                                   ? find_hash(hash_set, src0)
@@ -170,7 +169,7 @@ void v_compute_backword(struct v_ctx* ctx,
     case v_OP_ADD: {
       if (src0_needs_grads) { v_add_or_set(ctx, cgraph, isrc0, grad); }
       if (src1_needs_grads) {
-        struct v_tensor* tmp = grad;
+        v_tensor* tmp = grad;
         if (!v_are_same_shape(src0, src1)) { tmp = v_repeat_back(ctx, tmp, src1); }
         v_add_or_set(ctx, cgraph, isrc1, tmp);
       }
@@ -186,20 +185,20 @@ void v_compute_backword(struct v_ctx* ctx,
     case v_OP_ACC: {
       if (src0_needs_grads) { v_add_or_set(ctx, cgraph, isrc0, grad); }
       if (src1_needs_grads) {
-        const size_t nb1                  = ((int32_t*)tensor->op_params)[0];
-        const size_t nb2                  = ((int32_t*)tensor->op_params)[1];
-        const size_t nb3                  = ((int32_t*)tensor->op_params)[2];
-        const size_t offset               = ((int32_t*)tensor->op_params)[3];
-        struct v_tensor* tensor_grad_view = v_view_4d(ctx,
-                                                      grad,
-                                                      src1->ne[0],
-                                                      src1->ne[1],
-                                                      src1->ne[2],
-                                                      src1->ne[3],
-                                                      nb1,
-                                                      nb2,
-                                                      nb3,
-                                                      offset);
+        const size_t nb1           = ((int32_t*)tensor->op_params)[0];
+        const size_t nb2           = ((int32_t*)tensor->op_params)[1];
+        const size_t nb3           = ((int32_t*)tensor->op_params)[2];
+        const size_t offset        = ((int32_t*)tensor->op_params)[3];
+        v_tensor* tensor_grad_view = v_view_4d(ctx,
+                                               grad,
+                                               src1->ne[0],
+                                               src1->ne[1],
+                                               src1->ne[2],
+                                               src1->ne[3],
+                                               nb1,
+                                               nb2,
+                                               nb3,
+                                               offset);
 
         v_add_or_set(ctx, cgraph, isrc1, v_reshape(ctx, v_mem_cont(ctx, tensor_grad_view), src1));
       }
@@ -213,7 +212,7 @@ void v_compute_backword(struct v_ctx* ctx,
     case v_OP_MUL: {
       if (src0_needs_grads) { v_add_or_set(ctx, cgraph, isrc0, v_mul(ctx, grad, src1)); }
       if (src1_needs_grads) {
-        struct v_tensor* tmp = v_mul(ctx, src0, grad);
+        v_tensor* tmp = v_mul(ctx, src0, grad);
         if (!v_are_same_shape(src0, src1)) { tmp = v_repeat_back(ctx, tmp, src1); }
         v_add_or_set(ctx, cgraph, isrc1, tmp);
       }
@@ -224,7 +223,7 @@ void v_compute_backword(struct v_ctx* ctx,
       if (src1_needs_grads) { v_sub_or_set(ctx, cgraph, isrc1, v_mul(ctx, grad, v_div(ctx, tensor, src1))); }
     }
     break;
-    case v_OP_SQR: { if (src0_needs_grads) { v_add_or_set(ctx, cgraph, isrc0, v_scale(ctx, v_mul(ctx, src0, grad), 2.0f)); } }
+    case v_OP_SQR: { if (src0_needs_grads) v_add_or_set(ctx, cgraph, isrc0, v_scale(ctx, v_mul(ctx, src0, grad), 2.0f)); }
     break;
     case v_OP_SQRT: { if (src0_needs_grads) { v_add_or_set(ctx, cgraph, isrc0, v_scale(ctx, v_div(ctx, grad, tensor), 0.5f)); } }
     break;
@@ -280,10 +279,10 @@ void v_compute_backword(struct v_ctx* ctx,
         auto tSrc1 = v_reshape_2d(ctx, v_mem_cont(ctx, v_transpose(ctx, src1)),
                                   src1->ne[1],
                                   src1->ne[0]);
-        auto tGrad           = v_transpose(ctx, v_mem_cont(ctx, grad));
-        struct v_tensor* tmp = v_matmul(ctx,
-                                        tSrc1,
-                                        tGrad);
+        auto tGrad    = v_transpose(ctx, v_mem_cont(ctx, grad));
+        v_tensor* tmp = v_matmul(ctx,
+                                 tSrc1,
+                                 tGrad);
         // [n,p,qq,rr]
         // struct MmlTensor* tmp = v_out_prod(ctx, // [n,m,qq,rr]
         //                                      src1, // [p,n, qq,rr]
@@ -346,7 +345,7 @@ void v_compute_backword(struct v_ctx* ctx,
       const size_t nb3    = ((const int32_t*)tensor->op_params)[2];
       const size_t offset = ((const int32_t*)tensor->op_params)[3];
 
-      struct v_tensor* tensor_grad_view = NULL;
+      v_tensor* tensor_grad_view = NULL;
 
       if (src0_needs_grads || src1_needs_grads) {
         V_ASSERT(src0->type == tensor->type);
@@ -366,9 +365,9 @@ void v_compute_backword(struct v_ctx* ctx,
       }
 
       if (src0_needs_grads) {
-        struct v_tensor* tmp = v_sub(ctx,
-                                     v_set_zero(tensor_grad_view),
-                                     tensor_grad_view);
+        v_tensor* tmp = v_sub(ctx,
+                              v_set_zero(tensor_grad_view),
+                              tensor_grad_view);
 
         //struct MmlTensor* tmp = v_neg(ctx, tensor_grad_view);
         v_add_or_set(ctx, cgraph, isrc0, v_acc_imple(ctx, grad, tmp, nb1, nb2, nb3, offset, false));
@@ -407,9 +406,9 @@ void v_compute_backword(struct v_ctx* ctx,
     break;
     case v_OP_RESHAPE: {
       if (src0_needs_grads) {
-        struct v_tensor* grad_cont = v_is_contiguous(grad)
-                                       ? grad
-                                       : v_mem_cont(ctx, grad);
+        v_tensor* grad_cont = v_is_contiguous(grad)
+                                ? grad
+                                : v_mem_cont(ctx, grad);
         v_add_or_set(ctx, cgraph, isrc0, v_reshape(ctx, grad_cont, src0));
       }
     }
@@ -512,34 +511,34 @@ void v_compute_backword(struct v_ctx* ctx,
         memcpy(&beta_slow, (const float*)tensor->op_params + 10, sizeof(float));
         memcpy(&sections, tensor->op_params + 11, sizeof(sections));
 
-        struct v_tensor* rope_back = grad->ne[2] == src1->ne[0]
-                                       ? v_rope_ext_back(ctx,
-                                                         grad,
-                                                         src1,
-                                                         src2,
-                                                         n_dims,
-                                                         mode,
-                                                         n_ctx_orig,
-                                                         freq_base,
-                                                         freq_scale,
-                                                         ext_factor,
-                                                         attn_factor,
-                                                         beta_fast,
-                                                         beta_slow)
-                                       : v_rope_multi_back(ctx,
-                                                           grad,
-                                                           src1,
-                                                           src2,
-                                                           n_dims,
-                                                           sections,
-                                                           mode,
-                                                           n_ctx_orig,
-                                                           freq_base,
-                                                           freq_scale,
-                                                           ext_factor,
-                                                           attn_factor,
-                                                           beta_fast,
-                                                           beta_slow);
+        v_tensor* rope_back = grad->ne[2] == src1->ne[0]
+                                ? v_rope_ext_back(ctx,
+                                                  grad,
+                                                  src1,
+                                                  src2,
+                                                  n_dims,
+                                                  mode,
+                                                  n_ctx_orig,
+                                                  freq_base,
+                                                  freq_scale,
+                                                  ext_factor,
+                                                  attn_factor,
+                                                  beta_fast,
+                                                  beta_slow)
+                                : v_rope_multi_back(ctx,
+                                                    grad,
+                                                    src1,
+                                                    src2,
+                                                    n_dims,
+                                                    sections,
+                                                    mode,
+                                                    n_ctx_orig,
+                                                    freq_base,
+                                                    freq_scale,
+                                                    ext_factor,
+                                                    attn_factor,
+                                                    beta_fast,
+                                                    beta_slow);
         v_add_or_set(ctx, cgraph, isrc0, rope_back);
       }
       V_ASSERT((!src2 || !src2_needs_grads) && "gradients for freq factors not implemented");
@@ -561,12 +560,12 @@ void v_compute_backword(struct v_ctx* ctx,
     case V_OP_POOL_2D: {
       if (src0_needs_grads) {
         const auto op = static_cast<v_op_pool>(v_get_op_params_i32(tensor, 0));
-        const auto k0 = static_cast<int32_t>(v_get_op_params_i32(tensor, 1));
-        const auto k1 = static_cast<int32_t>(v_get_op_params_i32(tensor, 2));
-        const auto s0 = static_cast<int32_t>(v_get_op_params_i32(tensor, 3));
-        const auto s1 = static_cast<int32_t>(v_get_op_params_i32(tensor, 4));
-        const auto p0 = static_cast<int32_t>(v_get_op_params_i32(tensor, 5));
-        const auto p1 = static_cast<int32_t>(v_get_op_params_i32(tensor, 6));
+        const auto k0 = v_get_op_params_i32(tensor, 1);
+        const auto k1 = v_get_op_params_i32(tensor, 2);
+        const auto s0 = v_get_op_params_i32(tensor, 3);
+        const auto s1 = v_get_op_params_i32(tensor, 4);
+        const auto p0 = v_get_op_params_i32(tensor, 5);
+        const auto p1 = v_get_op_params_i32(tensor, 6);
         v_add_or_set(ctx, cgraph, isrc0, v_pool_2d_back(ctx, grad, src0, op, k0, k1, s0, s1, p0, p1));
       }
     }
@@ -636,10 +635,10 @@ void v_compute_backword(struct v_ctx* ctx,
   V_ASSERT(!src2_needs_grads || v_are_same_shape(src2, cgraph->grads[isrc2]));
 }
 
-void vk_host_buffer_get_tensor(v_backend_buffer_t buffer, const struct v_tensor* tensor,
+void vk_host_buffer_get_tensor(v_backend_buffer_t buffer, const v_tensor* tensor,
                                void* data, size_t offset, size_t size);
 
-void v_get_backend_tensor(const struct v_tensor* tensor,
+void v_get_backend_tensor(const v_tensor* tensor,
                           void* data,
                           size_t offset,
                           size_t size) {
@@ -656,10 +655,10 @@ void v_get_backend_tensor(const struct v_tensor* tensor,
     : vk_device_buffer_get_tensor(buf, tensor, data, offset, size);
 }
 
-void vk_host_buffer_set_tensor(v_backend_buffer_t buffer, struct v_tensor* tensor,
+void vk_host_buffer_set_tensor(v_backend_buffer_t buffer, v_tensor* tensor,
                                const void* data, size_t offset, size_t size);
 
-void v_set_backend_tensor(struct v_tensor* tensor, const void* data, size_t offset, size_t size) {
+void v_set_backend_tensor(v_tensor* tensor, const void* data, size_t offset, size_t size) {
   V_ASSERT(tensor);
   V_ASSERT(tensor->data != NULL && "tensor not allocated");
   V_ASSERT(offset + size <= num_bytes(tensor) && "tensor write out of bounds");

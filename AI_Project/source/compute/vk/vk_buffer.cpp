@@ -260,7 +260,7 @@ void vk_host_free(vk_device& device, void* ptr) {
   device->pinned_memory.erase(device->pinned_memory.begin() + index);
 }
 
-void v_vk_buffer_write_nc_async(vk_backend_ctx* ctx, vk_context& subctx, vk_buffer& dst, size_t offset, const v_tensor* tensor, bool sync_staging) {
+void v_vk_buffer_write_nc_async(vk_backend_ctx* ctx, vk_context& subctx, vk_buffer& dst, size_t offset, v_tensor* const tensor, bool sync_staging) {
   VK_LOG_DEBUG("v_vk_buffer_write_nc_async(" << tensor << ")");
   V_ASSERT(!v_is_contiguous(tensor));
   // Buffer is already mapped
@@ -382,7 +382,7 @@ void vk_host_buffer_free(v_backend_buffer_t buffer) {
   vk_host_free(vk_instance.devices[0], buffer->context);
 }
 
-bool vk_buffer_cpy_tensor(v_backend_buffer_t buffer, const struct v_tensor* src, struct v_tensor* dst) {
+bool vk_buffer_cpy_tensor(v_backend_buffer_t buffer, v_tensor* const src, v_tensor* dst) {
   v_backend_vk_buffer_ctx* src_buf_ctx = (v_backend_vk_buffer_ctx*)src->buffer->context;
   v_backend_vk_buffer_ctx* dst_buf_ctx = (v_backend_vk_buffer_ctx*)dst->buffer->context;
 
@@ -622,7 +622,7 @@ size_t vk_device_buffer_get_max_size(v_backend_buffer_type_t buft) {
   vk_buffer_type_context* ctx = (vk_buffer_type_context*)buft->context;
   return ctx->device->suballocation_block_size;
 }
-size_t vk_device_buffer_get_alloc_size(v_backend_buffer_type_t buft, const struct v_tensor* tensor) {
+size_t vk_device_buffer_get_alloc_size(v_backend_buffer_type_t buft, v_tensor* const tensor) {
   return num_bytes(tensor);
   UNUSED(buft);
 }

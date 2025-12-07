@@ -73,6 +73,7 @@ vk_op_pad_push_constants vk_op_pad_push_constants_init(const v_tensor* src0, con
 
   return p; // fastdiv values and offsets are initialized later in v_vk_op
 }
+
 vk_op_sum_rows_push_constants vk_op_sum_rows_push_constants_init(const v_tensor* src, const v_tensor* dst,
                                                                  int64_t n_cols) {
   uint32_t type_size              = (uint32_t)v_type_size(src->type);
@@ -89,4 +90,3 @@ vk_op_sum_rows_push_constants vk_op_sum_rows_push_constants_init(const v_tensor*
   p.weight                        = 1.0f;
   return p;
 }
-

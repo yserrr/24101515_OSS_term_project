@@ -81,7 +81,7 @@ struct v_graph_alloc {
 
 
 v_API struct v_tensor_alloc v_tallocr_new(struct v_backend_buffer* buffer);
-v_API enum v_status tensorAlloc(struct v_tensor_alloc* talloc, struct v_tensor* tensor);
+v_API enum v_status tensorAlloc(struct v_tensor_alloc* talloc, v_tensor*  tensor);
 typedef struct v_graph_alloc* v_graph_allocator_t;
 v_API v_graph_allocator_t v_gallocr_new(struct v_backend_buffer_type* buft);
 v_API v_graph_allocator_t v_gallocr_new_n(struct v_backend_buffer_type** bufts, int n_bufs);

@@ -1,5 +1,6 @@
 #include "v_opt_dataset.hpp"
 #include "v_opt_ctx.hpp"
+
 v_opt_data_set_t v_opt_dataset_init(enum v_data_type type_data__,
                                     enum v_data_type type_label__,
                                     int64_t ne_datapoint__,
@@ -10,9 +11,9 @@ v_opt_data_set_t v_opt_dataset_init(enum v_data_type type_data__,
   V_ASSERT(ne_label__ >= 0);
   V_ASSERT(ndata__ > 0);
   V_ASSERT(ndata_shard__ > 0);
-  v_opt_data_set_t result = new v_opt_dataset;
-  result->ndata__         = ndata__;
-  result->ndata_shard     = ndata_shard__;
+  auto result         = new v_opt_dataset;
+  result->ndata__     = ndata__;
+  result->ndata_shard = ndata_shard__;
   {
     struct v_init_param params = {
       .mem_size = 2 * v_tensor_over_head(),
@@ -68,8 +69,8 @@ void ggml_opt_dataset_get_batch_host(v_opt_data_set_t dataset,
     char* ptr_data_batch = (char*)data_batch + ishard_batch * dataset->nbs_data;
     memcpy(ptr_data_batch, ptr_data, dataset->nbs_data);
     if (!labels_batch) { continue; }
-    const char* ptr_labels = (const char*)dataset->labels->data + ishard * dataset->nbs_labels;
-    char* ptr_labels_batch = (char*)labels_batch + ishard_batch * dataset->nbs_labels;
+    const char* ptr_labels = static_cast<const char*>(dataset->labels->data) + ishard * dataset->nbs_labels;
+    char* ptr_labels_batch = static_cast<char*>(labels_batch) + ishard_batch * dataset->nbs_labels;
     memcpy(ptr_labels_batch, ptr_labels, dataset->nbs_labels);
   }
 }
@@ -102,16 +103,16 @@ void v_opt_dataset::get_batch(v_tensor* data_batch, v_tensor* labels_batch, int6
     const size_t nb_labels_batch = num_bytes(labels_batch);
     V_ASSERT(nb_labels_batch == shards_per_batch * dataset->nbs_labels);
   }
-  V_ASSERT((ibatch + 1) * shards_per_batch <= int64_t(dataset->permutation.size()));
+  V_ASSERT((ibatch + 1) * shards_per_batch <= static_cast<int64_t>(dataset->permutation.size()));
   for (int64_t ishard_batch = 0; ishard_batch < shards_per_batch; ++ishard_batch) {
     const int64_t ishard = dataset->permutation[ibatch * shards_per_batch + ishard_batch];
-    const char* ptr_data = (const char*)dataset->data->data + ishard * dataset->nbs_data;
+    const char* ptr_data = static_cast<const char*>(dataset->data->data) + ishard * dataset->nbs_data;
     v_set_backend_tensor(data_batch,
                          ptr_data,
                          ishard_batch * dataset->nbs_data,
                          dataset->nbs_data);
     if (!labels_batch) { continue; }
-    const char* ptr_labels = (const char*)dataset->labels->data
+    const char* ptr_labels = static_cast<const char*>(dataset->labels->data)
       + ishard * dataset->nbs_labels;
     v_set_backend_tensor(labels_batch,
                          ptr_labels,

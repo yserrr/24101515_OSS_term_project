@@ -211,9 +211,9 @@ void v_opt_epoch(v_opt_ctx* opt_ctx__,
                  v_opt_epoch_callback callback_train__,
                  v_opt_epoch_callback callback_eval__) {
   V_ASSERT((opt_ctx__)->isStaticGraph() && "v_opt_epoch requires static graphs");
-  v_tensor_t inputs = opt_ctx__->getInput();
-  v_tensor_t labels = opt_ctx__->getLabels();
-  v_tensor_t data   = v_opt_dataset_datas(dataset__);
+  v_tensor* inputs = opt_ctx__->getInput();
+  v_tensor* labels = opt_ctx__->getLabels();
+  v_tensor* data   = v_opt_dataset_datas(dataset__);
 
   V_ASSERT(data->ne[0] == inputs->ne[0]);
 
@@ -621,9 +621,7 @@ void v_opt_ctx::build() {
       v_build_foward_expand(opt_ctx->gf, opt_ctx->loss);
       v_set_name(opt_ctx->loss, "loss_sum_negative_log_likelihood");
 
-      //printf("opt period : %d \n", opt_ctx->opt_period);
-      //      const float scale = -1.0f /10000;
-      const float scale = -1.0f / opt_ctx->inputs->ne[1];
+      const float scale = -1.0f / opt_ctx->inputs->ne[1] * opt_ctx->opt_period;
       opt_ctx->loss     = v_scale(ctx_results, opt_ctx->loss, scale);
       //predict check
       v_build_foward_expand(opt_ctx->gf, opt_ctx->loss);

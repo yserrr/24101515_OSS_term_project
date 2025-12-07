@@ -64,21 +64,21 @@ int main() {
     std::string arch;
     v_backend_sched_t backend_sched;
     v_backend_t backend;
-    int nbatch_logical              = MNIST_NBATCH_LOGICAL;
-    int nbatch_physical             = MNIST_NBATCH_PHYSICAL;
-    v_tensor_t images               = nullptr;
-    v_tensor_t descriminator_in     = nullptr;
-    v_tensor_t descriminator_w1     = nullptr;
-    v_tensor_t descriminator_b1     = nullptr;
-    v_tensor_t descriminator_relu   = nullptr;
-    v_tensor_t descriminator_w2     = nullptr;
-    v_tensor_t descriminator_b2     = nullptr;
-    v_tensor_t descriminator_logits = nullptr;
+    int nbatch_logical             = MNIST_NBATCH_LOGICAL;
+    int nbatch_physical            = MNIST_NBATCH_PHYSICAL;
+    v_tensor* images               = nullptr;
+    v_tensor* descriminator_in     = nullptr;
+    v_tensor* descriminator_w1     = nullptr;
+    v_tensor* descriminator_b1     = nullptr;
+    v_tensor* descriminator_relu   = nullptr;
+    v_tensor* descriminator_w2     = nullptr;
+    v_tensor* descriminator_b2     = nullptr;
+    v_tensor* descriminator_logits = nullptr;
 
-    v_tensor_t generator_in   = nullptr;
-    v_tensor_t generator_w    = nullptr;
-    v_tensor_t generator_b    = nullptr;
-    v_tensor_t generator_relu = nullptr;
+    v_tensor* generator_in   = nullptr;
+    v_tensor* generator_w    = nullptr;
+    v_tensor* generator_b    = nullptr;
+    v_tensor* generator_relu = nullptr;
     ///discriminator:
     /// D_labels = [0,1]
     ///  x -> D(x)  = D_predX;

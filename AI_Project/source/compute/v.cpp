@@ -555,9 +555,9 @@ FILE* v_fopen(const char* fname, const char* mode) {
 static_assert(v_OP_COUNT == 90, "v_OP_COUNT != 90");
 static_assert(v_OP_POOL_COUNT == 2, "v_OP_POOL_COUNT != 2");
 static_assert(v_GLU_OP_COUNT == 6, "v_GLU_OP_COUNT != 6");
-static_assert(sizeof(struct v_object) % v_MEM_ALIGN == 0,
+static_assert(sizeof(v_object) % v_MEM_ALIGN == 0,
               "v_object size must be a multiple of v_MEM_ALIGN");
-static_assert(sizeof(struct v_tensor) % v_MEM_ALIGN == 0,
+static_assert(sizeof(v_tensor) % v_MEM_ALIGN == 0,
               "v_tensor size must be a multiple of v_MEM_ALIGN");
 
 
@@ -577,8 +577,7 @@ size_t v_graph_overhead_custom(size_t size, bool grads) {
   return MML_OBJECT_SIZE + MML_PAD(v_graph_nbyte(size, grads), v_MEM_ALIGN);
 }
 
-
-size_t num_bytes(const struct v_tensor* tensor) {
+size_t num_bytes(const v_tensor* tensor) {
   for (int i = 0; i < V_MAX_DIMS; ++i) {
     if (tensor->ne[i] <= 0) {
       return 0;
@@ -603,7 +602,7 @@ size_t num_bytes(const struct v_tensor* tensor) {
   return nbytes;
 }
 
-size_t v_nbytes_pad(const struct v_tensor* tensor) {
+size_t v_nbytes_pad(const v_tensor* tensor) {
   return MML_PAD(num_bytes(tensor), v_MEM_ALIGN);
 }
 
@@ -614,7 +613,7 @@ size_t v_row_size(enum v_data_type type, int64_t ne) {
 }
 
 
-const char* v_op_desc(const struct v_tensor* t) {
+const char* v_op_desc(const v_tensor* t) {
   if (t->op == v_OP_UNARY) {
     enum v_unary_op uop = v_get_unary_op(t);
     return v_unary_op_name(uop);
@@ -632,7 +631,7 @@ size_t v_tensor_over_head(void) {
 }
 
 
-bool v_is_contiguous_n(const struct v_tensor* tensor, int n) {
+bool v_is_contiguous_n(const v_tensor* tensor, int n) {
   size_t next_nb = v_type_size(tensor->type);
   if (tensor->ne[0] != block_size(tensor->type) && tensor->nb[0] != next_nb) {
     return false;
@@ -656,7 +655,7 @@ bool v_is_contiguous_n(const struct v_tensor* tensor, int n) {
 }
 
 
-bool is_empty(const struct v_tensor* tensor) {
+bool is_empty(const v_tensor* tensor) {
   for (int i = 0; i < V_MAX_DIMS; ++i) {
     if (tensor->ne[i] == 0) {
       // empty if any dimension has no elements
@@ -670,12 +669,12 @@ bool is_empty(const struct v_tensor* tensor) {
 ////////////////////////////////////////////////////////////////////////////////
 
 
-struct v_tensor* new_tensor_impl(struct v_ctx* ctx,
-                                 enum v_data_type type,
-                                 int n_dims,
-                                 const int64_t* ne,
-                                 struct v_tensor* view_src,
-                                 size_t view_offs) {
+v_tensor* new_tensor_impl(struct v_ctx* ctx,
+                          enum v_data_type type,
+                          int n_dims,
+                          const int64_t* ne,
+                          v_tensor* view_src,
+                          size_t view_offs) {
   V_ASSERT(type >= 0 && type < v_TYPE_COUNT);
   V_ASSERT(n_dims >= 1 && n_dims <= V_MAX_DIMS);
   // find the base tensor and absolute offset
@@ -707,19 +706,19 @@ struct v_tensor* new_tensor_impl(struct v_ctx* ctx,
   struct v_object* const obj_new = v_new_object(ctx, MML_TENSOR, v_TENSOR_SIZE + obj_alloc_size);
   V_ASSERT(obj_new);
 
-  struct v_tensor* result = (struct v_tensor*)((char*)ctx->mem_buffer + obj_new->offs);
-  (*result).type          = type;
-  (*result).buffer        = NULL;
-  (*result).ne[0]         = 1,
-    (*result).ne[1]       = 1,
-    (*result).ne[2]       = 1,
-    (*result).ne[3]       = 1;
-  (*result).nb[0]         = 0,
-    (*result).nb[1]       = 0,
-    (*result).nb[2]       = 0,
-    (*result).nb[3]       = 0;
-  (*result).op            = v_OP_NONE;
-  (*result).flags         = 0,
+  v_tensor* result  = (v_tensor*)((char*)ctx->mem_buffer + obj_new->offs);
+  (*result).type    = type;
+  (*result).buffer  = NULL;
+  (*result).ne[0]   = 1,
+    (*result).ne[1] = 1,
+    (*result).ne[2] = 1,
+    (*result).ne[3] = 1;
+  (*result).nb[0]   = 0,
+    (*result).nb[1] = 0,
+    (*result).nb[2] = 0,
+    (*result).nb[3] = 0;
+  (*result).op      = v_OP_NONE;
+  (*result).flags   = 0,
     //(*result).src = {NULL},
     (*result).view_src  = view_src,
     (*result).view_offs = view_offs,
@@ -746,7 +745,7 @@ struct v_tensor* new_tensor_impl(struct v_ctx* ctx,
 }
 
 
-void v_unravel_index(const struct v_tensor* tensor, int64_t i, int64_t* i0, int64_t* i1, int64_t* i2, int64_t* i3) {
+void v_unravel_index(const v_tensor* tensor, int64_t i, int64_t* i0, int64_t* i1, int64_t* i2, int64_t* i3) {
   const int64_t ne2 = tensor->ne[2];
   const int64_t ne1 = tensor->ne[1];
   const int64_t ne0 = tensor->ne[0];
@@ -771,7 +770,7 @@ void v_unravel_index(const struct v_tensor* tensor, int64_t i, int64_t* i0, int6
 }
 
 
-struct v_tensor* v_set_name(struct v_tensor* tensor, const char* name) {
+v_tensor* v_set_name(v_tensor* tensor, const char* name) {
   size_t i;
   for (i = 0; i < sizeof(tensor->name) - 1 && name[i] != '\0'; i++) {
     tensor->name[i] = name[i];
@@ -780,7 +779,7 @@ struct v_tensor* v_set_name(struct v_tensor* tensor, const char* name) {
   return tensor;
 }
 
-struct v_tensor* v_format_name(struct v_tensor* tensor, const char* fmt, ...) {
+v_tensor* v_format_name(v_tensor* tensor, const char* fmt, ...) {
   va_list args;
   va_start(args, fmt);
   vsnprintf(tensor->name, sizeof(tensor->name), fmt, args);
@@ -788,9 +787,9 @@ struct v_tensor* v_format_name(struct v_tensor* tensor, const char* fmt, ...) {
   return tensor;
 }
 
-struct v_tensor* v_tensor_view(struct v_ctx* ctx,
-                               struct v_tensor* src) {
-  struct v_tensor* result = new_tensor_impl(ctx, src->type, V_MAX_DIMS, src->ne, src, 0);
+v_tensor* v_tensor_view(struct v_ctx* ctx,
+                        v_tensor* src) {
+  v_tensor* result = new_tensor_impl(ctx, src->type, V_MAX_DIMS, src->ne, src, 0);
   v_format_name(result, "%s (view)", src->name);
   for (int i = 0; i < V_MAX_DIMS; i++) {
     result->nb[i] = src->nb[i];
@@ -799,21 +798,21 @@ struct v_tensor* v_tensor_view(struct v_ctx* ctx,
 }
 
 
-struct v_tensor* v_acc_imple(struct v_ctx* ctx,
-                             struct v_tensor* a,
-                             struct v_tensor* b,
-                             size_t nb1,
-                             size_t nb2,
-                             size_t nb3,
-                             size_t offset,
-                             bool inplace) {
+v_tensor* v_acc_imple(struct v_ctx* ctx,
+                      v_tensor* a,
+                      v_tensor* b,
+                      size_t nb1,
+                      size_t nb2,
+                      size_t nb3,
+                      size_t offset,
+                      bool inplace) {
   V_ASSERT(nelements(b) <= nelements(a));
   V_ASSERT(v_is_contiguous(a));
   V_ASSERT(a->type == v_TYPE_F32);
   V_ASSERT(b->type == v_TYPE_F32);
-  struct v_tensor* result = inplace
-                              ? v_tensor_view(ctx, a)
-                              : v_dup_tensor(ctx, a);
+  v_tensor* result = inplace
+                       ? v_tensor_view(ctx, a)
+                       : v_dup_tensor(ctx, a);
 
   int32_t params[] = {
     static_cast<int32_t>(nb1),
@@ -834,7 +833,7 @@ struct v_tensor* v_acc_imple(struct v_ctx* ctx,
 }
 
 
-void v_mul_mat_set_prec(struct v_tensor* a,
+void v_mul_mat_set_prec(v_tensor* a,
                         enum v_prec prec) {
   V_ASSERT(a->op == v_OP_MUL_MAT);
 
@@ -844,20 +843,20 @@ void v_mul_mat_set_prec(struct v_tensor* a,
 }
 
 
-struct v_tensor* set_impl(struct v_ctx* ctx,
-                          struct v_tensor* a,
-                          struct v_tensor* b,
-                          size_t nb1,
-                          size_t nb2,
-                          size_t nb3,
-                          size_t offset,
-                          bool inplace) {
+v_tensor* set_impl(struct v_ctx* ctx,
+                   v_tensor* a,
+                   v_tensor* b,
+                   size_t nb1,
+                   size_t nb2,
+                   size_t nb3,
+                   size_t offset,
+                   bool inplace) {
   V_ASSERT(nelements(a) >= nelements(b));
 
   // make a view of the destination
-  struct v_tensor* result = inplace
-                              ? v_tensor_view(ctx, a)
-                              : v_dup_tensor(ctx, a);
+  v_tensor* result = inplace
+                       ? v_tensor_view(ctx, a)
+                       : v_dup_tensor(ctx, a);
 
   V_ASSERT(offset < (size_t)(1 << 30));
   int32_t params[] = {
@@ -879,12 +878,12 @@ struct v_tensor* set_impl(struct v_ctx* ctx,
 }
 
 
-struct v_tensor* v_cpy(struct v_ctx* ctx,
-                       struct v_tensor* a,
-                       struct v_tensor* b) {
+v_tensor* v_cpy(struct v_ctx* ctx,
+                v_tensor* a,
+                v_tensor* b) {
   V_ASSERT(nelements(a) == nelements(b));
   // make a view of the destination
-  struct v_tensor* result = v_tensor_view(ctx, b);
+  v_tensor* result = v_tensor_view(ctx, b);
   if (strlen(b->name) > 0) {
     v_format_name(result, "%s (copy of %s)", b->name, a->name);
   }
@@ -898,40 +897,40 @@ struct v_tensor* v_cpy(struct v_ctx* ctx,
 }
 
 
-v_API struct v_tensor* v_cont_1d(
+v_API v_tensor* v_cont_1d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0) {
   return v_cont_4d(ctx, a, ne0, 1, 1, 1);
 }
 
-v_API struct v_tensor* v_cont_2d(
+v_API v_tensor* v_cont_2d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0,
   int64_t ne1) {
   return v_cont_4d(ctx, a, ne0, ne1, 1, 1);
 }
 
-v_API struct v_tensor* v_cont_3d(
+v_API v_tensor* v_cont_3d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0,
   int64_t ne1,
   int64_t ne2) {
   return v_cont_4d(ctx, a, ne0, ne1, ne2, 1);
 }
 
-struct v_tensor* v_cont_4d(
+v_tensor* v_cont_4d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0,
   int64_t ne1,
   int64_t ne2,
   int64_t ne3) {
   V_ASSERT(nelements(a) == (ne0*ne1*ne2*ne3));
 
-  struct v_tensor* result = v_new_tensor_4d(ctx, a->type, ne0, ne1, ne2, ne3);
+  v_tensor* result = v_new_tensor_4d(ctx, a->type, ne0, ne1, ne2, ne3);
   v_format_name(result, "%s (cont)", a->name);
 
   result->op     = v_OP_CONT;
@@ -942,15 +941,15 @@ struct v_tensor* v_cont_4d(
 
 // v_reshape
 
-struct v_tensor* v_reshape(
+v_tensor* v_reshape(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b) {
+  v_tensor* a,
+  v_tensor* b) {
   V_ASSERT(v_is_contiguous(a));
   // as only the shape of b is relevant, and not its memory layout, b is allowed to be non contiguous.
   V_ASSERT(nelements(a) == nelements(b));
 
-  struct v_tensor* result = new_tensor_impl(ctx, a->type, V_MAX_DIMS, b->ne, a, 0);
+  v_tensor* result = new_tensor_impl(ctx, a->type, V_MAX_DIMS, b->ne, a, 0);
   v_format_name(result, "%s (reshaped)", a->name);
 
   result->op     = v_OP_RESHAPE;
@@ -959,15 +958,15 @@ struct v_tensor* v_reshape(
   return result;
 }
 
-struct v_tensor* v_reshape_1d(
+v_tensor* v_reshape_1d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0) {
   V_ASSERT(v_is_contiguous(a));
   V_ASSERT(nelements(a) == ne0);
 
-  const int64_t ne[1]     = {ne0};
-  struct v_tensor* result = new_tensor_impl(ctx, a->type, 1, ne, a, 0);
+  const int64_t ne[1] = {ne0};
+  v_tensor* result    = new_tensor_impl(ctx, a->type, 1, ne, a, 0);
   v_format_name(result, "%s (reshaped)", a->name);
 
   result->op     = v_OP_RESHAPE;
@@ -976,15 +975,15 @@ struct v_tensor* v_reshape_1d(
   return result;
 }
 
-struct v_tensor* v_reshape_2d(struct v_ctx* ctx,
-                           struct v_tensor* a,
-                           int64_t ne0,
-                           int64_t ne1) {
+v_tensor* v_reshape_2d(struct v_ctx* ctx,
+                       v_tensor* a,
+                       int64_t ne0,
+                       int64_t ne1) {
   V_ASSERT(v_is_contiguous(a));
   V_ASSERT(nelements(a) == ne0*ne1);
 
-  const int64_t ne[2]     = {ne0, ne1};
-  struct v_tensor* result = new_tensor_impl(ctx, a->type, 2, ne, a, 0);
+  const int64_t ne[2] = {ne0, ne1};
+  v_tensor* result    = new_tensor_impl(ctx, a->type, 2, ne, a, 0);
   v_format_name(result, "%s (reshaped)", a->name);
 
   result->op     = v_OP_RESHAPE;
@@ -993,17 +992,17 @@ struct v_tensor* v_reshape_2d(struct v_ctx* ctx,
   return result;
 }
 
-struct v_tensor* v_reshape_3d(
+v_tensor* v_reshape_3d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0,
   int64_t ne1,
   int64_t ne2) {
   V_ASSERT(v_is_contiguous(a));
   V_ASSERT(nelements(a) == ne0*ne1*ne2);
 
-  const int64_t ne[3]     = {ne0, ne1, ne2};
-  struct v_tensor* result = new_tensor_impl(ctx, a->type, 3, ne, a, 0);
+  const int64_t ne[3] = {ne0, ne1, ne2};
+  v_tensor* result    = new_tensor_impl(ctx, a->type, 3, ne, a, 0);
   v_format_name(result, "%s (reshaped)", a->name);
 
   result->op     = v_OP_RESHAPE;
@@ -1012,9 +1011,9 @@ struct v_tensor* v_reshape_3d(
   return result;
 }
 
-struct v_tensor* v_reshape_4d(
+v_tensor* v_reshape_4d(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int64_t ne0,
   int64_t ne1,
   int64_t ne2,
@@ -1022,8 +1021,8 @@ struct v_tensor* v_reshape_4d(
   V_ASSERT(v_is_contiguous(a));
   V_ASSERT(nelements(a) == ne0*ne1*ne2*ne3);
 
-  const int64_t ne[4]     = {ne0, ne1, ne2, ne3};
-  struct v_tensor* result = new_tensor_impl(ctx, a->type, 4, ne, a, 0);
+  const int64_t ne[4] = {ne0, ne1, ne2, ne3};
+  v_tensor* result    = new_tensor_impl(ctx, a->type, 4, ne, a, 0);
   v_format_name(result, "%s (reshaped)", a->name);
 
   result->op     = v_OP_RESHAPE;
@@ -1032,13 +1031,13 @@ struct v_tensor* v_reshape_4d(
   return result;
 }
 
-static struct v_tensor* v_view_impl(
+static v_tensor* v_view_impl(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int n_dims,
   const int64_t* ne,
   size_t offset) {
-  struct v_tensor* result = new_tensor_impl(ctx, a->type, n_dims, ne, a, offset);
+  v_tensor* result = new_tensor_impl(ctx, a->type, n_dims, ne, a, offset);
   v_format_name(result, "%s (view)", a->name);
   v_set_op_params(result, &offset, sizeof(offset));
   result->op     = V_OP_VIEW;
@@ -1046,57 +1045,57 @@ static struct v_tensor* v_view_impl(
   return result;
 }
 
-struct v_tensor* v_view_1d(struct v_ctx* ctx,
-                           struct v_tensor* a,
-                           int64_t ne0,
-                           size_t offset) {
-  struct v_tensor* result = v_view_impl(ctx, a, 1, &ne0, offset);
+v_tensor* v_view_1d(struct v_ctx* ctx,
+                    v_tensor* a,
+                    int64_t ne0,
+                    size_t offset) {
+  v_tensor* result = v_view_impl(ctx, a, 1, &ne0, offset);
   return result;
 }
 
-struct v_tensor* v_view_2d(struct v_ctx* ctx,
-                           struct v_tensor* a,
-                           int64_t ne0,
-                           int64_t ne1,
-                           size_t nb1,
-                           size_t offset) {
-  const int64_t ne[2]     = {ne0, ne1};
-  struct v_tensor* result = v_view_impl(ctx, a, 2, ne, offset);
-  result->nb[1]           = nb1;
-  result->nb[2]           = result->nb[1] * ne1;
-  result->nb[3]           = result->nb[2];
+v_tensor* v_view_2d(struct v_ctx* ctx,
+                    v_tensor* a,
+                    int64_t ne0,
+                    int64_t ne1,
+                    size_t nb1,
+                    size_t offset) {
+  const int64_t ne[2] = {ne0, ne1};
+  v_tensor* result    = v_view_impl(ctx, a, 2, ne, offset);
+  result->nb[1]       = nb1;
+  result->nb[2]       = result->nb[1] * ne1;
+  result->nb[3]       = result->nb[2];
   return result;
 }
 
-struct v_tensor* v_view_3d(struct v_ctx* ctx,
-                           struct v_tensor* a,
-                           int64_t ne0,
-                           int64_t ne1,
-                           int64_t ne2,
-                           size_t nb1,
-                           size_t nb2,
-                           size_t offset) {
-  const int64_t ne[3]     = {ne0, ne1, ne2};
-  struct v_tensor* result = v_view_impl(ctx, a, 3, ne, offset);
-  result->nb[1]           = nb1;
-  result->nb[2]           = nb2;
-  result->nb[3]           = result->nb[2] * ne2;
+v_tensor* v_view_3d(struct v_ctx* ctx,
+                    v_tensor* a,
+                    int64_t ne0,
+                    int64_t ne1,
+                    int64_t ne2,
+                    size_t nb1,
+                    size_t nb2,
+                    size_t offset) {
+  const int64_t ne[3] = {ne0, ne1, ne2};
+  v_tensor* result    = v_view_impl(ctx, a, 3, ne, offset);
+  result->nb[1]       = nb1;
+  result->nb[2]       = nb2;
+  result->nb[3]       = result->nb[2] * ne2;
   return result;
 }
 
-struct v_tensor* v_view_4d(struct v_ctx* ctx,
-                           struct v_tensor* a,
-                           int64_t ne0,
-                           int64_t ne1,
-                           int64_t ne2,
-                           int64_t ne3,
-                           size_t nb1,
-                           size_t nb2,
-                           size_t nb3,
-                           size_t offset) {
+v_tensor* v_view_4d(struct v_ctx* ctx,
+                    v_tensor* a,
+                    int64_t ne0,
+                    int64_t ne1,
+                    int64_t ne2,
+                    int64_t ne3,
+                    size_t nb1,
+                    size_t nb2,
+                    size_t nb3,
+                    size_t offset) {
   const int64_t ne[4] = {ne0, ne1, ne2, ne3};
 
-  struct v_tensor* result = v_view_impl(ctx, a, 4, ne, offset);
+  v_tensor* result = v_view_impl(ctx, a, 4, ne, offset);
 
   result->nb[1] = nb1;
   result->nb[2] = nb2;
@@ -1106,14 +1105,14 @@ struct v_tensor* v_view_4d(struct v_ctx* ctx,
 }
 
 
-static struct v_tensor* v_diag_mask_inf_impl(
+static v_tensor* v_diag_mask_inf_impl(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int n_past,
   bool inplace) {
-  struct v_tensor* result = inplace
-                              ? v_tensor_view(ctx, a)
-                              : v_dup_tensor(ctx, a);
+  v_tensor* result = inplace
+                       ? v_tensor_view(ctx, a)
+                       : v_dup_tensor(ctx, a);
 
   int32_t params[] = {n_past};
   v_set_op_params(result, params, sizeof(params));
@@ -1124,29 +1123,29 @@ static struct v_tensor* v_diag_mask_inf_impl(
   return result;
 }
 
-struct v_tensor* v_diag_mask_inf(
+v_tensor* v_diag_mask_inf(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int n_past) {
   return v_diag_mask_inf_impl(ctx, a, n_past, false);
 }
 
-struct v_tensor* v_diag_mask_inf_inplace(
+v_tensor* v_diag_mask_inf_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int n_past) {
   return v_diag_mask_inf_impl(ctx, a, n_past, true);
 }
 
 // v_diag_mask_zero
 
-struct v_tensor* v_diag_mask_zero_impl(struct v_ctx* ctx,
-                                       struct v_tensor* a,
-                                       int n_past,
-                                       bool inplace) {
-  struct v_tensor* result = inplace
-                              ? v_tensor_view(ctx, a)
-                              : v_dup_tensor(ctx, a);
+v_tensor* v_diag_mask_zero_impl(struct v_ctx* ctx,
+                                v_tensor* a,
+                                int n_past,
+                                bool inplace) {
+  v_tensor* result = inplace
+                       ? v_tensor_view(ctx, a)
+                       : v_dup_tensor(ctx, a);
 
   int32_t params[] = {n_past};
   v_set_op_params(result, params, sizeof(params));
@@ -1157,26 +1156,26 @@ struct v_tensor* v_diag_mask_zero_impl(struct v_ctx* ctx,
   return result;
 }
 
-struct v_tensor* v_diag_mask_zero(
+v_tensor* v_diag_mask_zero(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int n_past) {
   return v_diag_mask_zero_impl(ctx, a, n_past, false);
 }
 
-struct v_tensor* v_diag_mask_zero_inplace(
+v_tensor* v_diag_mask_zero_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int n_past) {
   return v_diag_mask_zero_impl(ctx, a, n_past, true);
 }
 
 // v_soft_max
 
-static struct v_tensor* v_soft_max_impl(
+static v_tensor* v_soft_max_impl(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* mask,
+  v_tensor* a,
+  v_tensor* mask,
   float scale,
   float max_bias,
   bool inplace) {
@@ -1195,9 +1194,9 @@ static struct v_tensor* v_soft_max_impl(
     V_ASSERT(mask);
   }
 
-  struct v_tensor* result = inplace
-                              ? v_tensor_view(ctx, a)
-                              : v_dup_tensor(ctx, a);
+  v_tensor* result = inplace
+                       ? v_tensor_view(ctx, a)
+                       : v_dup_tensor(ctx, a);
 
   float params[] = {scale, max_bias};
   v_set_op_params(result, params, sizeof(params));
@@ -1209,39 +1208,39 @@ static struct v_tensor* v_soft_max_impl(
   return result;
 }
 
-struct v_tensor* v_soft_max(
+v_tensor* v_soft_max(
   struct v_ctx* ctx,
-  struct v_tensor* a) {
+  v_tensor* a) {
   return v_soft_max_impl(ctx, a, NULL, 1.0f, 0.0f, false);
 }
 
-struct v_tensor* v_soft_max_inplace(
+v_tensor* v_soft_max_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a) {
+  v_tensor* a) {
   return v_soft_max_impl(ctx, a, NULL, 1.0f, 0.0f, true);
 }
 
-struct v_tensor* v_soft_max_ext(
+v_tensor* v_soft_max_ext(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* mask,
+  v_tensor* a,
+  v_tensor* mask,
   float scale,
   float max_bias) {
   return v_soft_max_impl(ctx, a, mask, scale, max_bias, false);
 }
 
-struct v_tensor* v_soft_max_ext_inplace(
+v_tensor* v_soft_max_ext_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* mask,
+  v_tensor* a,
+  v_tensor* mask,
   float scale,
   float max_bias) {
   return v_soft_max_impl(ctx, a, mask, scale, max_bias, true);
 }
 
 void v_soft_max_add_sinks(
-  struct v_tensor* a,
-  struct v_tensor* sinks) {
+  v_tensor* a,
+  v_tensor* sinks) {
   if (!sinks) {
     a->src[2] = NULL;
     return;
@@ -1257,16 +1256,16 @@ void v_soft_max_add_sinks(
 
 // v_soft_max_ext_back
 
-static struct v_tensor* v_soft_max_ext_back_impl(
+static v_tensor* v_soft_max_ext_back_impl(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   float scale,
   float max_bias,
   bool inplace) {
-  struct v_tensor* result = inplace
-                              ? v_tensor_view(ctx, a)
-                              : v_dup_tensor(ctx, a);
+  v_tensor* result = inplace
+                       ? v_tensor_view(ctx, a)
+                       : v_dup_tensor(ctx, a);
 
   result->op     = v_OP_SOFT_MAX_BACK;
   result->src[0] = a;
@@ -1278,19 +1277,19 @@ static struct v_tensor* v_soft_max_ext_back_impl(
   return result;
 }
 
-struct v_tensor* v_soft_max_ext_back(
+v_tensor* v_soft_max_ext_back(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   float scale,
   float max_bias) {
   return v_soft_max_ext_back_impl(ctx, a, b, scale, max_bias, false);
 }
 
-struct v_tensor* v_soft_max_ext_back_inplace(
+v_tensor* v_soft_max_ext_back_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   float scale,
   float max_bias) {
   return v_soft_max_ext_back_impl(ctx, a, b, scale, max_bias, true);
@@ -1298,11 +1297,11 @@ struct v_tensor* v_soft_max_ext_back_inplace(
 
 // v_rope
 
-static struct v_tensor* v_rope_impl(
+static v_tensor* v_rope_impl(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
-  struct v_tensor* c,
+  v_tensor* a,
+  v_tensor* b,
+  v_tensor* c,
   int n_dims,
   int sections[v_MROPE_SECTIONS],
   int mode,
@@ -1332,9 +1331,9 @@ static struct v_tensor* v_rope_impl(
     V_ASSERT(c->ne[0] >= n_dims / 2);
   }
 
-  struct v_tensor* result = inplace
-                              ? v_tensor_view(ctx, a)
-                              : v_dup_tensor(ctx, a);
+  v_tensor* result = inplace
+                       ? v_tensor_view(ctx, a)
+                       : v_dup_tensor(ctx, a);
 
   int32_t params[15] = {
     /*n_past*/ 0, n_dims, mode, /*n_ctx*/ 0, n_ctx_orig
@@ -1361,10 +1360,10 @@ static struct v_tensor* v_rope_impl(
   return result;
 }
 
-struct v_tensor* v_rope(
+v_tensor* v_rope(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   int n_dims,
   int mode) {
   return v_rope_impl(
@@ -1386,11 +1385,11 @@ struct v_tensor* v_rope(
   );
 }
 
-struct v_tensor* v_rope_multi(
+v_tensor* v_rope_multi(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
-  struct v_tensor* c,
+  v_tensor* a,
+  v_tensor* b,
+  v_tensor* c,
   int n_dims,
   int sections[v_MROPE_SECTIONS],
   int mode,
@@ -1420,11 +1419,11 @@ struct v_tensor* v_rope_multi(
   );
 }
 
-struct v_tensor* v_rope_multi_inplace(
+v_tensor* v_rope_multi_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
-  struct v_tensor* c,
+  v_tensor* a,
+  v_tensor* b,
+  v_tensor* c,
   int n_dims,
   int sections[v_MROPE_SECTIONS],
   int mode,
@@ -1454,10 +1453,10 @@ struct v_tensor* v_rope_multi_inplace(
   );
 }
 
-struct v_tensor* v_rope_inplace(
+v_tensor* v_rope_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   int n_dims,
   int mode) {
   return v_rope_impl(
@@ -1479,11 +1478,11 @@ struct v_tensor* v_rope_inplace(
   );
 }
 
-struct v_tensor* v_rope_ext(
+v_tensor* v_rope_ext(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
-  struct v_tensor* c,
+  v_tensor* a,
+  v_tensor* b,
+  v_tensor* c,
   int n_dims,
   int mode,
   int n_ctx_orig,
@@ -1512,11 +1511,11 @@ struct v_tensor* v_rope_ext(
   );
 }
 
-struct v_tensor* v_rope_ext_inplace(
+v_tensor* v_rope_ext_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
-  struct v_tensor* c,
+  v_tensor* a,
+  v_tensor* b,
+  v_tensor* c,
   int n_dims,
   int mode,
   int n_ctx_orig,
@@ -1545,10 +1544,10 @@ struct v_tensor* v_rope_ext_inplace(
   );
 }
 
-struct v_tensor* v_rope_custom(
+v_tensor* v_rope_custom(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   int n_dims,
   int mode,
   int n_ctx_orig,
@@ -1577,10 +1576,10 @@ struct v_tensor* v_rope_custom(
   );
 }
 
-struct v_tensor* v_rope_custom_inplace(
+v_tensor* v_rope_custom_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+  v_tensor* a,
+  v_tensor* b,
   int n_dims,
   int mode,
   int n_ctx_orig,
@@ -1627,11 +1626,11 @@ void v_rope_yarn_corr_dims(
 
 // v_rope_back
 
-struct v_tensor* v_rope_ext_back(
+v_tensor* v_rope_ext_back(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
-  struct v_tensor* c,
+  v_tensor* a,
+  v_tensor* b,
+  v_tensor* c,
   int n_dims,
   int mode,
   int n_ctx_orig,
@@ -1641,7 +1640,7 @@ struct v_tensor* v_rope_ext_back(
   float attn_factor,
   float beta_fast,
   float beta_slow) {
-  struct v_tensor* result = v_rope_ext(
+  v_tensor* result = v_rope_ext(
     ctx,
     a,
     b,
@@ -1659,11 +1658,11 @@ struct v_tensor* v_rope_ext_back(
   return result;
 }
 
-struct v_tensor* v_rope_multi_back(
+v_tensor* v_rope_multi_back(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
-  struct v_tensor* c,
+  v_tensor* a,
+  v_tensor* b,
+  v_tensor* c,
   int n_dims,
   int sections[4],
   int mode,
@@ -1674,7 +1673,7 @@ struct v_tensor* v_rope_multi_back(
   float attn_factor,
   float beta_fast,
   float beta_slow) {
-  struct v_tensor* result = v_rope_multi(
+  v_tensor* result = v_rope_multi(
     ctx,
     a,
     b,
@@ -1695,13 +1694,13 @@ struct v_tensor* v_rope_multi_back(
 
 // v_clamp
 
-struct v_tensor* v_clamp(
+v_tensor* v_clamp(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   float min,
   float max) {
   // TODO: when implement backward, fix this:
-  struct v_tensor* result = v_tensor_view(ctx, a);
+  v_tensor* result = v_tensor_view(ctx, a);
 
   float params[] = {min, max};
   v_set_op_params(result, params, sizeof(params));
@@ -1715,18 +1714,18 @@ struct v_tensor* v_clamp(
 
 // v_pad
 
-struct v_tensor* v_pad(struct v_ctx* ctx,
-                       struct v_tensor* a,
-                       int p0,
-                       int p1,
-                       int p2,
-                       int p3) {
+v_tensor* v_pad(struct v_ctx* ctx,
+                v_tensor* a,
+                int p0,
+                int p1,
+                int p2,
+                int p3) {
   return v_pad_ext(ctx, a, 0, p0, 0, p1, 0, p2, 0, p3);
 }
 
-struct v_tensor* v_pad_ext(
+v_tensor* v_pad_ext(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int lp0,
   int rp0,
   int lp1,
@@ -1736,12 +1735,12 @@ struct v_tensor* v_pad_ext(
   int lp3,
   int rp3
 ) {
-  struct v_tensor* result = v_new_tensor_4d(ctx,
-                                           a->type,
-                                           a->ne[0] + lp0 + rp0,
-                                           a->ne[1] + lp1 + rp1,
-                                           a->ne[2] + lp2 + rp2,
-                                           a->ne[3] + lp3 + rp3);
+  v_tensor* result = v_new_tensor_4d(ctx,
+                                     a->type,
+                                     a->ne[0] + lp0 + rp0,
+                                     a->ne[1] + lp1 + rp1,
+                                     a->ne[2] + lp2 + rp2,
+                                     a->ne[3] + lp3 + rp3);
 
   v_set_op_params_i32(result, 0, lp0);
   v_set_op_params_i32(result, 1, rp0);
@@ -1760,10 +1759,10 @@ struct v_tensor* v_pad_ext(
 }
 
 // v_pad_reflect_1d
-struct v_tensor* v_pad_reflect_1d(struct v_ctx* ctx,
-                                  struct v_tensor* a,
-                                  int p0,
-                                  int p1) {
+v_tensor* v_pad_reflect_1d(struct v_ctx* ctx,
+                           v_tensor* a,
+                           int p0,
+                           int p1) {
   V_ASSERT(p0 >= 0);
   V_ASSERT(p1 >= 0);
 
@@ -1773,12 +1772,12 @@ struct v_tensor* v_pad_reflect_1d(struct v_ctx* ctx,
   V_ASSERT(v_is_contiguous(a));
   V_ASSERT(a->type == v_TYPE_F32);
 
-  struct v_tensor* result = v_new_tensor_4d(ctx,
-                                           a->type,
-                                           a->ne[0] + p0 + p1,
-                                           a->ne[1],
-                                           a->ne[2],
-                                           a->ne[3]);
+  v_tensor* result = v_new_tensor_4d(ctx,
+                                     a->type,
+                                     a->ne[0] + p0 + p1,
+                                     a->ne[1],
+                                     a->ne[2],
+                                     a->ne[3]);
 
   int32_t params[] = {p0, p1};
   v_set_op_params(result, params, sizeof(params));
@@ -1791,19 +1790,19 @@ struct v_tensor* v_pad_reflect_1d(struct v_ctx* ctx,
 
 // v_roll
 
-struct v_tensor* v_roll(struct v_ctx* ctx,
-                        struct v_tensor* a,
-                        int shift0,
-                        int shift1,
-                        int shift2,
-                        int shift3) {
+v_tensor* v_roll(struct v_ctx* ctx,
+                 v_tensor* a,
+                 int shift0,
+                 int shift1,
+                 int shift2,
+                 int shift3) {
   V_ASSERT(a->nb[0] == v_type_size(a->type));
   V_ASSERT(abs(shift0) < a->ne[0]);
   V_ASSERT(abs(shift1) < a->ne[1]);
   V_ASSERT(abs(shift2) < a->ne[2]);
   V_ASSERT(abs(shift3) < a->ne[3]);
 
-  struct v_tensor* result = v_dup_tensor(ctx, a);
+  v_tensor* result = v_dup_tensor(ctx, a);
 
   v_set_op_params_i32(result, 0, shift0);
   v_set_op_params_i32(result, 1, shift1);
@@ -1818,15 +1817,15 @@ struct v_tensor* v_roll(struct v_ctx* ctx,
 
 // v_arange
 
-struct v_tensor* v_arange(struct v_ctx* ctx,
-                          float start,
-                          float stop,
-                          float step) {
+v_tensor* v_arange(struct v_ctx* ctx,
+                   float start,
+                   float stop,
+                   float step) {
   V_ASSERT(stop > start);
 
   const int64_t steps = (int64_t)ceilf((stop - start) / step);
 
-  struct v_tensor* result = v_new_tensor_1d(ctx, v_TYPE_F32, steps);
+  v_tensor* result = v_new_tensor_1d(ctx, v_TYPE_F32, steps);
 
   v_set_op_params_f32(result, 0, start);
   v_set_op_params_f32(result, 1, stop);
@@ -1839,11 +1838,11 @@ struct v_tensor* v_arange(struct v_ctx* ctx,
 
 // v_timestep_embedding
 
-struct v_tensor* v_timestep_embedding(struct v_ctx* ctx,
-                                      struct v_tensor* timesteps,
-                                      int dim,
-                                      int max_period) {
-  struct v_tensor* result = v_new_tensor_2d(ctx, v_TYPE_F32, dim, timesteps->ne[0]);
+v_tensor* v_timestep_embedding(struct v_ctx* ctx,
+                               v_tensor* timesteps,
+                               int dim,
+                               int max_period) {
+  v_tensor* result = v_new_tensor_2d(ctx, v_TYPE_F32, dim, timesteps->ne[0]);
 
   v_set_op_params_i32(result, 0, dim);
   v_set_op_params_i32(result, 1, max_period);
@@ -1855,11 +1854,11 @@ struct v_tensor* v_timestep_embedding(struct v_ctx* ctx,
 }
 
 // v_argsort
-struct v_tensor* v_argsort(struct v_ctx* ctx,
-                           struct v_tensor* a,
-                           enum v_sort_order order) {
+v_tensor* v_argsort(struct v_ctx* ctx,
+                    v_tensor* a,
+                    enum v_sort_order order) {
   V_ASSERT(a->ne[0] <= INT32_MAX);
-  struct v_tensor* result = v_new_tensor(ctx, v_TYPE_I32, V_MAX_DIMS, a->ne);
+  v_tensor* result = v_new_tensor(ctx, v_TYPE_I32, V_MAX_DIMS, a->ne);
   v_set_op_params_i32(result, 0, (int32_t)order);
   result->op     = v_OP_ARGSORT;
   result->src[0] = a;
@@ -1867,35 +1866,35 @@ struct v_tensor* v_argsort(struct v_ctx* ctx,
 }
 
 // v_top_k
-struct v_tensor* v_top_k(struct v_ctx* ctx,
-                         struct v_tensor* a,
-                         int k) {
+v_tensor* v_top_k(struct v_ctx* ctx,
+                  v_tensor* a,
+                  int k) {
   V_ASSERT(a->ne[0] >= k);
 
-  struct v_tensor* result = v_argsort(ctx, a, v_SORT_ORDER_DESC);
-  result                  = v_view_4d(ctx,
-                                      result,
-                                      k,
-                                      result->ne[1],
-                                      result->ne[2],
-                                      result->ne[3],
-                                      result->nb[1],
-                                      result->nb[2],
-                                      result->nb[3],
-                                      0);
+  v_tensor* result = v_argsort(ctx, a, v_SORT_ORDER_DESC);
+  result           = v_view_4d(ctx,
+                               result,
+                               k,
+                               result->ne[1],
+                               result->ne[2],
+                               result->ne[3],
+                               result->nb[1],
+                               result->nb[2],
+                               result->nb[3],
+                               0);
   return result;
 }
 
 // v_flash_attn_ext
 
-struct v_tensor* v_flash_attn_ext(struct v_ctx* ctx,
-                                  struct v_tensor* q,
-                                  struct v_tensor* k,
-                                  struct v_tensor* v,
-                                  struct v_tensor* mask,
-                                  float scale,
-                                  float max_bias,
-                                  float logit_softcap) {
+v_tensor* v_flash_attn_ext(struct v_ctx* ctx,
+                           v_tensor* q,
+                           v_tensor* k,
+                           v_tensor* v,
+                           v_tensor* mask,
+                           float scale,
+                           float max_bias,
+                           float logit_softcap) {
   V_ASSERT(can_mul_mat(k, q));
   // TODO: check if vT can be multiplied by (k*qT)
 
@@ -1917,8 +1916,8 @@ struct v_tensor* v_flash_attn_ext(struct v_ctx* ctx,
   }
 
   // permute(0, 2, 1, 3)
-  int64_t ne[4]           = {v->ne[0], q->ne[2], q->ne[1], q->ne[3]};
-  struct v_tensor* result = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
+  int64_t ne[4]    = {v->ne[0], q->ne[2], q->ne[1], q->ne[3]};
+  v_tensor* result = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
 
   float params[] = {scale, max_bias, logit_softcap};
   v_set_op_params(result, params, sizeof(params));
@@ -1933,7 +1932,7 @@ struct v_tensor* v_flash_attn_ext(struct v_ctx* ctx,
 }
 
 void v_flash_attn_ext_set_prec(
-  struct v_tensor* a,
+  v_tensor* a,
   enum v_prec prec) {
   V_ASSERT(a->op == v_OP_FLASH_ATTN_EXT);
 
@@ -1943,7 +1942,7 @@ void v_flash_attn_ext_set_prec(
 }
 
 enum v_prec v_flash_attn_ext_get_prec(
-  const struct v_tensor* a) {
+  const v_tensor* a) {
   V_ASSERT(a->op == v_OP_FLASH_ATTN_EXT);
 
   const int32_t prec_i32 = v_get_op_params_i32(a, 3);
@@ -1952,8 +1951,8 @@ enum v_prec v_flash_attn_ext_get_prec(
 }
 
 void v_flash_attn_ext_add_sinks(
-  struct v_tensor* a,
-  struct v_tensor* sinks) {
+  v_tensor* a,
+  v_tensor* sinks) {
   if (!sinks) {
     a->src[4] = NULL;
     return;
@@ -1966,12 +1965,12 @@ void v_flash_attn_ext_add_sinks(
 }
 
 // v_flash_attn_back
-struct v_tensor* v_flash_attn_back(struct v_ctx* ctx,
-                                   struct v_tensor* q,
-                                   struct v_tensor* k,
-                                   struct v_tensor* v,
-                                   struct v_tensor* d,
-                                   bool masked) {
+v_tensor* v_flash_attn_back(struct v_ctx* ctx,
+                            v_tensor* q,
+                            v_tensor* k,
+                            v_tensor* v,
+                            v_tensor* d,
+                            bool masked) {
   v_ABORT("TODO: adapt to v_flash_attn_ext() changes");
 
   V_ASSERT(can_mul_mat(k, q));
@@ -2019,7 +2018,7 @@ struct v_tensor* v_flash_attn_back(struct v_ctx* ctx,
 
   const size_t nelements = (end + tsize - 1) / tsize;
 
-  struct v_tensor* result = v_new_tensor_1d(ctx, v_TYPE_F32, nelements);
+  v_tensor* result = v_new_tensor_1d(ctx, v_TYPE_F32, nelements);
 
   int32_t masked_i = masked
                        ? 1
@@ -2037,10 +2036,10 @@ struct v_tensor* v_flash_attn_back(struct v_ctx* ctx,
 
 // v_ssm_conv
 
-struct v_tensor* v_ssm_conv(
+v_tensor* v_ssm_conv(
   struct v_ctx* ctx,
-  struct v_tensor* sx,
-  struct v_tensor* c) {
+  v_tensor* sx,
+  v_tensor* c) {
   V_ASSERT(v_is_3d(sx));
   V_ASSERT(v_is_matrix(c));
 
@@ -2054,7 +2053,7 @@ struct v_tensor* v_ssm_conv(
   V_ASSERT(sx->ne[1] == d_inner);
   V_ASSERT(n_t >= 0);
 
-  struct v_tensor* result = v_new_tensor_3d(ctx, v_TYPE_F32, d_inner, n_t, n_s);
+  v_tensor* result = v_new_tensor_3d(ctx, v_TYPE_F32, d_inner, n_t, n_s);
 
   result->op     = v_OP_SSM_CONV;
   result->src[0] = sx;
@@ -2065,15 +2064,15 @@ struct v_tensor* v_ssm_conv(
 
 // v_ssm_scan
 
-struct v_tensor* v_ssm_scan(
+v_tensor* v_ssm_scan(
   struct v_ctx* ctx,
-  struct v_tensor* s,
-  struct v_tensor* x,
-  struct v_tensor* dt,
-  struct v_tensor* A,
-  struct v_tensor* B,
-  struct v_tensor* C,
-  struct v_tensor* ids) {
+  v_tensor* s,
+  v_tensor* x,
+  v_tensor* dt,
+  v_tensor* A,
+  v_tensor* B,
+  v_tensor* C,
+  v_tensor* ids) {
   V_ASSERT(v_is_contiguous(s));
   V_ASSERT(v_is_contiguous(dt));
   V_ASSERT(v_is_contiguous(A));
@@ -2114,9 +2113,9 @@ struct v_tensor* v_ssm_scan(
   }
 
   // concatenated y + ssm_states
-  struct v_tensor* result = v_new_tensor_1d(ctx,
-                                            v_TYPE_F32,
-                                            nelements(x) + s->ne[0] * s->ne[1] * s->ne[2] * ids->ne[0]);
+  v_tensor* result = v_new_tensor_1d(ctx,
+                                     v_TYPE_F32,
+                                     nelements(x) + s->ne[0] * s->ne[1] * s->ne[2] * ids->ne[0]);
 
   result->op     = v_OP_SSM_SCAN;
   result->src[0] = s;
@@ -2131,9 +2130,9 @@ struct v_tensor* v_ssm_scan(
 }
 
 // v_win_part
-struct v_tensor* v_win_part(
+v_tensor* v_win_part(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int w) {
   V_ASSERT(a->ne[3] == 1);
   V_ASSERT(a->type == v_TYPE_F32);
@@ -2146,8 +2145,8 @@ struct v_tensor* v_win_part(
   const int npy = (py + a->ne[2]) / w;
   const int np  = npx * npy;
 
-  const int64_t ne[4]     = {a->ne[0], w, w, np,};
-  struct v_tensor* result = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
+  const int64_t ne[4] = {a->ne[0], w, w, np,};
+  v_tensor* result    = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
 
   int32_t params[] = {npx, npy, w};
   v_set_op_params(result, params, sizeof(params));
@@ -2160,16 +2159,16 @@ struct v_tensor* v_win_part(
 
 // v_win_unpart
 
-struct v_tensor* v_win_unpart(
+v_tensor* v_win_unpart(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int w0,
   int h0,
   int w) {
   V_ASSERT(a->type == v_TYPE_F32);
 
-  const int64_t ne[4]     = {a->ne[0], w0, h0, 1,};
-  struct v_tensor* result = v_new_tensor(ctx, v_TYPE_F32, 3, ne);
+  const int64_t ne[4] = {a->ne[0], w0, h0, 1,};
+  v_tensor* result    = v_new_tensor(ctx, v_TYPE_F32, 3, ne);
 
   int32_t params[] = {w};
   v_set_op_params(result, params, sizeof(params));
@@ -2182,16 +2181,16 @@ struct v_tensor* v_win_unpart(
 
 // v_get_rel_pos
 
-struct v_tensor* v_get_rel_pos(
+v_tensor* v_get_rel_pos(
   struct v_ctx* ctx,
-  struct v_tensor* a,
+  v_tensor* a,
   int qh,
   int kh) {
   V_ASSERT(qh == kh);
   V_ASSERT(2*MAX(qh, kh) - 1 == a->ne[1]);
 
-  const int64_t ne[4]     = {a->ne[0], kh, qh, 1,};
-  struct v_tensor* result = v_new_tensor(ctx, v_TYPE_F16, 3, ne);
+  const int64_t ne[4] = {a->ne[0], kh, qh, 1,};
+  v_tensor* result    = v_new_tensor(ctx, v_TYPE_F16, 3, ne);
 
   result->op     = v_OP_GET_REL_POS;
   result->src[0] = a;
@@ -2201,11 +2200,11 @@ struct v_tensor* v_get_rel_pos(
 
 // v_add_rel_pos
 
-static struct v_tensor* v_add_rel_pos_impl(
+static v_tensor* v_add_rel_pos_impl(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* pw,
-  struct v_tensor* ph,
+  v_tensor* a,
+  v_tensor* pw,
+  v_tensor* ph,
   bool inplace) {
   V_ASSERT(v_are_same_shape(pw, ph));
   V_ASSERT(v_is_contiguous(a));
@@ -2217,9 +2216,9 @@ static struct v_tensor* v_add_rel_pos_impl(
   V_ASSERT(pw->ne[0]*pw->ne[0] == a->ne[0]);
   V_ASSERT(pw->ne[1]*pw->ne[2] == a->ne[1]);
 
-  struct v_tensor* result = inplace
-                              ? v_tensor_view(ctx, a)
-                              : v_dup_tensor(ctx, a);
+  v_tensor* result = inplace
+                       ? v_tensor_view(ctx, a)
+                       : v_dup_tensor(ctx, a);
   v_set_op_params_i32(result, 0, inplace
                                    ? 1
                                    : 0);
@@ -2232,31 +2231,31 @@ static struct v_tensor* v_add_rel_pos_impl(
   return result;
 }
 
-struct v_tensor* v_add_rel_pos(
+v_tensor* v_add_rel_pos(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* pw,
-  struct v_tensor* ph) {
+  v_tensor* a,
+  v_tensor* pw,
+  v_tensor* ph) {
   return v_add_rel_pos_impl(ctx, a, pw, ph, false);
 }
 
-struct v_tensor* v_add_rel_pos_inplace(
+v_tensor* v_add_rel_pos_inplace(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* pw,
-  struct v_tensor* ph) {
+  v_tensor* a,
+  v_tensor* pw,
+  v_tensor* ph) {
   return v_add_rel_pos_impl(ctx, a, pw, ph, true);
 }
 
 // v_rwkv_wkv6
-struct v_tensor* v_rwkv_wkv6(
+v_tensor* v_rwkv_wkv6(
   struct v_ctx* ctx,
-  struct v_tensor* k,
-  struct v_tensor* v,
-  struct v_tensor* r,
-  struct v_tensor* tf,
-  struct v_tensor* td,
-  struct v_tensor* state) {
+  v_tensor* k,
+  v_tensor* v,
+  v_tensor* r,
+  v_tensor* tf,
+  v_tensor* td,
+  v_tensor* state) {
   V_ASSERT(v_is_contiguous(k));
   V_ASSERT(v_is_contiguous(v));
   V_ASSERT(v_is_contiguous(r));
@@ -2276,8 +2275,8 @@ struct v_tensor* v_rwkv_wkv6(
   }
 
   // concat output and new_state
-  const int64_t ne[4]     = {S * H, n_tokens + S * n_seqs, 1, 1};
-  struct v_tensor* result = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
+  const int64_t ne[4] = {S * H, n_tokens + S * n_seqs, 1, 1};
+  v_tensor* result    = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
 
   result->op     = v_OP_RWKV_WKV6;
   result->src[0] = k;
@@ -2292,13 +2291,13 @@ struct v_tensor* v_rwkv_wkv6(
 
 // v_gated_linear_attn
 
-struct v_tensor* v_gated_linear_attn(
+v_tensor* v_gated_linear_attn(
   struct v_ctx* ctx,
-  struct v_tensor* k,
-  struct v_tensor* v,
-  struct v_tensor* q,
-  struct v_tensor* g,
-  struct v_tensor* state,
+  v_tensor* k,
+  v_tensor* v,
+  v_tensor* q,
+  v_tensor* g,
+  v_tensor* state,
   float scale) {
   V_ASSERT(v_is_contiguous(k));
   V_ASSERT(v_is_contiguous(v));
@@ -2318,8 +2317,8 @@ struct v_tensor* v_gated_linear_attn(
   }
 
   // concat output and new_state
-  const int64_t ne[4]     = {S * H, n_tokens + S * n_seqs, 1, 1};
-  struct v_tensor* result = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
+  const int64_t ne[4] = {S * H, n_tokens + S * n_seqs, 1, 1};
+  v_tensor* result    = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
   v_set_op_params_f32(result, 0, scale);
   result->op     = v_OP_GATED_LINEAR_ATTN;
   result->src[0] = k;
@@ -2332,15 +2331,15 @@ struct v_tensor* v_gated_linear_attn(
 
 // v_rwkv_wkv7
 
-struct v_tensor* v_rwkv_wkv7(
+v_tensor* v_rwkv_wkv7(
   struct v_ctx* ctx,
-  struct v_tensor* r,
-  struct v_tensor* w,
-  struct v_tensor* k,
-  struct v_tensor* v,
-  struct v_tensor* a,
-  struct v_tensor* b,
-  struct v_tensor* state) {
+  v_tensor* r,
+  v_tensor* w,
+  v_tensor* k,
+  v_tensor* v,
+  v_tensor* a,
+  v_tensor* b,
+  v_tensor* state) {
   V_ASSERT(v_is_contiguous(r));
   V_ASSERT(v_is_contiguous(w));
   V_ASSERT(v_is_contiguous(k));
@@ -2363,8 +2362,8 @@ struct v_tensor* v_rwkv_wkv7(
   }
 
   // concat output and new_state
-  const int64_t ne[4]     = {S * H, n_tokens + S * n_seqs, 1, 1};
-  struct v_tensor* result = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
+  const int64_t ne[4] = {S * H, n_tokens + S * n_seqs, 1, 1};
+  v_tensor* result    = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
 
   result->op     = v_OP_RWKV_WKV7;
   result->src[0] = r;
@@ -2379,17 +2378,17 @@ struct v_tensor* v_rwkv_wkv7(
 }
 
 
-struct v_tensor* v_map_custom1_impl(struct v_ctx* ctx,
-                                    struct v_tensor* a,
-                                    const v_custom1_op_t fun,
-                                    int n_tasks,
-                                    void* userdata,
-                                    bool inplace) {
+v_tensor* v_map_custom1_impl(struct v_ctx* ctx,
+                             v_tensor* a,
+                             const v_custom1_op_t fun,
+                             int n_tasks,
+                             void* userdata,
+                             bool inplace) {
   V_ASSERT(n_tasks == v_N_TASKS_MAX || n_tasks > 0);
 
-  struct v_tensor* result = inplace
-                              ? v_tensor_view(ctx, a)
-                              : v_dup_tensor(ctx, a);
+  v_tensor* result = inplace
+                       ? v_tensor_view(ctx, a)
+                       : v_dup_tensor(ctx, a);
 
   struct v_map_custom1_op_params params = {
     /*.fun      =*/ fun,
@@ -2405,18 +2404,18 @@ struct v_tensor* v_map_custom1_impl(struct v_ctx* ctx,
 }
 
 
-struct v_tensor* v_map_custom2_impl(struct v_ctx* ctx,
-                                    struct v_tensor* a,
-                                    struct v_tensor* b,
-                                    const v_custom2_op_t fun,
-                                    int n_tasks,
-                                    void* userdata,
-                                    bool inplace) {
+v_tensor* v_map_custom2_impl(struct v_ctx* ctx,
+                             v_tensor* a,
+                             v_tensor* b,
+                             const v_custom2_op_t fun,
+                             int n_tasks,
+                             void* userdata,
+                             bool inplace) {
   V_ASSERT(n_tasks == v_N_TASKS_MAX || n_tasks > 0);
 
-  struct v_tensor* result = inplace
-                              ? v_tensor_view(ctx, a)
-                              : v_dup_tensor(ctx, a);
+  v_tensor* result = inplace
+                       ? v_tensor_view(ctx, a)
+                       : v_dup_tensor(ctx, a);
 
   struct v_map_custom2_op_params params = {
     /*.fun      =*/ fun,
@@ -2433,19 +2432,19 @@ struct v_tensor* v_map_custom2_impl(struct v_ctx* ctx,
 }
 
 
-struct v_tensor* v_map_custom3_impl(
+v_tensor* v_map_custom3_impl(
   struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
-  struct v_tensor* c,
+  v_tensor* a,
+  v_tensor* b,
+  v_tensor* c,
   const v_custom3_op_t fun,
   int n_tasks,
   void* userdata,
   bool inplace) {
   V_ASSERT(n_tasks == v_N_TASKS_MAX || n_tasks > 0);
-  struct v_tensor* result = inplace
-                              ? v_tensor_view(ctx, a)
-                              : v_dup_tensor(ctx, a);
+  v_tensor* result = inplace
+                       ? v_tensor_view(ctx, a)
+                       : v_dup_tensor(ctx, a);
   struct v_map_custom3_op_params params = {
     /*.fun      =*/ fun,
     /*.n_tasks  =*/ n_tasks,
@@ -2460,19 +2459,19 @@ struct v_tensor* v_map_custom3_impl(
 }
 
 
-struct v_tensor* v_custom_4d(struct v_ctx* ctx,
-                             enum v_data_type type,
-                             int64_t ne0,
-                             int64_t ne1,
-                             int64_t ne2,
-                             int64_t ne3,
-                             struct v_tensor** args,
-                             int n_args,
-                             v_custom_op_t fun,
-                             int n_tasks,
-                             void* userdata) {
+v_tensor* v_custom_4d(struct v_ctx* ctx,
+                      enum v_data_type type,
+                      int64_t ne0,
+                      int64_t ne1,
+                      int64_t ne2,
+                      int64_t ne3,
+                      v_tensor* * args,
+                      int n_args,
+                      v_custom_op_t fun,
+                      int n_tasks,
+                      void* userdata) {
   V_ASSERT(n_args < v_MAX_SRC);
-  struct v_tensor* result          = v_new_tensor_4d(ctx, type, ne0, ne1, ne2, ne3);
+  v_tensor* result                 = v_new_tensor_4d(ctx, type, ne0, ne1, ne2, ne3);
   struct v_custom_op_params params = {
     /*.fun      =*/ fun,
     /*.n_tasks  =*/ n_tasks,
@@ -2486,15 +2485,15 @@ struct v_tensor* v_custom_4d(struct v_ctx* ctx,
   return result;
 }
 
-struct v_tensor* v_custom_inplace(struct v_ctx* ctx,
-                                  struct v_tensor* a,
-                                  struct v_tensor** args,
-                                  int n_args,
-                                  v_custom_op_t fun,
-                                  int n_tasks,
-                                  void* userdata) {
+v_tensor* v_custom_inplace(struct v_ctx* ctx,
+                           v_tensor* a,
+                           v_tensor* * args,
+                           int n_args,
+                           v_custom_op_t fun,
+                           int n_tasks,
+                           void* userdata) {
   V_ASSERT(n_args < v_MAX_SRC - 1);
-  struct v_tensor* result = v_tensor_view(ctx, a);
+  v_tensor* result = v_tensor_view(ctx, a);
 
   struct v_custom_op_params params = {
     /*.fun      =*/ fun,
@@ -2511,26 +2510,26 @@ struct v_tensor* v_custom_inplace(struct v_ctx* ctx,
   return result;
 }
 
-struct v_tensor* v_cross_entropy_loss(struct v_ctx* ctx,
-                                      struct v_tensor* a,
-                                      struct v_tensor* b) {
+v_tensor* v_cross_entropy_loss(struct v_ctx* ctx,
+                               v_tensor* a,
+                               v_tensor* b) {
   V_ASSERT(v_are_same_shape(a, b));
-  struct v_tensor* result = v_new_tensor_1d(ctx, a->type, 1);
-  result->op              = v_OP_CROSS_ENTROPY_LOSS;
-  result->src[0]          = a;
-  result->src[1]          = b;
+  v_tensor* result = v_new_tensor_1d(ctx, a->type, 1);
+  result->op       = v_OP_CROSS_ENTROPY_LOSS;
+  result->src[0]   = a;
+  result->src[1]   = b;
   return result;
 }
 
 // v_cross_entropy_loss_back
-struct v_tensor* v_cross_entropy_loss_back(struct v_ctx* ctx,
-                                           struct v_tensor* a,
-                                           struct v_tensor* b,
-                                           struct v_tensor* c) {
+v_tensor* v_cross_entropy_loss_back(v_ctx* ctx,
+                                    v_tensor* a,
+                                    v_tensor* b,
+                                    v_tensor* c) {
   V_ASSERT(v_is_scalar(a));
   V_ASSERT(v_are_same_shape(b, c));
 
-  struct v_tensor* result = v_dup_tensor(ctx, b);
+  v_tensor* result = v_dup_tensor(ctx, b);
 
   result->op     = v_OP_CROSS_ENTROPY_LOSS_BACK;
   result->src[0] = a;
@@ -2541,42 +2540,42 @@ struct v_tensor* v_cross_entropy_loss_back(struct v_ctx* ctx,
 }
 
 // opt_step_adamw
-struct v_tensor* v_opt_step_adamw(struct v_ctx* ctx,
-                                  struct v_tensor* a,
-                                  struct v_tensor* grad,
-                                  struct v_tensor* m,
-                                  struct v_tensor* v,
-                                  struct v_tensor* adamw_params) {
+v_tensor* v_opt_step_adamw(struct v_ctx* ctx,
+                           v_tensor* a,
+                           v_tensor* grad,
+                           v_tensor* m,
+                           v_tensor* v,
+                           v_tensor* adamw_params) {
   V_ASSERT(a->flags & TENSOR_FLAG_PARAM);
   V_ASSERT(v_are_same_shape(a, grad));
   V_ASSERT(v_are_same_shape(a, m));
   V_ASSERT(v_are_same_shape(a, v));
   V_ASSERT(adamw_params->type == v_TYPE_F32);
   V_ASSERT(nelements(adamw_params) == 7);
-  struct v_tensor* result = v_tensor_view(ctx, a);
-  result->op              = v_OP_OPT_STEP_ADAMW;
-  result->src[0]          = a;
-  result->src[1]          = grad;
-  result->src[2]          = m;
-  result->src[3]          = v;
-  result->src[4]          = adamw_params;
+  v_tensor* result = v_tensor_view(ctx, a);
+  result->op       = v_OP_OPT_STEP_ADAMW;
+  result->src[0]   = a;
+  result->src[1]   = grad;
+  result->src[2]   = m;
+  result->src[3]   = v;
+  result->src[4]   = adamw_params;
   return result;
 }
 
 // opt_step_sgd
-struct v_tensor* v_opt_step_sgd(struct v_ctx* ctx,
-                                struct v_tensor* a,
-                                struct v_tensor* grad,
-                                struct v_tensor* params) {
+v_tensor* v_opt_step_sgd(struct v_ctx* ctx,
+                         v_tensor* a,
+                         v_tensor* grad,
+                         v_tensor* params) {
   V_ASSERT(a->flags & TENSOR_FLAG_PARAM);
   V_ASSERT(v_are_same_shape(a, grad));
   V_ASSERT(params->type == v_TYPE_F32);
   V_ASSERT(nelements(params) == 2);
-  struct v_tensor* result = v_tensor_view(ctx, a);
-  result->op              = v_OP_OPT_STEP_SGD;
-  result->src[0]          = a;
-  result->src[1]          = grad;
-  result->src[2]          = params;
+  v_tensor* result = v_tensor_view(ctx, a);
+  result->op       = v_OP_OPT_STEP_SGD;
+  result->src[0]   = a;
+  result->src[1]   = grad;
+  result->src[2]   = params;
   return result;
 }
 
@@ -2586,7 +2585,7 @@ struct v_hash_set v_hash_set_new(size_t size) {
   size = v_hash_size(size);
   struct v_hash_set result;
   result.size = size;
-  result.keys = (struct v_tensor**)v_MALLOC(sizeof(struct v_tensor *) * size);
+  result.keys = (v_tensor* *)v_MALLOC(sizeof(v_tensor *) * size);
   result.used = (uint32_t*)v_CALLOC(v_bitset_size(size), sizeof(unsigned));
   return result;
 }
@@ -2629,7 +2628,7 @@ size_t v_hash_size(size_t min_sz) {
 struct hash_map* v_new_hash_map(size_t size) {
   struct hash_map* result = (struct hash_map*)v_MALLOC(sizeof(struct hash_map));
   result->set             = v_hash_set_new(size);
-  result->vals            = (struct v_tensor**)v_CALLOC(result->set.size, sizeof(struct v_tensor *));
+  result->vals            = (v_tensor* *)v_CALLOC(result->set.size, sizeof(v_tensor *));
   return result;
 }
 
@@ -2640,9 +2639,8 @@ void v_hash_map_free(struct hash_map* map) {
 }
 
 
-size_t v_visit_parents(struct v_cgraph* cgraph, struct v_tensor* node) {
+size_t v_visit_parents(struct v_cgraph* cgraph, v_tensor* node) {
   // check if already visited
-
   size_t node_hash_pos = find_hash(&cgraph->visited_hash_set, node);
   #ifdef MEM_DEBUG
   std::cout << node_hash_pos << std::endl;
@@ -2667,7 +2665,7 @@ size_t v_visit_parents(struct v_cgraph* cgraph, struct v_tensor* node) {
                     :
                     /* unknown order, just fall back to using i */ i;
 
-    struct v_tensor* src = node->src[k];
+    v_tensor* src = node->src[k];
     if (src) {
       size_t src_hash_pos = v_visit_parents(cgraph, src);
       // Update the use count for this operand.
@@ -2698,7 +2696,7 @@ size_t v_visit_parents(struct v_cgraph* cgraph, struct v_tensor* node) {
 }
 
 
-void v_build_foward_expand(struct v_cgraph* cgraph, struct v_tensor* tensor) {
+void v_build_foward_expand(struct v_cgraph* cgraph, v_tensor* tensor) {
   const int n0 = cgraph->n_nodes;
   v_visit_parents(cgraph, tensor);
   const int n_new = cgraph->n_nodes - n0;
@@ -2714,29 +2712,29 @@ void v_build_foward_expand(struct v_cgraph* cgraph, struct v_tensor* tensor) {
 
 void v_build_backward_expend(struct v_ctx* ctx,
                              struct v_cgraph* cgraph,
-                             struct v_tensor** grad_accs) {
+                             v_tensor* * grad_accs) {
   V_ASSERT(cgraph->n_nodes > 0);
   V_ASSERT(cgraph->grads);
   V_ASSERT(cgraph->grad_accs);
 
   const int n_nodes_f = cgraph->n_nodes;
-  memset(cgraph->grads, 0, cgraph->visited_hash_set.size * sizeof(struct v_tensor*));
-  memset(cgraph->grad_accs, 0, cgraph->visited_hash_set.size * sizeof(struct v_tensor*));
+  memset(cgraph->grads, 0, cgraph->visited_hash_set.size * sizeof(v_tensor*));
+  memset(cgraph->grad_accs, 0, cgraph->visited_hash_set.size * sizeof(v_tensor*));
   bool* grads_needed = (bool*)calloc(cgraph->visited_hash_set.size, sizeof(bool));
   {
     bool any_params = false;
     bool any_loss   = false;
     for (int i = 0; i < n_nodes_f; ++i) {
-      struct v_tensor* node = cgraph->nodes[i];
-      any_params            = any_params || (node->flags & TENSOR_FLAG_PARAM);
-      any_loss              = any_loss || (node->flags & TENSOR_FLAG_LOSS);
+      v_tensor* node = cgraph->nodes[i];
+      any_params     = any_params || (node->flags & TENSOR_FLAG_PARAM);
+      any_loss       = any_loss || (node->flags & TENSOR_FLAG_LOSS);
     }
     //V_ASSERT(any_params && "no trainable parameters found, did you forget to call v_set_param?");
     //V_ASSERT(any_loss && "no training loss found, did you forget to call v_set_loss?");
   }
 
   for (int i = 0; i < n_nodes_f; ++i) {
-    struct v_tensor* node = cgraph->nodes[i];
+    v_tensor* node = cgraph->nodes[i];
 
     if (node->type == v_TYPE_I32) {
       continue;
@@ -2802,9 +2800,9 @@ void v_build_backward_expend(struct v_ctx* ctx,
   }
 
   for (int i = n_nodes_f - 1; i >= 0; --i) {
-    struct v_tensor* node = cgraph->nodes[i];
+    v_tensor* node = cgraph->nodes[i];
     printf("node name: %s \n", v_op_name(node->op));
-    v_compute_backword(ctx, cgraph, i, grads_needed);
+    v_compute_backward(ctx, cgraph, i, grads_needed);
   }
   free(grads_needed);
 }
@@ -2817,8 +2815,8 @@ void v_graph_reset(struct v_cgraph* cgraph) {
   V_ASSERT(cgraph->grads != NULL);
 
   for (int i = 0; i < cgraph->n_nodes; i++) {
-    struct v_tensor* node     = cgraph->nodes[i];
-    struct v_tensor* grad_acc = v_graph_get_grad_acc(cgraph, node);
+    v_tensor* node     = cgraph->nodes[i];
+    v_tensor* grad_acc = v_graph_get_grad_acc(cgraph, node);
 
     if (node->op == v_OP_OPT_STEP_ADAMW) {
       // clear momenta
@@ -2848,9 +2846,9 @@ void v_graph_reset(struct v_cgraph* cgraph) {
 }
 
 
-struct v_tensor* v_graph_get_tensor(const struct v_cgraph* cgraph, const char* name) {
+v_tensor* v_graph_get_tensor(const struct v_cgraph* cgraph, const char* name) {
   for (int i = 0; i < cgraph->n_leafs; i++) {
-    struct v_tensor* leaf = cgraph->leafs[i];
+    v_tensor* leaf = cgraph->leafs[i];
 
     if (strcmp(leaf->name, name) == 0) {
       return leaf;
@@ -2858,7 +2856,7 @@ struct v_tensor* v_graph_get_tensor(const struct v_cgraph* cgraph, const char* n
   }
 
   for (int i = 0; i < cgraph->n_nodes; i++) {
-    struct v_tensor* node = cgraph->nodes[i];
+    v_tensor* node = cgraph->nodes[i];
 
     if (strcmp(node->name, name) == 0) {
       return node;
@@ -2873,7 +2871,7 @@ void v_print_graph(const struct v_cgraph* cgraph) {
   LOG_INFO("=== GRAPH ===\n");
   LOG_INFO("n_nodes = %d\n", cgraph->n_nodes);
   for (int i = 0; i < cgraph->n_nodes; i++) {
-    struct v_tensor* node = cgraph->nodes[i];
+    v_tensor* node = cgraph->nodes[i];
     LOG_INFO(" - %3d: [ %5" PRId64 ", %5" PRId64 ", %5" PRId64 "] %16s %s\n",
              i,
              node->ne[0],
@@ -2886,7 +2884,7 @@ void v_print_graph(const struct v_cgraph* cgraph) {
 
   LOG_INFO("n_leafs = %d\n", cgraph->n_leafs);
   for (int i = 0; i < cgraph->n_leafs; i++) {
-    struct v_tensor* node = cgraph->leafs[i];
+    v_tensor* node = cgraph->leafs[i];
 
     LOG_INFO(" - %3d: [ %5" PRId64 ", %5" PRId64 "] %8s %16s\n",
              i,
@@ -2901,7 +2899,7 @@ void v_print_graph(const struct v_cgraph* cgraph) {
 static int v_node_list_find_tensor(const struct v_cgraph* cgraph,
                                    const int* idxs,
                                    int count,
-                                   const struct v_tensor* tensor) {
+                                   const v_tensor* tensor) {
   V_ASSERT(cgraph && idxs);
   for (int i = 0; i < count; ++i) {
     const int node_idx = idxs[i];
@@ -2928,7 +2926,7 @@ bool v_can_fuse_subgraph_ext(const struct v_cgraph* cgraph,
       return false;
     }
 
-    const struct v_tensor* node = cgraph->nodes[node_idxs[i]];
+    const v_tensor* node = cgraph->nodes[node_idxs[i]];
 
     if (node->op != ops[i]) {
       return false;
@@ -2944,7 +2942,7 @@ bool v_can_fuse_subgraph_ext(const struct v_cgraph* cgraph,
 
     int subgraph_uses = 0;
     for (int j = i + 1; j < count; ++j) {
-      const struct v_tensor* other_node = cgraph->nodes[node_idxs[j]];
+      const v_tensor* other_node = cgraph->nodes[node_idxs[j]];
       for (int src_idx = 0; src_idx < v_MAX_SRC; src_idx++) {
         if (other_node->src[src_idx] == node) {
           subgraph_uses++;
@@ -2957,7 +2955,7 @@ bool v_can_fuse_subgraph_ext(const struct v_cgraph* cgraph,
     }
 
     // if node is a view, check if the view_src and all it's parent view_srcs are within the subgraph
-    struct v_tensor* view_src = node->view_src;
+    v_tensor* view_src = node->view_src;
     while (view_src) {
       if (v_node_list_find_tensor(cgraph, node_idxs, count, view_src) == -1) {
         return false;
@@ -2970,7 +2968,7 @@ bool v_can_fuse_subgraph_ext(const struct v_cgraph* cgraph,
 }
 
 // check if node is part of the graph
-static bool v_graph_find(const struct v_cgraph* cgraph, const struct v_tensor* node) {
+static bool v_graph_find(const struct v_cgraph* cgraph, const v_tensor* node) {
   if (cgraph == NULL) {
     return true;
   }
@@ -2985,10 +2983,10 @@ static bool v_graph_find(const struct v_cgraph* cgraph, const struct v_tensor* n
 }
 
 
-static struct v_tensor* v_graph_get_parent(const struct v_cgraph* cgraph, const struct v_tensor* node) {
+static v_tensor* v_graph_get_parent(const struct v_cgraph* cgraph, const v_tensor* node) {
   for (int i = 0; i < cgraph->n_nodes; i++) {
-    struct v_tensor* parent = cgraph->nodes[i];
-    struct v_tensor* grad   = v_graph_get_grad(cgraph, parent);
+    v_tensor* parent = cgraph->nodes[i];
+    v_tensor* grad   = v_graph_get_grad(cgraph, parent);
 
     if (grad == node) {
       return parent;
@@ -2998,10 +2996,10 @@ static struct v_tensor* v_graph_get_parent(const struct v_cgraph* cgraph, const 
   return NULL;
 }
 
-static void v_graph_dump_dot_node_edge(FILE* fp, const struct v_cgraph* gb, struct v_tensor* node,
-                                       struct v_tensor* parent, const char* label) {
-  struct v_tensor* gparent  = v_graph_get_parent(gb, node);
-  struct v_tensor* gparent0 = v_graph_get_parent(gb, parent);
+static void v_graph_dump_dot_node_edge(FILE* fp, const struct v_cgraph* gb, v_tensor* node,
+                                       v_tensor* parent, const char* label) {
+  v_tensor* gparent  = v_graph_get_parent(gb, node);
+  v_tensor* gparent0 = v_graph_get_parent(gb, parent);
   fprintf(fp,
           "  \"%p\" -> \"%p\" [ arrowhead = %s; style = %s; label = \"%s\"; ]\n",
           gparent0
@@ -3019,7 +3017,7 @@ static void v_graph_dump_dot_node_edge(FILE* fp, const struct v_cgraph* gb, stru
           label);
 }
 
-static void v_graph_dump_dot_leaf_edge(FILE* fp, struct v_tensor* node, struct v_tensor* parent,
+static void v_graph_dump_dot_leaf_edge(FILE* fp, v_tensor* node, v_tensor* parent,
                                        const char* label) {
   fprintf(fp,
           "  \"%p\" -> \"%p\" [ label = \"%s\"; ]\n",
@@ -3036,8 +3034,8 @@ void v_graph_dump_dot(const struct v_cgraph* gb, const struct v_cgraph* gf, cons
   fprintf(fp, "  newrank = true;\n");
   fprintf(fp, "  rankdir = TB;\n");
   for (int i = 0; i < gb->n_nodes; i++) {
-    struct v_tensor* node = gb->nodes[i];
-    struct v_tensor* grad = v_graph_get_grad(gb, node);
+    v_tensor* node = gb->nodes[i];
+    v_tensor* grad = v_graph_get_grad(gb, node);
 
     if (v_graph_get_parent(gb, node) != NULL) {
       continue;
@@ -3094,7 +3092,7 @@ void v_graph_dump_dot(const struct v_cgraph* gb, const struct v_cgraph* gf, cons
   }
 
   for (int i = 0; i < gb->n_leafs; i++) {
-    struct v_tensor* node = gb->leafs[i];
+    v_tensor* node = gb->leafs[i];
 
     snprintf(color, sizeof(color), "pink");
 
@@ -3139,7 +3137,7 @@ void v_graph_dump_dot(const struct v_cgraph* gb, const struct v_cgraph* gf, cons
   }
 
   for (int i = 0; i < gb->n_nodes; i++) {
-    struct v_tensor* node = gb->nodes[i];
+    v_tensor* node = gb->nodes[i];
 
     for (int j = 0; j < v_MAX_SRC; j++) {
       if (node->src[j]) {
@@ -3151,7 +3149,7 @@ void v_graph_dump_dot(const struct v_cgraph* gb, const struct v_cgraph* gf, cons
   }
 
   for (int i = 0; i < gb->n_leafs; i++) {
-    struct v_tensor* node = gb->leafs[i];
+    v_tensor* node = gb->leafs[i];
 
     for (int j = 0; j < v_MAX_SRC; j++) {
       if (node->src[j]) {

@@ -2,7 +2,6 @@
 #define MYPROJECT_VK_COMMON_H
 #include "v_vk.h"
 #include <vulkan/vulkan_core.h>
-using v_tensor_t = v_tensor*;
 
 #if defined(v_VULKAN_RUN_TESTS) || defined(v_VULKAN_CHECK_RESULTS)
 #include <chrono>

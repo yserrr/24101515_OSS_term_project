@@ -10,7 +10,6 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "source/AI/Model.hpp"
 #include "extern/pybind11/pybind11.h"
 #include "pybind11/embed.h"
 #include "pybind11/stl.h"
@@ -20,6 +19,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdint>
+#include "v_util.h"
 #include <fstream>
 #include <random>
 #include <string>
@@ -34,7 +34,7 @@ namespace py = pybind11;
 #define CIFAR_NTEST  10000
 #define CIFAR_NINPUT  (32*32*3)
 #define CIFAR_NCLASSES 10
-#define CIFAR_NHIDDEN  3000
+#define CIFAR_NHIDDEN  1000
 #define CIFAR_NBATCH_LOGICAL  5000
 #define CIFAR_NBATCH_PHYSICAL 5000
 #define CIFAR_NCHANEL  =3
