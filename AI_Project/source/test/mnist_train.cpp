@@ -253,11 +253,15 @@ int main()
 
   v_opt_result_t result_train = v_opt_result_init();
   v_opt_result_t result_val   = v_opt_result_init();
-  for (; epoch <= 10000; ++epoch) {
+
+  v_time_init();
+  const int64_t t_start_us = v_time_us();
+
+  for (; epoch <= 60; ++epoch) {
     dataset->shuffle(opt_ctx, idata_split);
     result_train->reset();
     result_val->reset();
-    fprintf(stderr, "%s: epoch %04" PRId64 "/%04" PRId64 ":\n", __func__, epoch, 100);
+    fprintf(stderr, "%s: epoch %04" PRId64 "/%04" PRId64 ":\n", __func__, epoch, 60);
     v_tensor* inputs = opt_ctx->getInput();
     v_tensor* labels = opt_ctx->getLabels();
     v_tensor* data   = v_opt_dataset_datas(dataset);
@@ -271,6 +275,7 @@ int main()
     idata_split            = idata_split < 0 ? ndata : idata_split;
 
     V_ASSERT(idata_split % ndata_batch == 0);
+
     const int64_t ibatch_split = idata_split / ndata_batch;
     int64_t batch_idx          = 0;
     int64_t t_loop_start       = v_time_us();
@@ -302,7 +307,17 @@ int main()
 
     fprintf(stderr, "\n");
   }
-
+  int64_t t_total_s       = (v_time_us() - t_start_us) / 1000000;
+  const int64_t t_total_h = t_total_s / 3600;
+  t_total_s -= t_total_h * 3600;
+  const int64_t t_total_m = t_total_s / 60;
+  t_total_s -= t_total_m * 60;
+  fprintf(stderr,
+          "%s: training took %02" PRId64 ":%02" PRId64 ":%02" PRId64 "\n",
+          __func__,
+          t_total_h,
+          t_total_m,
+          t_total_s);
   opt_ctx->free();
   result_train->reset();
   result_val->reset();

@@ -79,6 +79,7 @@ int main() {
     v_tensor* generator_w    = nullptr;
     v_tensor* generator_b    = nullptr;
     v_tensor* generator_relu = nullptr;
+
     ///discriminator:
     /// D_labels = [0,1]
     ///  x -> D(x)  = D_predX;
@@ -86,6 +87,7 @@ int main() {
     ///  z_loss = cross_entropy D(G(z) ,0)
     ///  D_loss =x_loss + z_loss
     ///  need: for opt_epoch
+    ///    not impled yet
 
 
     v_ctx* ctx_static             = nullptr;

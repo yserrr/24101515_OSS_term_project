@@ -215,11 +215,7 @@ int main() {
     for (int64_t i = 0; i < ne; ++i) { tmp[i] = nd(gen); }
     v_set_backend_tensor(t, tmp.data(), 0, num_bytes(t));
   }
-  ///not checked need:
-  /// im2col :
-  ///   backpropagation check
-  ///   pool2d_back_check
-  ///
+
   v_set_params(model.kernel_1);
   v_set_params(model.bias_1);
   v_set_params(model.kernel_2);
@@ -248,6 +244,13 @@ int main() {
                                 model.dense_w,
                                 dense_in),
                        model.dense_b);
+
+  ///not impled yet, need:
+  /// im2col :
+  ///   backpropagation check
+  ///   pool2d_back_check
+  ///   not impled back_propagation kernels yet
+
 
   v_opt_fit(model.backend_sched,
             model.ctx_compute,
