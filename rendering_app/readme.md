@@ -38,7 +38,7 @@ Rendering 구조와 설계를 공부하고 실험하기 위해 시작한 프로�
 # Use: Frame Graph 
 
 
-# use example :
+# Use example :
 
 naive한 frame graph가 구현되어있습니다.
 각 Frame Pass는 다음으로 graph를 build합니다.
@@ -147,6 +147,7 @@ MRT:
 - Vulkan 기반 Rendering 구조 실험 중심 프로젝트
 - 학습 목적이며, 구조 이해 및 실습 위주로 구현
 - 향후 최적화 및 다양한 그래픽 기능 확장 계획
+
 
 
 
