@@ -22,7 +22,12 @@ AI Project는 **Vulkan Compute Shader**를 활용하여 AI 구조를 구현하�
 - GGML의 Vulkan backend를 fork하여 시작하였습니다.
 - CPU fallback 없이, 단일 벡엔드 비동기 구조를 목표로합니다.
 - OP fallback 없는 구조 목표로 구현합니다. 
-- Vulkan을 통해서 GPU 벤더와 무관하게 학습가능한 환경을 만드는 것이 목표입니다. 
+- Vulkan을 통해서 GPU 벤더와 무관하게 학습가능한 환경을 만드는 것이 목표입니다.
+- 구체적 구현
+  - source/compute
+  - source/compute/vk
+  - source/compute/vk_kernels 폴더에 구현됩니다.
+  
 
 Vulkan을 활용하여 AI 학습 연산 환경을 만드는 것을 목표로 합니다.
 
@@ -49,8 +54,7 @@ cmake --build .
 ---
 ## 🚧 Current Progress
 SINGLE VULKAN BACKEND
-
-- Vulkan backend를 단일 구조로 진행
+- Vulkan backend를 단일 구조로 진행하고 있습니다. 
 - shader kernel implement
 - OP fallback 제거 목표 진행 중
 - mnist train impl
