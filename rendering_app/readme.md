@@ -46,13 +46,13 @@ naive한 frame graph가 구현되어있습니다.
 - write한 리소스는 명시적으로 RenderPass가 등록되어있지 않다면, 자동으로 No Clear로 pass가 삽입됩니다.
 - frame resource들은 view를 통해서 각 read,write관계를 시각화합니다.
 - transfer resource는 한번만 호출된 이후 pass를 cull합니다.
+- 기본적으로 frame resource로 선언된다면, device local memory를 가정합니다. 
 --- 
 
 
 # use example :
 source/core/Render  directory에서 render pass를 추가할 수 있습니다.
 
-frame resource로 선언된 경우, graph가 빌드할 타이밍에 gpu physical resource를 할당합니다. 
 
 ```bash
 pass->read__.push_back(renderTargetFilm_->what_need_to_read_target.get());
@@ -66,7 +66,8 @@ pass->read__.push_back(renderTargetFilm_->what_need_to_read_target.get());
   }
 
 ```
-
+frame resource로 선언된 경우, graph가 빌드할 타이밍에 gpu physical resource를 할당합니다. 
+이전까지는 resource 메모리가 할당되어있지않습니다. 
 ```bash
     addGBufferWritePass();
     addShadowPass();
@@ -118,6 +119,7 @@ MRT:
 - Vulkan 기반 Rendering 구조 실험 중심 프로젝트
 - 학습 목적이며, 구조 이해 및 실습 위주로 구현
 - 향후 최적화 및 다양한 그래픽 기능 확장 계획
+
 
 
 
