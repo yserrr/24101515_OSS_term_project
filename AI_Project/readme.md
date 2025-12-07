@@ -63,10 +63,9 @@ cmake build 이후 사용할 수 있습니다.
 ---
 ## 🚧 Current Progress
 SINGLE VULKAN BACKEND
-- Vulkan backend를 단일 구조로 진행하고 있습니다. 
-- shader kernel implement
-- OP fallback 제거 목표 진행 중
-- mnist train impl
+- nnist train 예제가 구현되었습니다.
+- Vulkan backend를 단일 구조로 진행하고 있습니다. cpu 연산을 제거하여, vk에서 지원하지 않는 연산이 많습니다. 이를 구현하고 있습니다.
+- 기존 vk에서 없는 연산을 추가하고 있습니다.
 
 ## ⚙️ Requirements
 - C++ Compiler: C++17 
