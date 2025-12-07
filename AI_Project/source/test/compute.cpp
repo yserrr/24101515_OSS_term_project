@@ -10,7 +10,6 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "source/AI/Model.hpp"
 #include "extern/pybind11/pybind11.h"
 #include "pybind11/embed.h"
 #include "pybind11/stl.h"
