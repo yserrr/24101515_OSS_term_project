@@ -1,4 +1,4 @@
-# 24101515_이재훈 OSS Term Project
+# 24101515 OSS Term Project
 
 ![C++](https://img.shields.io/badge/C++-17-blue)
 ![Vulkan](https://img.shields.io/badge/Vulkan-API-orange)
