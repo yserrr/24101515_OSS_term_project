@@ -1,11 +1,12 @@
 #include <iostream>
 #include "vk_buffer.h"
 
-#include "vk_device.h"
+#include "vk_device.hpp"
 #include "vk_context.h"
-#include "vk_util.h"
+#include "vk_util.hpp"
 #include "vk_op_f32.hpp"
-struct v_backend_buffer_type host{
+
+v_backend_buffer_type host{
   0,
   nullptr,
   true
@@ -242,7 +243,7 @@ void vk_host_free(vk_device& device, void* ptr) {
   vk_buffer buf;
   size_t index;
   for (size_t i = 0; i < device->pinned_memory.size(); i++) {
-    const uint8_t* addr = (const uint8_t*)std::get<0>(device->pinned_memory[i]);
+    auto addr = static_cast<const uint8_t*>(std::get<0>(device->pinned_memory[i]));
     const uint8_t* endr = addr + std::get<1>(device->pinned_memory[i]);
     if (ptr >= addr && ptr < endr) {
       buf   = std::get<2>(device->pinned_memory[i]);
@@ -540,7 +541,7 @@ void vk_buffer_read2d_async(vk_context subctx,
   V_ASSERT(width > 0);
   V_ASSERT(height > 0);
   V_ASSERT(src != nullptr);
-  // TODO: staging_offset is not used
+  // TODO: staging_offset is not used_bits__
   // Check if dst is pinned memory
   vk_buffer buf     = nullptr;
   size_t buf_offset = 0;
@@ -614,24 +615,24 @@ const char* vk_device_buffer_name(v_backend_buffer_type_t buft) {
   vk_buffer_type_context* ctx = (vk_buffer_type_context*)buft->context;
   return ctx->name.c_str();
 }
+
 size_t vk_device_buffer_get_align(v_backend_buffer_type_t buft) {
   vk_buffer_type_context* ctx = (vk_buffer_type_context*)buft->context;
   return ctx->device->properties.limits.minStorageBufferOffsetAlignment;
 }
+
 size_t vk_device_buffer_get_max_size(v_backend_buffer_type_t buft) {
   vk_buffer_type_context* ctx = (vk_buffer_type_context*)buft->context;
   return ctx->device->suballocation_block_size;
 }
-size_t vk_device_buffer_get_alloc_size(v_backend_buffer_type_t buft, v_tensor* const tensor) {
-  return num_bytes(tensor);
-  UNUSED(buft);
-}
+
 v_backend_buffer_type_t vk_device_buffer_type(size_t dev_num) {
   vk_instance_init();
   VK_LOG_DEBUG("v_backend_vk_buffer_type(" << dev_num << ")");
   vk_device dev = v_vk_get_device(dev_num);
   return &dev->buffer_type;
 }
+
 v_backend_buffer_t vk_host_buffer_alloc(v_backend_buffer_type_t buft, size_t size) {
   VK_LOG_MEMORY("v_backend_vk_host_buffer_type_alloc_buffer(" << size << ")");
   size += 32; // Behave like the CPU buffer type
@@ -647,16 +648,20 @@ v_backend_buffer_t vk_host_buffer_alloc(v_backend_buffer_type_t buft, size_t siz
   return buffer;
   UNUSED(buft);
 }
+
 size_t vk_host_buffer_get_align(v_backend_buffer_type_t buft) {
   return vk_instance.devices[0]->properties.limits.minMemoryMapAlignment;
   UNUSED(buft);
 }
+
 size_t vk_host_buffer_get_align() { return vk_instance.devices[0]->properties.limits.minMemoryMapAlignment; }
+
 size_t vk_host_buffer_get_max_size(v_backend_buffer_type_t buft) {
   return vk_instance.devices[0]->suballocation_block_size;
 
   UNUSED(buft);
 }
+
 v_backend_buffer_type_t vk_host_buffer_type() {
   // Make sure device 0 is initialized
   vk_instance_init();

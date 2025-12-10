@@ -1,13 +1,13 @@
 #include <array>
 
-#include "vk_device.h"
+#include "vk_device.hpp"
 
 #include "v-vulkan-kernels.hpp"
 #include "vk_buffer.h"
 #include "vk_context.h"
 #include "vk_constant.h"
-#include "vk_util.h"
-#include "vk_pipeline.h"
+#include "vk_util.hpp"
+#include "vk_pipeline.hpp"
 
 // variables to track number of compiles in progress
 // The FA coopmat1 shader assumes 16x16x16 matrix multiply support.

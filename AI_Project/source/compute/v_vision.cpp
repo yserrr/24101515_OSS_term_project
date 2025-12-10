@@ -1,20 +1,21 @@
 #include "v_vision.hpp"
-#include "ggml-impl.h"
+#include "ggml-impl.hpp"
 #include "vk_common.h"
-#include "vk_util.h"
+#include "vk_util.hpp"
+
 static int64_t v_calc_conv_output_size(int64_t ins, int64_t ks, int s, int p, int d) {
   return (ins + 2 * p - d * (ks - 1) - 1) / s + 1;
 }
 
-struct v_tensor* v_conv_1d(struct v_ctx* ctx,
-                           struct v_tensor* a,
-                           struct v_tensor* b,
-                           int s0,
-                           int p0,
-                           int d0) {
-  struct v_tensor* im2col = v_im2col(ctx, a, b, s0, 0, p0, 0, d0, 0, false, v_TYPE_F16); // [N, OL, IC * K]
+v_tensor* v_conv_1d(v_ctx* ctx,
+                    v_tensor* a,
+                    v_tensor* b,
+                    int s0,
+                    int p0,
+                    int d0) {
+  v_tensor* im2col = v_im2col(ctx, a, b, s0, 0, p0, 0, d0, 0, false, v_TYPE_F16); // [N, OL, IC * K]
 
-  struct v_tensor* result =
+  v_tensor* result =
     v_matmul(ctx,
              v_reshape_2d(ctx, im2col, im2col->ne[0], (im2col->ne[2] * im2col->ne[1])),
              // [N, OL, IC * K] => [N*OL, IC * K]
@@ -26,10 +27,10 @@ struct v_tensor* v_conv_1d(struct v_ctx* ctx,
 }
 
 // v_conv_1d_ph
-struct v_tensor* v_conv_1d_ph(
-  struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+v_tensor* v_conv_1d_ph(
+  v_ctx* ctx,
+  v_tensor* a,
+  v_tensor* b,
   int s,
   int d) {
   return v_conv_1d(ctx, a, b, s, a->ne[0] / 2, d);
@@ -37,18 +38,18 @@ struct v_tensor* v_conv_1d_ph(
 
 // v_conv_1d_dw
 
-struct v_tensor* v_conv_1d_dw(
-  struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+v_tensor* v_conv_1d_dw(
+  v_ctx* ctx,
+  v_tensor* a,
+  v_tensor* b,
   int s0,
   int p0,
   int d0) {
-  struct v_tensor* new_b = v_reshape_4d(ctx, b, b->ne[0], 1, b->ne[1], b->ne[2]);
+  v_tensor* new_b = v_reshape_4d(ctx, b, b->ne[0], 1, b->ne[1], b->ne[2]);
 
-  struct v_tensor* im2col = v_im2col(ctx, a, new_b, s0, 0, p0, 0, d0, 0, false, v_TYPE_F16);
+  v_tensor* im2col = v_im2col(ctx, a, new_b, s0, 0, p0, 0, d0, 0, false, v_TYPE_F16);
 
-  struct v_tensor* result = v_matmul(ctx, im2col, a);
+  v_tensor* result = v_matmul(ctx, im2col, a);
 
   result = v_reshape_3d(ctx, result, result->ne[0], result->ne[2], 1);
 
@@ -57,10 +58,10 @@ struct v_tensor* v_conv_1d_dw(
 
 // v_conv_1d_dw_ph
 
-struct v_tensor* v_conv_1d_dw_ph(
-  struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+v_tensor* v_conv_1d_dw_ph(
+  v_ctx* ctx,
+  v_tensor* a,
+  v_tensor* b,
   int s0,
   int d0) {
   return v_conv_1d_dw(ctx, a, b, s0, a->ne[0] / 2, d0);
@@ -72,10 +73,10 @@ static int64_t v_calc_conv_transpose_1d_output_size(int64_t ins, int64_t ks, int
   return (ins - 1) * s - 2 * p + d * (ks - 1) + 1;
 }
 
-v_API struct v_tensor* v_conv_transpose_1d(
-  struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+V_API v_tensor* v_conv_transpose_1d(
+  v_ctx* ctx,
+  v_tensor* a,
+  v_tensor* b,
   int s0,
   int p0,
   int d0) {
@@ -90,7 +91,7 @@ v_API struct v_tensor* v_conv_transpose_1d(
     v_calc_conv_transpose_1d_output_size(b->ne[0], a->ne[0], s0, 0 /*p0*/, 1 /*d0*/),
     a->ne[1], b->ne[2], 1,
   };
-  struct v_tensor* result = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
+  v_tensor* result = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
 
   int32_t params[] = {s0, p0, d0};
   v_set_op_params(result, params, sizeof(params));
@@ -107,20 +108,20 @@ v_API struct v_tensor* v_conv_transpose_1d(
 // a: [OC，IC, KH, KW]
 // b: [N, IC, IH, IW]
 // result: [N, OC, OH, OW]
-struct v_tensor* v_conv_2d(
-  struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+v_tensor* v_conv_2d(
+  v_ctx* ctx,
+  v_tensor* a,
+  v_tensor* b,
   int s0,
   int s1,
   int p0,
   int p1,
   int d0,
   int d1) {
-  struct v_tensor* im2col = v_im2col(ctx, a, b, s0, s1, p0, p1, d0, d1, true, a->type);
+  v_tensor* im2col = v_im2col(ctx, a, b, s0, s1, p0, p1, d0, d1, true, a->type);
   // [N, OH, OW, IC * KH * KW]
 
-  struct v_tensor* result =
+  v_tensor* result =
     v_matmul(ctx,
              v_reshape_2d(ctx, im2col, im2col->ne[0], im2col->ne[3] * im2col->ne[2] * im2col->ne[1]),
              // [N, OH, OW, IC * KH * KW] => [N*OH*OW, IC * KH * KW]
@@ -134,10 +135,10 @@ struct v_tensor* v_conv_2d(
 // a: [OC*IC, KD, KH, KW]
 // b: [N*IC, ID, IH, IW]
 // result: [N*OD, OH, OW, IC * KD * KH * KW]
-struct v_tensor* v_im2col_3d(
-  struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+v_tensor* v_im2col_3d(
+  v_ctx* ctx,
+  v_tensor* a,
+  v_tensor* b,
   int64_t IC,
   int s0, // stride width
   int s1, // stride height
@@ -170,8 +171,8 @@ struct v_tensor* v_im2col_3d(
 
   const int64_t ne[4] = {KW * KH * KD * IC, OW, OH, OD * N};
 
-  struct v_tensor* result = v_new_tensor(ctx, dst_type, 4, ne);
-  int32_t params[]        = {s0, s1, s2, p0, p1, p2, d0, d1, d2, (int32_t)IC};
+  v_tensor* result = v_new_tensor(ctx, dst_type, 4, ne);
+  int32_t params[] = {s0, s1, s2, p0, p1, p2, d0, d1, d2, (int32_t)IC};
   v_set_op_params(result, params, sizeof(params));
 
   result->op     = v_OP_IM2COL_3D;
@@ -184,10 +185,10 @@ struct v_tensor* v_im2col_3d(
 // a: [OC*IC, KD, KH, KW]
 // b: [N*IC, ID, IH, IW]
 // result: [N*OC, OD, OH, OW]
-struct v_tensor* v_conv_3d(
-  struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+v_tensor* v_conv_3d(
+  v_ctx* ctx,
+  v_tensor* a,
+  v_tensor* b,
   int64_t IC,
   int s0, // stride width
   int s1, // stride height
@@ -199,12 +200,12 @@ struct v_tensor* v_conv_3d(
   int d1, // dilation height
   int d2 // dilation depth
 ) {
-  struct v_tensor* im2col = v_im2col_3d(ctx, a, b, IC, s0, s1, s2, p0, p1, p2, d0, d1, d2, a->type);
+  v_tensor* im2col = v_im2col_3d(ctx, a, b, IC, s0, s1, s2, p0, p1, p2, d0, d1, d2, a->type);
   // [N*OD, OH, OW, IC * KD * KH * KW]
 
-  int64_t OC              = a->ne[3] / IC;
-  int64_t N               = b->ne[3] / IC;
-  struct v_tensor* result =
+  int64_t OC       = a->ne[3] / IC;
+  int64_t N        = b->ne[3] / IC;
+  v_tensor* result =
     v_matmul(ctx,
              v_reshape_2d(ctx, im2col, im2col->ne[0], im2col->ne[3] * im2col->ne[2] * im2col->ne[1]),
              // [N*OD, OH, OW, IC * KD * KH * KW] => [N*OD*OH*OW, IC * KD * KH * KW]
@@ -222,64 +223,64 @@ struct v_tensor* v_conv_3d(
 
 // v_conv_2d_sk_p0
 
-struct v_tensor* v_conv_2d_sk_p0(
-  struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b) {
+v_tensor* v_conv_2d_sk_p0(
+  v_ctx* ctx,
+  v_tensor* a,
+  v_tensor* b) {
   return v_conv_2d(ctx, a, b, a->ne[0], a->ne[1], 0, 0, 1, 1);
 }
 
 // v_conv_2d_s1_ph
 
-struct v_tensor* v_conv_2d_s1_ph(struct v_ctx* ctx,
-                                 struct v_tensor* a,
-                                 struct v_tensor* b) {
+v_tensor* v_conv_2d_s1_ph(v_ctx* ctx,
+                          v_tensor* a,
+                          v_tensor* b) {
   return v_conv_2d(ctx, a, b, 1, 1, a->ne[0] / 2, a->ne[1] / 2, 1, 1);
 }
 
 // v_conv_2d_dw
-struct v_tensor* v_conv_2d_dw(struct v_ctx* ctx,
-                              struct v_tensor* a,
-                              struct v_tensor* b,
-                              int s0,
-                              int s1,
-                              int p0,
-                              int p1,
-                              int d0,
-                              int d1) {
-  struct v_tensor* new_a  = v_reshape_4d(ctx, a, a->ne[0], a->ne[1], 1, a->ne[2] * a->ne[3]);
-  struct v_tensor* im2col = v_im2col(ctx,
-                                     new_a,
-                                     v_reshape_4d(ctx, b, b->ne[0], b->ne[1], 1, b->ne[2] * b->ne[3]),
-                                     s0,
-                                     s1,
-                                     p0,
-                                     p1,
-                                     d0,
-                                     d1,
-                                     true,
-                                     v_TYPE_F16); // [N * IC, OH, OW, KH * KW]
-  struct v_tensor* new_b = v_reshape_4d(ctx,
-                                        im2col,
-                                        im2col->ne[0],
-                                        im2col->ne[2] * im2col->ne[1],
-                                        b->ne[2],
-                                        b->ne[3]); // [N * IC, OH, OW, KH * KW] => [N, IC, OH * OW, KH * KW]
+v_tensor* v_conv_2d_dw(v_ctx* ctx,
+                       v_tensor* a,
+                       v_tensor* b,
+                       int s0,
+                       int s1,
+                       int p0,
+                       int p1,
+                       int d0,
+                       int d1) {
+  v_tensor* new_a  = v_reshape_4d(ctx, a, a->ne[0], a->ne[1], 1, a->ne[2] * a->ne[3]);
+  v_tensor* im2col = v_im2col(ctx,
+                              new_a,
+                              v_reshape_4d(ctx, b, b->ne[0], b->ne[1], 1, b->ne[2] * b->ne[3]),
+                              s0,
+                              s1,
+                              p0,
+                              p1,
+                              d0,
+                              d1,
+                              true,
+                              v_TYPE_F16); // [N * IC, OH, OW, KH * KW]
+  v_tensor* new_b = v_reshape_4d(ctx,
+                                 im2col,
+                                 im2col->ne[0],
+                                 im2col->ne[2] * im2col->ne[1],
+                                 b->ne[2],
+                                 b->ne[3]); // [N * IC, OH, OW, KH * KW] => [N, IC, OH * OW, KH * KW]
 
   new_a = v_reshape_4d(ctx, new_a, (new_a->ne[0] * new_a->ne[1]), new_a->ne[2], new_a->ne[3], 1);
   // [OC，1, KH, KW] => [1, OC, 1, KH * KW]
-  struct v_tensor* result = v_matmul(ctx, new_a, new_b);
-  result                  = v_reshape_4d(ctx, result, im2col->ne[1], im2col->ne[2], b->ne[2], b->ne[3]); // [N, OC, OH, OW]
+  v_tensor* result = v_matmul(ctx, new_a, new_b);
+  result           = v_reshape_4d(ctx, result, im2col->ne[1], im2col->ne[2], b->ne[2], b->ne[3]); // [N, OC, OH, OW]
 
   return result;
 }
 
 // v_conv_2d_dw_direct
 
-struct v_tensor* v_conv_2d_dw_direct(
-  struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+v_tensor* v_conv_2d_dw_direct(
+  v_ctx* ctx,
+  v_tensor* a,
+  v_tensor* b,
   int stride0,
   int stride1,
   int pad0,
@@ -289,11 +290,11 @@ struct v_tensor* v_conv_2d_dw_direct(
   V_ASSERT(a->ne[2] == 1);
   V_ASSERT(a->ne[3] == b->ne[2]);
   int64_t ne[4];
-  ne[0]                   = v_calc_conv_output_size(b->ne[0], a->ne[0], stride0, pad0, dilation0);
-  ne[1]                   = v_calc_conv_output_size(b->ne[1], a->ne[1], stride1, pad1, dilation1);
-  ne[2]                   = b->ne[2];
-  ne[3]                   = b->ne[3];
-  struct v_tensor* result = v_new_tensor(ctx, b->type, 4, ne);
+  ne[0]            = v_calc_conv_output_size(b->ne[0], a->ne[0], stride0, pad0, dilation0);
+  ne[1]            = v_calc_conv_output_size(b->ne[1], a->ne[1], stride1, pad1, dilation1);
+  ne[2]            = b->ne[2];
+  ne[3]            = b->ne[3];
+  v_tensor* result = v_new_tensor(ctx, b->type, 4, ne);
 
   if (v_is_contiguous_channels(b)) {
     // Result will be permuted the same way as input (CWHN order)
@@ -315,15 +316,15 @@ struct v_tensor* v_conv_2d_dw_direct(
 
 // v_conv_2d_direct
 
-struct v_tensor* v_conv_2d_direct(struct v_ctx* ctx,
-                                  struct v_tensor* a, // convolution kernel [KW, KH, IC, OC]
-                                  struct v_tensor* b, // input data [W, H, C, N]
-                                  int s0, // stride dimension 0
-                                  int s1, // stride dimension 1
-                                  int p0, // padding dimension 0
-                                  int p1, // padding dimension 1
-                                  int d0, // dilation dimension 0
-                                  int d1) {
+v_tensor* v_conv_2d_direct(v_ctx* ctx,
+                           v_tensor* a, // convolution kernel [KW, KH, IC, OC]
+                           v_tensor* b, // input data [W, H, C, N]
+                           int s0, // stride dimension 0
+                           int s1, // stride dimension 1
+                           int p0, // padding dimension 0
+                           int p1, // padding dimension 1
+                           int d0, // dilation dimension 0
+                           int d1) {
   // dilation dimension 1
   V_ASSERT(a->ne[2] == b->ne[2]);
   V_ASSERT(a->type == b->type);
@@ -334,7 +335,7 @@ struct v_tensor* v_conv_2d_direct(struct v_ctx* ctx,
   ne[2] = a->ne[3];
   ne[3] = b->ne[3];
 
-  struct v_tensor* result = v_new_tensor(ctx, b->type, 4, ne);
+  v_tensor* result = v_new_tensor(ctx, b->type, 4, ne);
 
   v_set_op_params_i32(result, 0, s0);
   v_set_op_params_i32(result, 1, s1);
@@ -350,10 +351,10 @@ struct v_tensor* v_conv_2d_direct(struct v_ctx* ctx,
   return result;
 }
 
-struct v_tensor* v_conv_3d_direct(
-  struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+v_tensor* v_conv_3d_direct(
+  v_ctx* ctx,
+  v_tensor* a,
+  v_tensor* b,
   int s0,
   int s1,
   int s2,
@@ -375,7 +376,7 @@ struct v_tensor* v_conv_3d_direct(
   ne[2] = v_calc_conv_output_size(b->ne[2], a->ne[2], s2, p2, d2);
   ne[3] = (int64_t)oc * n;
 
-  struct v_tensor* result = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
+  v_tensor* result = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
 
   v_set_op_params_i32(result, 0, s0);
   v_set_op_params_i32(result, 1, s1);
@@ -403,10 +404,10 @@ static int64_t v_calc_conv_transpose_output_size(int64_t ins, int64_t ks, int s,
   return (ins - 1) * s - 2 * p + ks;
 }
 
-struct v_tensor* v_conv_transpose_2d_p0(
-  struct v_ctx* ctx,
-  struct v_tensor* a,
-  struct v_tensor* b,
+v_tensor* v_conv_transpose_2d_p0(
+  v_ctx* ctx,
+  v_tensor* a,
+  v_tensor* b,
   int stride) {
   V_ASSERT(a->ne[3] == b->ne[2]);
 
@@ -416,7 +417,7 @@ struct v_tensor* v_conv_transpose_2d_p0(
     a->ne[2], b->ne[3],
   };
 
-  struct v_tensor* result = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
+  v_tensor* result = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
 
   v_set_op_params_i32(result, 0, stride);
 
@@ -434,10 +435,7 @@ static int64_t v_calc_pool_output_size(int64_t ins, int ks, int s, float p) {
 
 // v_pool_1d
 
-struct v_tensor* v_pool_1d(
-  struct v_ctx* ctx,
-  struct v_tensor* a,
-  enum v_op_pool op,
+v_tensor* v_pool_1d(v_ctx* ctx,v_tensor* a,v_op_pool op,
   int k0,
   int s0,
   int p0) {
@@ -447,7 +445,7 @@ struct v_tensor* v_pool_1d(
     a->ne[2],
     a->ne[3],
   };
-  struct v_tensor* result = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
+  v_tensor* result = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
 
   int32_t params[] = {op, k0, s0, p0};
   v_set_op_params(result, params, sizeof(params));
@@ -460,13 +458,13 @@ struct v_tensor* v_pool_1d(
 
 // v_pool_2d
 
-struct v_tensor* v_pool_2d(struct v_ctx* ctx,
-                           struct v_tensor* a,
-                           enum v_op_pool op,
-                           int k0, int k1,
-                           int s0, int s1,
-                           float p0, float p1) {
-  struct v_tensor* result;
+v_tensor* v_pool_2d(v_ctx* ctx,
+                    v_tensor* a,
+                    enum v_op_pool op,
+                    int k0, int k1,
+                    int s0, int s1,
+                    float p0, float p1) {
+  v_tensor* result;
   const int64_t ne[4] = {
     v_calc_pool_output_size(a->ne[0], k0, s0, p0),
     v_calc_pool_output_size(a->ne[1], k1, s1, p1),
@@ -492,20 +490,15 @@ struct v_tensor* v_pool_2d(struct v_ctx* ctx,
   return result;
 }
 
-struct v_tensor* v_pool_2d_back(struct v_ctx* ctx,
-                                struct v_tensor* a,
-                                struct v_tensor* af,
-                                enum v_op_pool op,
-                                int k0,
-                                int k1,
-                                int s0,
-                                int s1,
-                                float p0,
-                                float p1) {
-  struct v_tensor* result;
+v_tensor* v_pool_2d_back(v_ctx* ctx,
+                         v_tensor* a, v_tensor* af, v_op_pool op,
+                         int k0, int k1,
+                         int s0, int s1,
+                         float p0, float p1) {
+  v_tensor* result;
   auto t_a         = v_mem_cont(ctx, a);
   auto t_af        = v_mem_cont(ctx, af);
-  result           = v_new_tensor(ctx, v_TYPE_F32, 4, af->ne);
+  result           = v_new_tensor(ctx, v_TYPE_F32, 4, af->ne.data());
   int32_t params[] = {
     static_cast<int32_t>(op),
     static_cast<int32_t>(k0),
@@ -523,16 +516,16 @@ struct v_tensor* v_pool_2d_back(struct v_ctx* ctx,
 }
 
 // v_upscale / v_interpolate
-struct v_tensor* v_interpolate_impl(struct v_ctx* ctx,
-                                    struct v_tensor* a,
-                                    int64_t ne0,
-                                    int64_t ne1,
-                                    int64_t ne2,
-                                    int64_t ne3,
-                                    uint32_t mode) {
+v_tensor* v_interpolate_impl(v_ctx* ctx,
+                             v_tensor* a,
+                             int64_t ne0,
+                             int64_t ne1,
+                             int64_t ne2,
+                             int64_t ne3,
+                             uint32_t mode) {
   V_ASSERT((mode & 0xFF) < v_SCALE_MODE_COUNT);
 
-  struct v_tensor* result = v_new_tensor_4d(ctx, a->type, ne0, ne1, ne2, ne3);
+  v_tensor* result = v_new_tensor_4d(ctx, a->type, ne0, ne1, ne2, ne3);
 
   v_set_op_params_i32(result, 0, (int32_t)mode);
 
@@ -546,14 +539,14 @@ struct v_tensor* v_interpolate_impl(struct v_ctx* ctx,
 // a: [OC，IC, KH, KW]
 // b: [N, IC, IH, IW]
 // result: [N, OH, OW, IC*KH*KW]
-struct v_tensor* v_im2col(struct v_ctx* ctx,
-                          struct v_tensor* a,
-                          struct v_tensor* b,
-                          int s0, int s1,
-                          int p0, int p1,
-                          int d0, int d1,
-                          bool is_2D,
-                          enum v_data_type dst_type) {
+v_tensor* v_im2col(v_ctx* ctx,
+                   v_tensor* a,
+                   v_tensor* b,
+                   int s0, int s1,
+                   int p0, int p1,
+                   int d0, int d1,
+                   bool is_2D,
+                   enum v_data_type dst_type) {
   if (is_2D) {
     V_ASSERT(a->ne[2] == b->ne[2]);
   }
@@ -583,8 +576,8 @@ struct v_tensor* v_im2col(struct v_ctx* ctx,
       : 1,
   };
 
-  struct v_tensor* result = v_new_tensor(ctx, dst_type, 4, ne);
-  int32_t params[]        = {
+  v_tensor* result = v_new_tensor(ctx, dst_type, 4, ne);
+  int32_t params[] = {
     s0, s1, p0, p1, d0, d1, (is_2D
                                ? 1
                                : 0)
@@ -603,22 +596,20 @@ struct v_tensor* v_im2col(struct v_ctx* ctx,
 /// t_a = dY(grad)
 /// t_b = forward Input X
 /// dX =
-struct v_tensor* v_im2col_back(struct v_ctx* ctx,
-                               struct v_tensor* a,
-                               struct v_tensor* b,
-                               int64_t* ne,
-                               int s0, int s1,
-                               int p0, int p1,
-                               int d0, int d1,
-                               bool is_2D) {
-
+v_tensor* v_im2col_back(v_ctx* ctx,
+                        v_tensor* a,
+                        v_tensor* b,
+                        int64_t* ne,
+                        int s0, int s1,
+                        int p0, int p1,
+                        int d0, int d1,
+                        bool is_2D) {
   //t_b= src0
   //t_W=  im2col (grad^T, dY_col)
-  struct v_tensor* result = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
-  v_tensor* t_a = v_mem_cont(ctx, v_transpose(ctx,a));
-  v_tensor* t_b = v_mem_cont(ctx, v_transpose(ctx,b));
-
-  int32_t params[]        = {
+  v_tensor* result = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
+  v_tensor* t_a    = v_mem_cont(ctx, v_transpose(ctx, a));
+  v_tensor* t_b    = v_mem_cont(ctx, v_transpose(ctx, b));
+  int32_t params[] = {
     s0, s1, p0, p1, d0, d1, (is_2D
                                ? 1
                                : 0)

@@ -1,6 +1,6 @@
 #ifndef MYPROJECT_VK_VISION_COMP_HPP
 #define MYPROJECT_VK_VISION_COMP_HPP
-#include "v_vk.h"
+#include "v_vk.hpp"
 #include "vk_common.h"
 
 std::array<uint32_t, 3> v_vk_get_conv_elements(const v_tensor* dst);

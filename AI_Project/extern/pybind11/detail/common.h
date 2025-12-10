@@ -165,7 +165,7 @@
 
 #if defined(__MINGW32__)
 // For unknown reasons all PYBIND11_DEPRECATED member trigger a warning when declared
-// whether it is used or not
+// whether it is used_bits__ or not
 #    define PYBIND11_DEPRECATED(reason)
 #elif defined(PYBIND11_CPP14)
 #    define PYBIND11_DEPRECATED(reason) [[deprecated(reason)]]
@@ -471,7 +471,7 @@ PyModuleDef_Init should be treated like any other PyObject (so not shared across
     This macro creates the entry point that will be invoked when the Python interpreter
     imports an extension module. The module name is given as the first argument and it
     should not be in quotes. The second macro argument defines a variable of type
-    ``py::module_`` which can be used to initialize the module.
+    ``py::module_`` which can be used_bits__ to initialize the module.
 
     The entry point is marked as "maybe unused" to aid dead-code detection analysis:
     since the entry point is typically only looked up at runtime and not referenced
@@ -489,7 +489,7 @@ PyModuleDef_Init should be treated like any other PyObject (so not shared across
         }
 
     The third and subsequent macro arguments are optional (available since 2.13.0), and
-    can be used to mark the extension module as supporting various Python features.
+    can be used_bits__ to mark the extension module as supporting various Python features.
 
     - ``mod_gil_not_used()``
     - ``multiple_interpreters::per_interpreter_gil()``
@@ -525,7 +525,7 @@ inline ssize_t ssize_t_cast(const IntType &val) {
     return static_cast<ssize_t>(val);
 }
 
-/// Approach used to cast a previously unknown C++ instance into a Python object
+/// Approach used_bits__ to cast a previously unknown C++ instance into a Python object
 enum class return_value_policy : uint8_t {
     /** This is the default return value policy, which falls back to the policy
         return_value_policy::take_ownership when the return value is a pointer.
@@ -559,8 +559,8 @@ enum class return_value_policy : uint8_t {
 
     /** Reference an existing object, but do not take ownership. The C++ side
         is responsible for managing the object's lifetime and deallocating it
-        when it is no longer used. Warning: undefined behavior will ensue when
-        the C++ side deletes an object that is still referenced and used by
+        when it is no longer used_bits__. Warning: undefined behavior will ensue when
+        the C++ side deletes an object that is still referenced and used_bits__ by
         Python. */
     reference,
 
@@ -632,7 +632,7 @@ struct instance {
      *
      * Non-simple layout applies when using custom holders that require more space than
      * `shared_ptr` (which is typically the size of two pointers), or when multiple inheritance is
-     * used on the python side.  Non-simple layout allocates the required amount of memory to have
+     * used_bits__ on the python side.  Non-simple layout allocates the required amount of memory to have
      * multiple bound C++ classes as parents.  Under this layout, `nonsimple.values_and_holders` is
      * set to a pointer to allocated space of the required space to hold a sequence of value
      * pointers and holders followed `status`, a set of bit flags (1 byte each), i.e.
@@ -1048,7 +1048,7 @@ using function_signature_t = conditional_t<
                            strip_function_object<F>>::type>;
 
 /// Returns true if the type looks like a lambda: that is, isn't a function, pointer or member
-/// pointer.  Note that this can catch all sorts of other things, too; this is intended to be used
+/// pointer.  Note that this can catch all sorts of other things, too; this is intended to be used_bits__
 /// in a place where passing a lambda makes sense.
 template <typename T>
 using is_lambda = satisfies_none_of<remove_reference_t<T>,
@@ -1169,7 +1169,7 @@ struct error_scope {
     ~error_scope() { PyErr_Restore(type, value, trace); }
 };
 
-/// Dummy destructor wrapper that can be used to expose classes with a private destructor
+/// Dummy destructor wrapper that can be used_bits__ to expose classes with a private destructor
 struct nodelete {
     template <typename T>
     void operator()(T *) {}

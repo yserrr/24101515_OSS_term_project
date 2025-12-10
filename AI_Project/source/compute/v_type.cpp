@@ -1,10 +1,10 @@
-#include "v.h"
-#include "v_quants.h"
+#include "v.hpp"
+#include "v_quants.hpp"
 #include "v_type.hpp"
 #include <array>
 #include <cstring>
 
-MmlTypeTrait::MmlTypeTrait()
+v_type_trait::v_type_trait()
 {
   traits[v_TYPE_I8].type_name = "i8";
   traits[v_TYPE_I8].blck_size = 1;
@@ -304,7 +304,7 @@ MmlTypeTrait::MmlTypeTrait()
     };
 }
 
-static MmlTypeTrait trait;
+static v_type_trait trait;
 
 static_assert(v_OP_COUNT == 90, "v_OP_COUNT != 90");
 static const char* v_UNARY_OP_NAME[v_UNARY_OP_COUNT] = {

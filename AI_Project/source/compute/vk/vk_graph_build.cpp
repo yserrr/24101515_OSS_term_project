@@ -1,8 +1,8 @@
 #include "vk_context.h"
-#include "vk_pipeline.h"
+#include "vk_pipeline.hpp"
 #include "vk_common.h"
-#include "vk_device.h"
-#include "vk_util.h"
+#include "vk_device.hpp"
+#include "vk_util.hpp"
 #include "vk_op_f32.hpp"
 #include "vk_vision_comp.hpp"
 #include "vk_comp.hpp"
@@ -261,7 +261,7 @@ bool vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
         need_sync = true;
         break;
       }
-      for (uint32_t j = 0; j < v_MAX_SRC; ++j) {
+      for (uint32_t j = 0; j < V_MAX_SRC; ++j) {
         if (!cur_node->src[j]) { continue; }
         if (overlaps_unsynced(cur_node->src[j], ctx->unsynced_nodes_written)) {
           need_sync = true;
@@ -279,7 +279,7 @@ bool vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
       const v_tensor* cur_node = cgraph->nodes[node_idx + i];
       // Multiple outputs could be written, e.g. in topk_moe. Add them all to the list.
       ctx->unsynced_nodes_written.push_back(cur_node);
-      for (uint32_t j = 0; j < v_MAX_SRC; ++j) {
+      for (uint32_t j = 0; j < V_MAX_SRC; ++j) {
         if (!cur_node->src[j]) { continue; }
         ctx->unsynced_nodes_read.push_back(cur_node->src[j]);
       }
@@ -388,9 +388,9 @@ bool vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
         v_tensor* other_src = mul->src[0] == node
                                 ? mul->src[1]
                                 : mul->src[0];
-        v_vk_rms_norm(ctx, compute_ctx, src0, other_src, mul, (float*)node->op_params, dryrun);
+        v_vk_rms_norm(ctx, compute_ctx, src0, other_src, mul, reinterpret_cast<float*>(node->op_params.data()), dryrun);
       }
-      else { v_vk_rms_norm(ctx, compute_ctx, src0, src0, node, (float*)node->op_params, dryrun); }
+      else { v_vk_rms_norm(ctx, compute_ctx, src0, src0, node, reinterpret_cast<float*>(node->op_params.data()), dryrun); }
       break;
     case v_OP_RMS_NORM_BACK:
       v_vk_rms_norm_back(ctx, compute_ctx, src0, src1, node, dryrun);
@@ -589,15 +589,15 @@ bool vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
     bool ok = v_vk_compute_forward(ctx, cgraph, node_begin, node_idx_begin, false, almost_ready);
     if (!ok) {
       if (node->op == v_OP_UNARY) {
-        std::cerr << __func__ << ": error: op not supported UNARY " << node->name << " (" << v_unary_op_name(
+        std::cerr << __func__ << ": error: op not supported UNARY " << node->name.data() << " (" << v_unary_op_name(
           static_cast<v_unary_op>(node->op_params[0])) << ")" << std::endl;
       }
       else if (node->op == v_OP_GLU) {
-        std::cerr << __func__ << ": error: op not supported GLU " << node->name << " (" << v_glu_op_name(
+        std::cerr << __func__ << ": error: op not supported GLU " << node->name.data() << " (" << v_glu_op_name(
           static_cast<v_glu_op>(node->op_params[0])) << ")" << std::endl;
       }
       else {
-        std::cerr << __func__ << ": error: op not supported " << node->name << " (" << v_op_name(node->op) << ")" <<
+        std::cerr << __func__ << ": error: op not supported " << node->name.data() << " (" << v_op_name(node->op) << ")" <<
           std::endl;
       }
     }
@@ -615,7 +615,7 @@ void vk_graph_optimize(v_backend_t backend, struct v_cgraph* graph) {
   };
 
   auto const& is_src_of = [](const v_tensor* dst, const v_tensor* src) -> bool {
-    for (uint32_t s = 0; s < v_MAX_SRC; ++s) { if (dst->src[s] == src) { return true; } }
+    for (uint32_t s = 0; s < V_MAX_SRC; ++s) { if (dst->src[s] == src) { return true; } }
     // implicit dependency if they view the same tensor
     const v_tensor* dst2 = dst->view_src
                              ? dst->view_src
@@ -664,7 +664,7 @@ void vk_graph_optimize(v_backend_t backend, struct v_cgraph* graph) {
     current_set.push_back(first_unused);
 
     // Loop through the next N nodes. Grab any that don't depend on other nodes that
-    // haven't already been run. Nodes that have already been run have used[i] set
+    // haven't already been run. Nodes that have already been run have used_bits__[i] set
     // to true. Allow nodes that depend on the previous node if it's a fusion pattern
     // that we support (e.g. RMS_NORM + MUL).
     // This first pass only grabs "real" (non-view nodes). Second pass grabs view nodes.

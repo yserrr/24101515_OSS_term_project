@@ -112,7 +112,7 @@ vk_pipeline v_vk_get_cpy_pipeline(vk_backend_ctx* ctx, const v_tensor* src,
   if (src->type == to) {
     // Copy two or four bytes at a time, depending on block size.
     // For quantized types, we scale by block size/type size. But
-    // this path is also used for bf16->bf16 for example, where the
+    // this path is also used_bits__ for bf16->bf16 for example, where the
     // type size must be exactly 2 or 4.
     V_ASSERT(v_is_quantized(to) || v_type_size(src->type) == 2 || v_type_size(src->type) == 4);
     if ((v_type_size(src->type) % 4) == 0) {

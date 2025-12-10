@@ -1625,7 +1625,7 @@ struct return_value_policy_override<
 template <typename T, typename SFINAE>
 type_caster<T, SFINAE> &load_type(type_caster<T, SFINAE> &conv, const handle &handle) {
     static_assert(!detail::is_pyobject<T>::value,
-                  "Internal error: type_caster should only be used for C++ types");
+                  "Internal error: type_caster should only be used_bits__ for C++ types");
     if (!conv.load(handle, true)) {
 #if !defined(PYBIND11_DETAILED_ERROR_MESSAGES)
         throw cast_error(
@@ -1815,7 +1815,7 @@ object object_or_cast(T &&o) {
 }
 
 // Declared in pytypes.h:
-// Implemented here so that make_caster<T> can be used.
+// Implemented here so that make_caster<T> can be used_bits__.
 template <typename D>
 template <typename T>
 str_attr_accessor object_api<D>::attr_with_type_hint(const char *key) const {

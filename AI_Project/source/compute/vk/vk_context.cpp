@@ -1,10 +1,8 @@
 #include <memory>
 #include "vk_context.h"
-
-#include <vk_util.h>
-
-#include "vk_device.h"
-#include "vk_queue.h"
+#include <vk_util.hpp>
+#include "vk_device.hpp"
+#include "vk_queue.hpp"
 bool vk_instance_initialized = false;
 vk_instance_struct vk_instance;
 bool vk_perf_logger_enabled = false;
@@ -132,7 +130,7 @@ void vk_backend_free(v_backend_t backend) {
 }
 
 v_backend_buffer_type_t vk_get_device_buffer(v_backend_t backend) {
-  vk_backend_ctx* ctx = (vk_backend_ctx*)backend->context;
+  vk_backend_ctx* ctx = backend->context;
 
   return &ctx->device->buffer_type;
 }
@@ -199,7 +197,7 @@ void* vk_device_buffer_get_base(v_backend_buffer_t buffer) {
   UNUSED(buffer);
 }
 
-v_status vk_buffer_init_tensor(v_backend_buffer_t buffer, const v_tensor*  tensor) {
+v_status vk_buffer_init_tensor(v_backend_buffer_t buffer, const v_tensor* tensor) {
   V_ASSERT(buffer);
   VK_LOG_DEBUG("v_backend_vk_buffer_init_tensor(" << buffer << " (" << buffer->context << "), " << tensor << ")");
   if (tensor->view_src != nullptr) { V_ASSERT(tensor->view_src->buffer->buft == buffer->buft); }
@@ -215,7 +213,7 @@ void vk_device_buffer_set_tensor(v_backend_buffer_t buffer, v_tensor* tensor, co
   v_vk_buffer_write(buf, vk_tensor_offset(tensor) + tensor->view_offs + offset, data, size);
 }
 
-void vk_device_buffer_get_tensor(v_backend_buffer_t buffer, const v_tensor*  tensor, void* data, size_t offset, size_t size) {
+void vk_device_buffer_get_tensor(v_backend_buffer_t buffer, const v_tensor* tensor, void* data, size_t offset, size_t size) {
   VK_LOG_DEBUG(
     "vk_buffer_get_tensor(" << buffer << ", " << tensor << ", " << data << ", " << offset << ", " << size
     << ")");
@@ -288,8 +286,6 @@ v_backend_t backend_vk_init(size_t dev_num) {
     vk_backend->context  = ctx;
   return vk_backend;
 }
-
-int vk_get_device_count() { return v_vk_get_device_count(); }
 
 void vk_get_device_description(int device, char* description, size_t description_size) {
   V_ASSERT(device < (int) vk_instance.device_indices.size());

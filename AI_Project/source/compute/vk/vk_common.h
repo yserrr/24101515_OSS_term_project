@@ -1,6 +1,6 @@
 #ifndef MYPROJECT_VK_COMMON_H
 #define MYPROJECT_VK_COMMON_H
-#include "v_vk.h"
+#include "v_vk.hpp"
 #include <vulkan/vulkan_core.h>
 
 #if defined(v_VULKAN_RUN_TESTS) || defined(v_VULKAN_CHECK_RESULTS)
@@ -68,7 +68,7 @@ DispatchLoaderDynamic& v_vk_default_dispatcher();
 #define YIELD()
 #endif
 
-#include "ggml-impl.h"
+#include "ggml-impl.hpp"
 
 // remove this once it's more widely available in the SDK
 #if !defined(VK_KHR_shader_bfloat16)
@@ -91,7 +91,7 @@ typedef struct VkPhysicalDeviceShaderBfloat16FeaturesKHR
 
 #define ROUNDUP_POW2(M, N) (((M) + (N) - 1) & ~((N) - 1))
 #define CEIL_DIV(M, N) (((M) + (N)-1) / (N))
-#define UNUSED v_UNUSED
+#define UNUSED V_UNUSED
 
 //#define MML_VK_DEBUG
 #ifdef MML_VK_DEBUG

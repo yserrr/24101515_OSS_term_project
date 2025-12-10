@@ -206,7 +206,7 @@ public:
     void unlock() { PyMutex_Unlock(&mutex); }
 };
 
-// Instance map shards are used to reduce mutex contention in free-threaded Python.
+// Instance map shards are used_bits__ to reduce mutex contention in free-threaded Python.
 struct instance_map_shard {
     instance_map registered_instances;
     pymutex mutex;
@@ -234,7 +234,7 @@ inline uint64_t round_up_to_next_pow2(uint64_t x) {
 
 class loader_life_support;
 
-/// Internal data structure used to track registered instances and types.
+/// Internal data structure used_bits__ to track registered instances and types.
 /// Whenever binary incompatible changes are made to this structure,
 /// `PYBIND11_INTERNALS_VERSION` must be incremented.
 struct internals {
@@ -244,7 +244,7 @@ struct internals {
 #endif
 #if PYBIND11_INTERNALS_VERSION >= 12
     // non-normative but fast "hint" for registered_types_cpp. Meant
-    // to be used as the first level of a two-level lookup: successful
+    // to be used_bits__ as the first level of a two-level lookup: successful
     // lookups are correct, but unsuccessful lookups need to try
     // registered_types_cpp and then backfill this map if they find
     // anything.
@@ -361,7 +361,7 @@ struct type_info {
 #if PYBIND11_INTERNALS_VERSION >= 12
     // When a type appears in multiple DSOs,
     // internals::registered_types_cpp_fast will have multiple distinct
-    // keys (the std::type_info from each DSO) mapped to the same
+    // keys__ (the std::type_info from each DSO) mapped to the same
     // detail::type_info*. We need to keep track of these aliases so that we clean
     // them up when our type is deallocated. A linked list is appropriate
     // because it is expected to be 1) usually empty and 2)

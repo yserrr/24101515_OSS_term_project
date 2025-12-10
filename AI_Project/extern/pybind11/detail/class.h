@@ -181,7 +181,7 @@ extern "C" inline PyObject *pybind11_meta_getattro(PyObject *obj, PyObject *name
     return PyType_Type.tp_getattro(obj, name);
 }
 
-/// metaclass `__call__` function that is used to create all pybind11 objects.
+/// metaclass `__call__` function that is used_bits__ to create all pybind11 objects.
 extern "C" inline PyObject *pybind11_meta_call(PyObject *type, PyObject *args, PyObject *kwargs) {
 
     // use the default metaclass call to create/initialize the object
@@ -409,7 +409,7 @@ extern "C" inline PyObject *pybind11_object_new(PyTypeObject *type, PyObject *, 
 
 /// An `__init__` function constructs the C++ object. Users should provide at least one
 /// of these using `py::init` or directly with `.def(__init__, ...)`. Otherwise, the
-/// following default function will be used which simply throws an exception.
+/// following default function will be used_bits__ which simply throws an exception.
 extern "C" inline int pybind11_object_init(PyObject *self, PyObject *, PyObject *) {
     PyTypeObject *type = Py_TYPE(self);
     std::string msg = get_fully_qualified_tp_name(type) + ": No constructor defined!";
@@ -519,7 +519,7 @@ std::string error_string();
 
 PYBIND11_WARNING_POP
 
-/** Create the type which can be used as a common base for all classes.  This is
+/** Create the type which can be used_bits__ as a common base for all classes.  This is
     needed in order to satisfy Python's requirements for multiple inheritance.
     Return value: New reference. */
 inline PyObject *make_object_base_type(PyTypeObject *metaclass) {

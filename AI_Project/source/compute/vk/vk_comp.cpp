@@ -364,15 +364,15 @@ void v_vk_ssm_scan(vk_backend_ctx* ctx, vk_context& subctx, v_tensor* dst, bool 
   };
 
   v_backend_vk_buffer_ctx* dst_buf_ctx = (v_backend_vk_buffer_ctx*)dst->buffer->context;
-  v_backend_vk_buffer_ctx* src_buf_ctxs[v_MAX_SRC];
-  for (int i = 0; i < v_MAX_SRC && dst->src[i] != nullptr; i++) { src_buf_ctxs[i] = (v_backend_vk_buffer_ctx*)dst->src[i]->buffer->context; }
+  v_backend_vk_buffer_ctx* src_buf_ctxs[V_MAX_SRC];
+  for (int i = 0; i < V_MAX_SRC && dst->src[i] != nullptr; i++) { src_buf_ctxs[i] = (v_backend_vk_buffer_ctx*)dst->src[i]->buffer->context; }
 
-  vk_buffer d_D     = nullptr, d_srcs[v_MAX_SRC] = {nullptr};
-  size_t dst_offset = 0, src_offsets[v_MAX_SRC]  = {0};
-  bool dst_uma      = false, srcs_uma[v_MAX_SRC] = {false};
+  vk_buffer d_D     = nullptr, d_srcs[V_MAX_SRC] = {nullptr};
+  size_t dst_offset = 0, src_offsets[V_MAX_SRC]  = {0};
+  bool dst_uma      = false, srcs_uma[V_MAX_SRC] = {false};
 
   if (ctx->device->uma) {
-    for (int i = 0; i < v_MAX_SRC && dst->src[i] != nullptr; i++) {
+    for (int i = 0; i < V_MAX_SRC && dst->src[i] != nullptr; i++) {
       vk_get_host_buffer(ctx->device, dst->src[i]->data, d_srcs[i], src_offsets[i]);
       srcs_uma[i] = d_srcs[i] != nullptr;
     }
@@ -384,7 +384,7 @@ void v_vk_ssm_scan(vk_backend_ctx* ctx, vk_context& subctx, v_tensor* dst, bool 
     d_D        = dst_buf_ctx->dev_buffer;
     dst_offset = vk_tensor_offset(dst) + dst->view_offs;
   }
-  for (int i = 0; i < v_MAX_SRC && dst->src[i] != nullptr; i++) {
+  for (int i = 0; i < V_MAX_SRC && dst->src[i] != nullptr; i++) {
     if (!srcs_uma[i]) {
       d_srcs[i]      = src_buf_ctxs[i]->dev_buffer;
       src_offsets[i] = vk_tensor_offset(dst->src[i]) + dst->src[i]->view_offs;
@@ -392,8 +392,8 @@ void v_vk_ssm_scan(vk_backend_ctx* ctx, vk_context& subctx, v_tensor* dst, bool 
   }
 
   size_t dst_size = num_bytes(dst);
-  size_t src_sizes[v_MAX_SRC];
-  for (int i = 0; i < v_MAX_SRC && dst->src[i] != nullptr; i++) { src_sizes[i] = num_bytes(dst->src[i]); }
+  size_t src_sizes[V_MAX_SRC];
+  for (int i = 0; i < V_MAX_SRC && dst->src[i] != nullptr; i++) { src_sizes[i] = num_bytes(dst->src[i]); }
 
   std::array<uint32_t, 3> elements;
 
@@ -573,7 +573,7 @@ void v_vk_opt_step_sgd(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* 
 
 void v_vk_concat(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0,
                  const v_tensor* src1, v_tensor* dst, bool dryrun) {
-  int* op_params = (int*)dst->op_params;
+  int* op_params = dst->op_params.data();
 
   const uint32_t src0_type_size = v_type_size(src0->type);
   const uint32_t src1_type_size = v_type_size(src1->type);
@@ -809,7 +809,7 @@ void v_vk_silu_back(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src
 
 void v_vk_norm(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst,
                bool dryrun) {
-  float* op_params = (float*)dst->op_params;
+  float* op_params = (float*)dst->op_params.data();
 
   v_vk_op_f32<vk_op_push_constants>(ctx,
                                     subctx,
@@ -824,8 +824,8 @@ void v_vk_norm(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_
 
 void v_vk_group_norm(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0,
                      v_tensor* dst, bool dryrun) {
-  const int* int_op_params     = (const int*)dst->op_params;
-  const float* float_op_params = (const float*)dst->op_params;
+  const int* int_op_params     = dst->op_params.data();
+  const float* float_op_params = reinterpret_cast<const float*>(dst->op_params.data());
 
   const uint32_t num_groups = int_op_params[0];
   const float eps           = float_op_params[1];
@@ -902,7 +902,7 @@ void v_vk_rms_norm(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0
 
 void v_vk_rms_norm_back(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0,
                         const v_tensor* src1, v_tensor* dst, bool dryrun) {
-  float* op_params = (float*)dst->op_params;
+  float* op_params = (float*)dst->op_params.data();
   v_vk_op_f32<vk_op_push_constants>(ctx,
                                     subctx,
                                     src0,
@@ -916,7 +916,7 @@ void v_vk_rms_norm_back(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor*
 
 void v_vk_l2_norm(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst,
                   bool dryrun) {
-  float* op_params = (float*)dst->op_params;
+  float* op_params = reinterpret_cast<float*>(dst->op_params.data());
   v_vk_op_f32<vk_op_push_constants>(ctx,
                                     subctx,
                                     src0,
@@ -943,7 +943,7 @@ void v_vk_unary(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v
 
 void v_vk_glu(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0,
               const v_tensor* src1, v_tensor* dst, bool dryrun) {
-  const float* op_params_f = (const float*)dst->op_params;
+  const float* op_params_f = reinterpret_cast<const float*>(dst->op_params.data());
 
   const bool swapped = (bool)dst->op_params[1];
   const bool split   = src1 != nullptr;
@@ -985,7 +985,7 @@ void v_vk_glu(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0,
 
 void v_vk_diag_mask_inf(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0,
                         v_tensor* dst, bool dryrun) {
-  int32_t* op_params = (int32_t*)dst->op_params;
+  int32_t* op_params = dst->op_params.data();
   v_vk_op_f32<vk_op_diag_mask_push_constants>(ctx,
                                               subctx,
                                               src0,
@@ -999,7 +999,7 @@ void v_vk_diag_mask_inf(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor*
 
 void v_vk_soft_max(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0,
                    const v_tensor* src1, const v_tensor* src2, v_tensor* dst, bool dryrun) {
-  float* op_params = (float*)dst->op_params;
+  float* op_params = reinterpret_cast<float*>(dst->op_params.data());
 
   float scale    = op_params[0];
   float max_bias = op_params[1];
@@ -1056,7 +1056,7 @@ void v_vk_soft_max(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0
 
 void v_vk_soft_max_back(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0,
                         const v_tensor* src1, v_tensor* dst, bool dryrun) {
-  float* op_params = (float*)dst->op_params;
+  float* op_params = reinterpret_cast<float*>(dst->op_params.data());
   v_vk_op_f32<vk_op_push_constants>(ctx,
                                     subctx,
                                     src0,
@@ -1165,18 +1165,18 @@ void v_vk_topk_moe(vk_backend_ctx* ctx, vk_context& subctx, v_cgraph* cgraph, in
 void v_vk_rope(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0,
                const v_tensor* src1, const v_tensor* src2, v_tensor* dst, bool backprop,
                bool dryrun) {
-  const int n_dims = ((int32_t*)dst->op_params)[1];
-  const int mode   = ((int32_t*)dst->op_params)[2];
+  const int n_dims = dst->op_params[1];
+  const int mode   = dst->op_params[2];
   // const int n_ctx         = ((int32_t *) dst->op_params)[3];
-  const int n_ctx_orig    = ((int32_t*)dst->op_params)[4];
-  const float freq_base   = ((float*)dst->op_params)[5];
-  const float freq_scale  = ((float*)dst->op_params)[6];
-  const float ext_factor  = ((float*)dst->op_params)[7];
-  const float attn_factor = ((float*)dst->op_params)[8];
-  const float beta_fast   = ((float*)dst->op_params)[9];
-  const float beta_slow   = ((float*)dst->op_params)[10];
+  const int n_ctx_orig    = dst->op_params[4];
+  const float freq_base   = ((float*)dst->op_params.data())[5];
+  const float freq_scale  = ((float*)dst->op_params.data())[6];
+  const float ext_factor  = ((float*)dst->op_params.data())[7];
+  const float attn_factor = ((float*)dst->op_params.data())[8];
+  const float beta_fast   = ((float*)dst->op_params.data())[9];
+  const float beta_slow   = ((float*)dst->op_params.data())[10];
   int sections[4]{};
-  if (mode & v_ROPE_TYPE_MROPE) { memcpy(sections, (int32_t*)dst->op_params + 11, sizeof(int) * 4); }
+  if (mode & v_ROPE_TYPE_MROPE) { memcpy(sections, dst->op_params.data() + 11, sizeof(int) * 4); }
 
   float corr_dims[2];
   v_rope_yarn_corr_dims(n_dims, n_ctx_orig, freq_base, beta_fast, beta_slow, corr_dims);
@@ -1206,9 +1206,8 @@ void v_vk_rope(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0,
 
 void v_vk_argsort(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst,
                   bool dryrun) {
-  int32_t* op_params = (int32_t*)dst->op_params;
-
-  uint32_t ncols = src0->ne[0];
+  int32_t* op_params = dst->op_params.data();
+  uint32_t ncols     = src0->ne[0];
 
   v_vk_op_f32<vk_op_argsort_push_constants>(ctx,
                                             subctx,
@@ -1272,7 +1271,7 @@ void v_vk_count_equal(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* s
 
 void v_vk_leaky_relu(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0,
                      v_tensor* dst, bool dryrun) {
-  const float* op_params = (const float*)dst->op_params;
+  const float* op_params = reinterpret_cast<const float*>(dst->op_params.data());
   v_vk_op_f32<vk_op_push_constants>(ctx,
                                     subctx,
                                     src0,
@@ -1280,9 +1279,10 @@ void v_vk_leaky_relu(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* sr
                                     nullptr,
                                     dst,
                                     v_OP_LEAKY_RELU,
-                                    {(uint32_t)nelements(src0), 0, op_params[0], 0.0f},
+                                    {static_cast<uint32_t>(nelements(src0)), 0, op_params[0], 0.0f},
                                     dryrun);
 }
+
 void v_vk_get_rows(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0,
                    const v_tensor* src1, v_tensor* dst, bool dryrun) {
   const uint32_t src0_type_size = v_type_size(src0->type);
@@ -1361,7 +1361,7 @@ void v_vk_multi_add(vk_backend_ctx* ctx, vk_context& subctx, v_cgraph* cgraph, i
   const v_tensor* first_node = cgraph->nodes[node_idx];
   const v_tensor* dst        = cgraph->nodes[node_idx + ctx->num_additional_fused_ops];
 
-  // Make a list of all the tensors used by the op.
+  // Make a list of all the tensors used_bits__ by the op.
   // Last element of the list is the dest tensor.
   const v_tensor* tensors[MAX_PARAMETER_COUNT];
   uint32_t num_srcs    = ctx->num_additional_fused_ops + 2;

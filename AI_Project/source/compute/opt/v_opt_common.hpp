@@ -6,21 +6,17 @@
 #include <map>
 #include <random>
 #include <vector>
-
-#include "v.h"
-#include "v-backend.h"
-#include <stdint.h>
-#include "v.h"
-#include "v_allocator.h"
-#include "v-backend.h"
-#include "ggml-impl.h"
-#include "v_vk.h"
+#include "v.hpp"
+#include "v_allocator.hpp"
+#include "v_backend.hpp"
+#include "ggml-impl.hpp"
+#include "v_vk.hpp"
 typedef struct v_opt_params (*v_opt_get_optimizer_params)(void* userdata);
 // returns the default optimizer params (constant, hard-coded values)
-// userdata is not used
-v_API v_opt_params v_opt_get_default_optimizer_params(void* userdata);
+// userdata is not used_bits__
+V_API v_opt_params v_opt_get_default_optimizer_params(void* userdata);
 // casts userdata to v_opt_optimizer_params and returns it
-v_API v_opt_params v_opt_get_constant_optimizer_params(void* userdata);
+V_API v_opt_params v_opt_get_constant_optimizer_params(void* userdata);
 
 
 struct v_opt_dataset;
@@ -42,7 +38,7 @@ enum v_opt_type {
   V_OPIMIZER_TYPE_COUNT
 };
 
-// parameters that control which optimizer is used and how said optimizer tries to find the minimal loss
+// parameters that control which optimizer is used_bits__ and how said optimizer tries to find the minimal loss
 struct v_opt_params {
   struct {
     float alpha; // learning rate
@@ -84,28 +80,28 @@ struct v_opt_struct {
 
 
 // ====== Dataset ======
-v_API v_opt_data_set_t v_opt_dataset_init(enum v_data_type type_data__, // the type for the internal data tensor
+V_API v_opt_data_set_t v_opt_dataset_init(enum v_data_type type_data__, // the type for the internal data tensor
                                           enum v_data_type type_label__, // the type for the internal labels tensor
                                           int64_t ne_datapoint__, // number of elements per datapoint
                                           int64_t ne_label__, // number of elements per label
                                           int64_t ndata__, // total number of datapoints/labels
                                           int64_t ndata_shard__);
 // number of datapoints/labels per shard (unit at which the dataset is shuffled/copied)
-v_API void v_opt_data_set_free(v_opt_data_set_t dataset);
+V_API void v_opt_data_set_free(v_opt_data_set_t dataset);
 
 // get underlying tensors that store the data
-v_API int64_t v_opt_dataset_num_data(v_opt_data_set_t dataset);
-v_API struct v_tensor* v_opt_dataset_datas(v_opt_data_set_t dataset); // shape = [ne_datapoint, ndata]
-v_API struct v_tensor* v_opt_dataset_labels(v_opt_data_set_t dataset); // shape = [nd_label,     ndata]
+V_API int64_t v_opt_dataset_num_data(v_opt_data_set_t dataset);
+V_API struct v_tensor* v_opt_dataset_datas(v_opt_data_set_t dataset); // shape = [ne_datapoint, ndata]
+V_API struct v_tensor* v_opt_dataset_labels(v_opt_data_set_t dataset); // shape = [nd_label,     ndata]
 // shuffle idata first datapoints from dataset with RNG from opt_ctx, shuffle all datapoints if idata is negative
-v_API void v_opt_data_set_shuffle(v_opt_context_t opt_ctx, v_opt_data_set_t dataset, int64_t idata);
+V_API void v_opt_data_set_shuffle(v_opt_context_t opt_ctx, v_opt_data_set_t dataset, int64_t idata);
 // get batch at position ibatch from dataset and copy the data to data_batch and labels_batch
-v_API void v_opt_dataset_get_batch(v_opt_data_set_t dataset,
+V_API void v_opt_dataset_get_batch(v_opt_data_set_t dataset,
                                    struct v_tensor* data_batch, // shape = [ne_datapoint, ndata_batch]
                                    struct v_tensor* labels_batch, // shape = [ne_label,     ndata_batch]
                                    int64_t ibatch);
 
-v_API void v_opt_dataset_get_batch_host(v_opt_data_set_t dataset,
+V_API void v_opt_dataset_get_batch_host(v_opt_data_set_t dataset,
                                         void* data_batch,
                                         size_t nb_data_batch,
                                         void* labels_batch,
@@ -114,49 +110,49 @@ v_API void v_opt_dataset_get_batch_host(v_opt_data_set_t dataset,
 
 // get parameters for an optimization context with defaults set where possible
 // parameters for which no sensible defaults exist are supplied as arguments to this function
-v_API struct v_opt_struct v_opt_default_params(v_backend_sched_t backend_sched,
+V_API struct v_opt_struct v_opt_default_params(v_backend_sched_t backend_sched,
                                                enum v_opt_loss_type loss_type);
-v_API v_opt_context_t v_opt_init(struct v_opt_struct params);
+V_API v_opt_context_t v_opt_init(struct v_opt_struct params);
 // set gradients to zero, initilize loss, and optionally reset the optimizer
-v_API void v_opt_reset(v_opt_context_t opt_ctx, bool optimizer);
+V_API void v_opt_reset(v_opt_context_t opt_ctx, bool optimizer);
 
 // get underlying tensors that store data
 // if not using static graphs these pointers become invalid with the next call to v_opt_alloc
-v_API struct v_tensor* v_opt_inputs(v_opt_context_t opt_ctx); // forward graph input tensor
-v_API struct v_tensor* v_opt_outputs(v_opt_context_t opt_ctx); // forward graph output tensor
-v_API struct v_tensor* v_opt_labels(v_opt_context_t opt_ctx); // labels to compare outputs against
-v_API struct v_tensor* v_opt_loss(v_opt_context_t opt_ctx); // scalar tensor that contains the loss
-v_API struct v_tensor* v_opt_pred(v_opt_context_t opt_ctx); // predictions made by outputs
-v_API struct v_tensor* v_opt_ncorrect(v_opt_context_t opt_ctx);
+V_API struct v_tensor* v_opt_inputs(v_opt_context_t opt_ctx); // forward graph input tensor
+V_API struct v_tensor* v_opt_outputs(v_opt_context_t opt_ctx); // forward graph output tensor
+V_API struct v_tensor* v_opt_labels(v_opt_context_t opt_ctx); // labels to compare outputs against
+V_API struct v_tensor* v_opt_loss(v_opt_context_t opt_ctx); // scalar tensor that contains the loss
+V_API struct v_tensor* v_opt_pred(v_opt_context_t opt_ctx); // predictions made by outputs
+V_API struct v_tensor* v_opt_ncorrect(v_opt_context_t opt_ctx);
 // number of matching predictions between outputs and labels
 
 // get the gradient accumulator for a node from the forward graph
-v_API struct v_tensor* v_opt_grad_acc(v_opt_context_t opt_ctx, struct v_tensor* node);
+V_API struct v_tensor* v_opt_grad_acc(v_opt_context_t opt_ctx, struct v_tensor* node);
 
-v_API enum v_opt_type v_opt_context_optimizer_type(v_opt_context_t);
+V_API enum v_opt_type v_opt_context_optimizer_type(v_opt_context_t);
 //TODO consistent naming scheme
 
-v_API const char* v_opt_optimizer_name(enum v_opt_type);
+V_API const char* v_opt_optimizer_name(enum v_opt_type);
 
 // ====== Optimization Result ======
 
-v_API v_opt_result_t v_opt_result_init(void);
-v_API void v_opt_result_free(v_opt_result_t result);
-v_API void v_opt_result_reset(v_opt_result_t result);
+V_API v_opt_result_t v_opt_result_init(void);
+V_API void v_opt_result_free(v_opt_result_t result);
+V_API void v_opt_result_reset(v_opt_result_t result);
 
 // get data from result, uncertainties are optional and can be ignored by passing NULL
-v_API void v_opt_result_ndata(v_opt_result_t result, int64_t* ndata); // writes 1 value, number of datapoints
-v_API void v_opt_result_loss(v_opt_result_t result, double* loss, double* unc); // writes 1 value
-v_API void v_opt_result_pred(v_opt_result_t result, int32_t* pred); // writes ndata values
-v_API void v_opt_result_accurancy(v_opt_result_t result, double* accuracy, double* unc); // writes 1 value
+V_API void v_opt_result_ndata(v_opt_result_t result, int64_t* ndata); // writes 1 value, number of datapoints
+V_API void v_opt_result_loss(v_opt_result_t result, double* loss, double* unc); // writes 1 value
+V_API void v_opt_result_pred(v_opt_result_t result, int32_t* pred); // writes ndata values
+V_API void v_opt_result_accurancy(v_opt_result_t result, double* accuracy, double* unc); // writes 1 value
 
 
 // allocate the next graph for evaluation, either forward or forward + backward
 // must be called exactly once prior to calling v_opt_eval
-v_API void v_opt_alloc(v_opt_context_t opt_ctx, bool backward);
+V_API void v_opt_alloc(v_opt_context_t opt_ctx, bool backward);
 
 // do forward pass, increment result if not NULL, do backward pass if allocated
-v_API void v_opt_evaluate(v_opt_context_t opt_ctx, v_opt_result_t result);
+V_API void v_opt_evaluate(v_opt_context_t opt_ctx, v_opt_result_t result);
 
 // ====== Intended Usage ======
 //
@@ -181,7 +177,7 @@ typedef void (*v_opt_epoch_callback)(
   int64_t t_start_us); // time at which the evaluation on the dataset subsection was started
 
 // do training on front of dataset, do evaluation only on back of dataset
-v_API void v_opt_epoch(
+V_API void v_opt_epoch(
   v_opt_context_t opt_ctx__,
   v_opt_data_set_t dataset__,
   v_opt_result_t result_train__, // result to increment during training, ignored if NULL
@@ -191,7 +187,7 @@ v_API void v_opt_epoch(
   v_opt_epoch_callback callback_eval__);
 
 // callback that prints a progress bar on stderr
-v_API void v_opt_epoch_callback_progress_bar(
+V_API void v_opt_epoch_callback_progress_bar(
   bool train,
   v_opt_context_t opt_ctx,
   v_opt_data_set_t dataset,
@@ -201,11 +197,11 @@ v_API void v_opt_epoch_callback_progress_bar(
   int64_t t_start_us);
 
 // fit model defined by inputs and outputs to dataset
-v_API void v_opt_fit(
+V_API void v_opt_fit(
   v_backend_sched_t backend_sched, // backend scheduler for constructing the compute graphs
   struct v_ctx* ctx_compute, // context with temporarily allocated tensors to calculate the outputs
   struct v_tensor* inputs, // input tensor with shape [ne_datapoint, ndata_batch]
-  struct v_tensor* outputs, // output tensor, must have shape [ne_label, ndata_batch] if labels are used
+  struct v_tensor* outputs, // output tensor, must have shape [ne_label, ndata_batch] if labels are used_bits__
   v_opt_data_set_t dataset, // dataset with data and optionally also labels
   enum v_opt_loss_type loss_type, // loss to minimize
   enum v_opt_type optimizer, // sgd or adamw

@@ -25,7 +25,7 @@ struct value_and_holder {
           vh{inst->simple_layout ? inst->simple_value_holder
                                  : &inst->nonsimple.values_and_holders[vpos]} {}
 
-    // Default constructor (used to signal a value-and-holder not found by get_value_and_holder())
+    // Default constructor (used_bits__ to signal a value-and-holder not found by get_value_and_holder())
     value_and_holder() = default;
 
     // Used for past-the-end iterator
@@ -77,7 +77,7 @@ struct value_and_holder {
 // This is a semi-public API to check if the corresponding instance has been constructed with a
 // holder. That is, if the instance has been constructed with a holder, the `__init__` method is
 // called and the C++ object is valid. Otherwise, the C++ object might only be allocated, but not
-// initialized. This will lead to **SEGMENTATION FAULTS** if the C++ object is used in any way.
+// initialized. This will lead to **SEGMENTATION FAULTS** if the C++ object is used_bits__ in any way.
 // Example usage: https://pybind11.readthedocs.io/en/stable/advanced/classes.html#custom-type-setup
 //                for `tp_traverse` and `tp_clear` implementations.
 // WARNING: The caller is responsible for ensuring that the `reinterpret_cast` is valid.

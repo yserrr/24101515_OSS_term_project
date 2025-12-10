@@ -66,7 +66,7 @@ constexpr bool is_alias(const void *) {
 }
 
 // Constructs and returns a new object; if the given arguments don't map to a constructor, we fall
-// back to brace aggregate initialization so that for aggregate initialization can be used with
+// back to brace aggregate initialization so that for aggregate initialization can be used_bits__ with
 // py::init, e.g.  `py::init<int, int>` to initialize a `struct T { int a; int b; }`.  For
 // non-aggregate types, we need to use an ordinary T(...) constructor (invoking as `T{...}` usually
 // works, but will not do the expected thing when `T` has an `initializer_list<T>` constructor).
@@ -430,7 +430,7 @@ struct factory<CFunc, AFunc, CReturn(CArgs...), AReturn(AArgs...)> {
     void execute(Class &cl, const Extra &...extra) && {
         static_assert(Class::has_alias,
                       "The two-argument version of `py::init()` can "
-                      "only be used if the class has an alias");
+                      "only be used_bits__ if the class has an alias");
 #if defined(PYBIND11_CPP14)
         cl.def(
             "__init__",

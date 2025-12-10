@@ -1,8 +1,8 @@
 #include <vk_constant.h>
 #include <vk_context.h>
-#include <vk_util.h>
+#include <vk_util.hpp>
 #include "vk_op_f32.hpp"
-#include "vk_pipeline.h"
+#include "vk_pipeline.hpp"
 #include "vk_comp.hpp"
 
 
@@ -154,8 +154,8 @@ bool v_vk_should_use_mmvq(const vk_device& device, uint32_t m, uint32_t n, uint3
       return true;
   }
 
-  v_UNUSED(m);
-  v_UNUSED(k);
+  V_UNUSED(m);
+  V_UNUSED(k);
 }
 
 

@@ -1,15 +1,15 @@
 #define _CRT_SECURE_NO_DEPRECATE // Disables "unsafe" warnings on Windows
 #define _USE_MATH_DEFINES // For M_PI on MSVC
-#include "v-backend.h"
-#include "ggml-impl.h"
-#include "v.h"
-#include "v_hash.h"
+#include "v_backend.hpp"
+#include "ggml-impl.hpp"
+#include "v.hpp"
+#include "v_hash.hpp"
 #include "v_tensor.hpp"
 // FIXME: required here for quantization functions
 #include <mutex>
 
-#include "v_quants.h"
-#include "v_util.h"
+#include "v_quants.hpp"
+#include "v_util.hpp"
 #if defined(_MSC_VER) || defined(__MINGW32__)
 #include <malloc.h> // using malloc.h with MSC/MINGW
 #elif !defined(__FreeBSD__) && !defined(__NetBSD__) && !defined(__OpenBSD__)
@@ -28,7 +28,6 @@
 #include <float.h>
 #include <limits.h>
 #include <stdarg.h>
-#include <signal.h>
 #if defined(__gnu_linux__)
 #include <syscall.h>
 #endif
@@ -47,7 +46,7 @@
 #include <windows.h>
 #endif
 
-#define UNUSED v_UNUSED
+#define UNUSED V_UNUSED
 
 #if defined(_MSC_VER)
 #define m512bh(p) p
@@ -134,7 +133,7 @@ void v_print_backtrace(void) {
 #if defined(__linux__)
 FILE* f        = fopen("/proc/self/status", "r");
 size_t size    = 0;
-char* line     = NULL;
+char* line     = nullptr;
 ssize_t length = 0;
     while ((length = getline(&line, &size, f)) > 0) {
         if (!strncmp(line, "TracerPid:", sizeof("TracerPid:") - 1) &&
@@ -173,13 +172,13 @@ execlp ("gdb", "gdb", "--batch",
             "-ex", "bt -frame-info source-and-location",
             "-ex", "detach",
             "-ex", "quit",
-(char*) NULL);
+(char*) nullptr);
 // try lldb
 execlp ("lldb", "lldb", "--batch",
             "-o", "bt",
             "-o", "quit",
             "-p", &attach [sizeof("attach ") - 1],
-(char*) NULL);
+(char*) nullptr);
 // gdb failed, fallback to backtrace_symbols
 v_print_backtrace_symbols();
 _Exit (0);
@@ -189,7 +188,7 @@ prctl(PR_SET_PTRACER, child_pid);
 close (lock[1]);
 close (lock[0]);
 #endif
-waitpid(child_pid, NULL, 0);
+waitpid(child_pid, nullptr, 0);
     }
 }
 #else
@@ -199,38 +198,14 @@ void v_print_backtrace(void) {
 #endif
 
 
-#include "ggml-impl.h"
 #include <cstdlib>
 #include <exception>
 
 
-static std::terminate_handler previous_terminate_handler;
-
-v_NORETURN static void v_uncaught_exception() {
-  v_print_backtrace();
-  if (previous_terminate_handler) {
-    previous_terminate_handler();
-  }
-  abort(); // unreachable unless previous_terminate_handler was nullptr
-}
-
-static bool v_uncaught_exception_init = [] {
-  const char* v_NO_BACKTRACE = getenv("v_NO_BACKTRACE");
-  if (v_NO_BACKTRACE) {
-    return false;
-  }
-  const auto prev{std::get_terminate()};
-  V_ASSERT(prev != v_uncaught_exception);
-  previous_terminate_handler = prev;
-  std::set_terminate(v_uncaught_exception);
-  return true;
-}();
-
-
-static v_abort_callback_t g_abort_callback = NULL;
+static v_abort_callback_t g_abort_callback = nullptr;
 
 // Set the abort callback (passing null will restore original abort functionality: printing a message to stdout)
-v_API v_abort_callback_t v_set_abort_callback(v_abort_callback_t callback) {
+V_API v_abort_callback_t v_set_abort_callback(v_abort_callback_t callback) {
   v_abort_callback_t ret_val = g_abort_callback;
   g_abort_callback           = callback;
   return ret_val;
@@ -270,10 +245,10 @@ struct v_logger_state {
   void* log_callback_user_data;
 };
 
-static struct v_logger_state g_logger_state = {mml_log_callback_default, NULL};
+static struct v_logger_state g_logger_state = {v_log_callback_default, nullptr};
 
 static void v_log_internal_v(enum v_log_level level, const char* format, va_list args) {
-  if (format == NULL) {
+  if (format == nullptr) {
     return;
   }
   va_list args_copy;
@@ -300,7 +275,7 @@ void v_log_internal(enum v_log_level level, const char* format, ...) {
   va_end(args);
 }
 
-void mml_log_callback_default(enum v_log_level level, const char* text, void* user_data) {
+void v_log_callback_default(enum v_log_level level, const char* text, void* user_data) {
   (void)level;
   (void)user_data;
   fputs(text, stderr);
@@ -320,9 +295,9 @@ void* v_aligned_malloc(size_t size) {
   #else
   if (size == 0) {
     v_LOG_WARN("Behavior may be unexpected when allocating 0 bytes for v_aligned_malloc!\n");
-    return NULL;
+    return nullptr;
   }
-  void* aligned_memory = NULL;
+  void* aligned_memory = nullptr;
   if (result != 0) {
     // Handle allocation failure
     const char* error_desc = "unknown allocation error";
@@ -335,14 +310,14 @@ void* v_aligned_malloc(size_t size) {
         break;
     }
     v_LOG_ERROR("%s: %s (attempted to allocate %6.2f MB)\n", __func__, error_desc, size / (1024.0 * 1024.0));
-    return NULL;
+    return nullptr;
   }
   return aligned_memory;
   #endif
 }
 
 void v_aligned_free(void* ptr, size_t size) {
-  v_UNUSED(size);
+  V_UNUSED(size);
   _aligned_free(ptr);
 }
 
@@ -350,10 +325,10 @@ void v_aligned_free(void* ptr, size_t size) {
 inline static void* v_malloc(size_t size) {
   if (size == 0) {
     v_LOG_WARN("Behavior may be unexpected when allocating 0 bytes for v_malloc!\n");
-    return NULL;
+    return nullptr;
   }
   void* result = malloc(size);
-  if (result == NULL) {
+  if (result == nullptr) {
     v_LOG_ERROR("%s: failed to allocate %6.2f MB\n", __func__, size/(1024.0*1024.0));
     v_ABORT("fatal error");
   }
@@ -364,10 +339,10 @@ inline static void* v_malloc(size_t size) {
 inline static void* v_calloc(size_t num, size_t size) {
   if (num == 0 || size == 0) {
     v_LOG_WARN("Behavior may be unexpected when allocating 0 bytes for v_calloc!\n");
-    return NULL;
+    return nullptr;
   }
   void* result = calloc(num, size);
-  if (result == NULL) {
+  if (result == nullptr) {
     v_LOG_ERROR("%s: failed to allocate %6.2f MB\n", __func__, size/(1024.0*1024.0));
     v_ABORT("fatal error");
   }
@@ -507,10 +482,10 @@ int64_t v_cycles_per_ms(void) {
 
 #ifdef _WIN32
 static wchar_t* v_mbstowcs(const char* mbs) {
-  int wlen = MultiByteToWideChar(CP_UTF8, 0, mbs, -1, NULL, 0);
+  int wlen = MultiByteToWideChar(CP_UTF8, 0, mbs, -1, nullptr, 0);
   if (!wlen) {
     errno = EINVAL;
-    return NULL;
+    return nullptr;
   }
 
   wchar_t* wbuf = (wchar_t*)v_MALLOC(wlen * sizeof(wchar_t));
@@ -518,7 +493,7 @@ static wchar_t* v_mbstowcs(const char* mbs) {
   if (!wlen) {
     v_FREE(wbuf);
     errno = EINVAL;
-    return NULL;
+    return nullptr;
   }
 
   return wbuf;
@@ -527,7 +502,7 @@ static wchar_t* v_mbstowcs(const char* mbs) {
 
 FILE* v_fopen(const char* fname, const char* mode) {
   #ifdef _WIN32
-  FILE* file = NULL;
+  FILE* file = nullptr;
   // convert fname (UTF-8)
   wchar_t* wfname = v_mbstowcs(fname);
   if (wfname) {
@@ -555,8 +530,6 @@ FILE* v_fopen(const char* fname, const char* mode) {
 static_assert(v_OP_COUNT == 90, "v_OP_COUNT != 90");
 static_assert(v_OP_POOL_COUNT == 2, "v_OP_POOL_COUNT != 2");
 static_assert(v_GLU_OP_COUNT == 6, "v_GLU_OP_COUNT != 6");
-static_assert(sizeof(v_object) % v_MEM_ALIGN == 0,
-              "v_object size must be a multiple of v_MEM_ALIGN");
 static_assert(sizeof(v_tensor) % v_MEM_ALIGN == 0,
               "v_tensor size must be a multiple of v_MEM_ALIGN");
 
@@ -565,7 +538,7 @@ void v_print_objects(const struct v_ctx* ctx) {
   struct v_object* obj = ctx->objects_begin;
   LOG_INFO("%s: objects in context %p:\n", __func__, (const void *) ctx);
 
-  while (obj != NULL) {
+  while (obj != nullptr) {
     v_print_object(obj);
     obj = obj->next;
   }
@@ -574,7 +547,7 @@ void v_print_objects(const struct v_ctx* ctx) {
 }
 
 size_t v_graph_overhead_custom(size_t size, bool grads) {
-  return MML_OBJECT_SIZE + MML_PAD(v_graph_nbyte(size, grads), v_MEM_ALIGN);
+  return MML_OBJECT_SIZE + V_PAD(v_graph_nbyte(size, grads), v_MEM_ALIGN);
 }
 
 size_t num_bytes(const v_tensor* tensor) {
@@ -603,7 +576,7 @@ size_t num_bytes(const v_tensor* tensor) {
 }
 
 size_t v_nbytes_pad(const v_tensor* tensor) {
-  return MML_PAD(num_bytes(tensor), v_MEM_ALIGN);
+  return V_PAD(num_bytes(tensor), v_MEM_ALIGN);
 }
 
 
@@ -687,28 +660,28 @@ v_tensor* new_tensor_impl(struct v_ctx* ctx,
     data_size *= ne[i];
   }
 
-  V_ASSERT(view_src == NULL || data_size == 0 || data_size + view_offs <= num_bytes(view_src));
+  V_ASSERT(view_src == nullptr || data_size == 0 || data_size + view_offs <= num_bytes(view_src));
 
-  void* data = view_src != NULL
+  void* data = view_src != nullptr
                  ? view_src->data
-                 : NULL;
-  if (data != NULL) {
+                 : nullptr;
+  if (data != nullptr) {
     data = (char*)data + view_offs;
   }
 
   size_t obj_alloc_size = 0;
 
-  if (view_src == NULL && !ctx->no_alloc) {
+  if (view_src == nullptr && !ctx->no_alloc) {
     // allocate tensor data in the context's memory pool
     obj_alloc_size = data_size;
   }
 
-  struct v_object* const obj_new = v_new_object(ctx, MML_TENSOR, v_TENSOR_SIZE + obj_alloc_size);
+  struct v_object* const obj_new = v_new_object(ctx, V_TENSOR, v_TENSOR_SIZE + obj_alloc_size);
   V_ASSERT(obj_new);
 
   v_tensor* result  = (v_tensor*)((char*)ctx->mem_buffer + obj_new->offs);
   (*result).type    = type;
-  (*result).buffer  = NULL;
+  (*result).buffer  = nullptr;
   (*result).ne[0]   = 1,
     (*result).ne[1] = 1,
     (*result).ne[2] = 1,
@@ -719,19 +692,18 @@ v_tensor* new_tensor_impl(struct v_ctx* ctx,
     (*result).nb[3] = 0;
   (*result).op      = v_OP_NONE;
   (*result).flags   = 0,
-    //(*result).src = {NULL},
+    //(*result).src = {nullptr},
     (*result).view_src  = view_src,
     (*result).view_offs = view_offs,
     (*result).data      = obj_alloc_size > 0
                             ? (void*)(result + 1)
                             : data,
     //(*result).name = {},
-    (*result).extra = NULL;
-  //(*result).padding = {0};
-  std::fill(std::begin((*result).op_params), std::end((*result).op_params), 0);
+    //(*result).padding = {0};
+    std::fill(std::begin((*result).op_params), std::end((*result).op_params), 0);
   std::fill(std::begin((*result).src), std::end((*result).src), nullptr);
 
-  //(*result).src = {NULL},
+  //(*result).src = {nullptr},
   for (int i = 0; i < n_dims; i++) {
     result->ne[i] = ne[i];
   }
@@ -755,18 +727,13 @@ void v_unravel_index(const v_tensor* tensor, int64_t i, int64_t* i0, int64_t* i1
   const int64_t i1_ = (i - i3_ * ne2 * ne1 * ne0 - i2_ * ne1 * ne0) / ne0;
   const int64_t i0_ = (i - i3_ * ne2 * ne1 * ne0 - i2_ * ne1 * ne0 - i1_ * ne0);
 
-  if (i0) {
-    *i0 = i0_;
-  }
-  if (i1) {
-    *i1 = i1_;
-  }
-  if (i2) {
-    *i2 = i2_;
-  }
-  if (i3) {
-    *i3 = i3_;
-  }
+  if (i0) *i0 = i0_;
+
+  if (i1) *i1 = i1_;
+
+  if (i2) *i2 = i2_;
+
+  if (i3) *i3 = i3_;
 }
 
 
@@ -782,14 +749,14 @@ v_tensor* v_set_name(v_tensor* tensor, const char* name) {
 v_tensor* v_format_name(v_tensor* tensor, const char* fmt, ...) {
   va_list args;
   va_start(args, fmt);
-  vsnprintf(tensor->name, sizeof(tensor->name), fmt, args);
+  vsnprintf(tensor->name.data(), sizeof(tensor->name.data()), fmt, args);
   va_end(args);
   return tensor;
 }
 
 v_tensor* v_tensor_view(struct v_ctx* ctx,
                         v_tensor* src) {
-  v_tensor* result = new_tensor_impl(ctx, src->type, V_MAX_DIMS, src->ne, src, 0);
+  v_tensor* result = new_tensor_impl(ctx, src->type, V_MAX_DIMS, src->ne.data(), src, 0);
   v_format_name(result, "%s (view)", src->name);
   for (int i = 0; i < V_MAX_DIMS; i++) {
     result->nb[i] = src->nb[i];
@@ -884,11 +851,11 @@ v_tensor* v_cpy(struct v_ctx* ctx,
   V_ASSERT(nelements(a) == nelements(b));
   // make a view of the destination
   v_tensor* result = v_tensor_view(ctx, b);
-  if (strlen(b->name) > 0) {
-    v_format_name(result, "%s (copy of %s)", b->name, a->name);
+  if (strlen(b->name.data()) > 0) {
+    v_format_name(result, "%s (copy of %s)", b->name.data(), a->name.data());
   }
   else {
-    v_format_name(result, "%s (copy)", a->name);
+    v_format_name(result, "%s (copy)", a->name.data());
   }
   result->op     = v_OP_CPY;
   result->src[0] = a;
@@ -897,14 +864,14 @@ v_tensor* v_cpy(struct v_ctx* ctx,
 }
 
 
-v_API v_tensor* v_cont_1d(
+V_API v_tensor* v_cont_1d(
   struct v_ctx* ctx,
   v_tensor* a,
   int64_t ne0) {
   return v_cont_4d(ctx, a, ne0, 1, 1, 1);
 }
 
-v_API v_tensor* v_cont_2d(
+V_API v_tensor* v_cont_2d(
   struct v_ctx* ctx,
   v_tensor* a,
   int64_t ne0,
@@ -912,7 +879,7 @@ v_API v_tensor* v_cont_2d(
   return v_cont_4d(ctx, a, ne0, ne1, 1, 1);
 }
 
-v_API v_tensor* v_cont_3d(
+V_API v_tensor* v_cont_3d(
   struct v_ctx* ctx,
   v_tensor* a,
   int64_t ne0,
@@ -949,7 +916,7 @@ v_tensor* v_reshape(
   // as only the shape of b is relevant, and not its memory layout, b is allowed to be non contiguous.
   V_ASSERT(nelements(a) == nelements(b));
 
-  v_tensor* result = new_tensor_impl(ctx, a->type, V_MAX_DIMS, b->ne, a, 0);
+  v_tensor* result = new_tensor_impl(ctx, a->type, V_MAX_DIMS, b->ne.data(), a, 0);
   v_format_name(result, "%s (reshaped)", a->name);
 
   result->op     = v_OP_RESHAPE;
@@ -1211,13 +1178,13 @@ static v_tensor* v_soft_max_impl(
 v_tensor* v_soft_max(
   struct v_ctx* ctx,
   v_tensor* a) {
-  return v_soft_max_impl(ctx, a, NULL, 1.0f, 0.0f, false);
+  return v_soft_max_impl(ctx, a, nullptr, 1.0f, 0.0f, false);
 }
 
 v_tensor* v_soft_max_inplace(
   struct v_ctx* ctx,
   v_tensor* a) {
-  return v_soft_max_impl(ctx, a, NULL, 1.0f, 0.0f, true);
+  return v_soft_max_impl(ctx, a, nullptr, 1.0f, 0.0f, true);
 }
 
 v_tensor* v_soft_max_ext(
@@ -1242,12 +1209,12 @@ void v_soft_max_add_sinks(
   v_tensor* a,
   v_tensor* sinks) {
   if (!sinks) {
-    a->src[2] = NULL;
+    a->src[2] = nullptr;
     return;
   }
 
   V_ASSERT(a->op == V_OP_SOFT_MAX);
-  V_ASSERT(a->src[2] == NULL);
+  V_ASSERT(a->src[2] == nullptr);
   V_ASSERT(a->src[0]->ne[2] == sinks->ne[0]);
   V_ASSERT(sinks->type == v_TYPE_F32);
 
@@ -1271,8 +1238,8 @@ static v_tensor* v_soft_max_ext_back_impl(
   result->src[0] = a;
   result->src[1] = b;
 
-  memcpy((float*)result->op_params + 0, &scale, sizeof(float));
-  memcpy((float*)result->op_params + 1, &max_bias, sizeof(float));
+  memcpy((float*)result->op_params.data() + 0, &scale, sizeof(float));
+  memcpy((float*)result->op_params.data() + 1, &max_bias, sizeof(float));
 
   return result;
 }
@@ -1370,9 +1337,9 @@ v_tensor* v_rope(
     ctx,
     a,
     b,
-    NULL,
+    nullptr,
     n_dims,
-    NULL,
+    nullptr,
     mode,
     0,
     10000.0f,
@@ -1463,9 +1430,9 @@ v_tensor* v_rope_inplace(
     ctx,
     a,
     b,
-    NULL,
+    nullptr,
     n_dims,
-    NULL,
+    nullptr,
     mode,
     0,
     10000.0f,
@@ -1498,7 +1465,7 @@ v_tensor* v_rope_ext(
     b,
     c,
     n_dims,
-    NULL,
+    nullptr,
     mode,
     n_ctx_orig,
     freq_base,
@@ -1531,7 +1498,7 @@ v_tensor* v_rope_ext_inplace(
     b,
     c,
     n_dims,
-    NULL,
+    nullptr,
     mode,
     n_ctx_orig,
     freq_base,
@@ -1561,9 +1528,9 @@ v_tensor* v_rope_custom(
     ctx,
     a,
     b,
-    NULL,
+    nullptr,
     n_dims,
-    NULL,
+    nullptr,
     mode,
     n_ctx_orig,
     freq_base,
@@ -1593,9 +1560,9 @@ v_tensor* v_rope_custom_inplace(
     ctx,
     a,
     b,
-    NULL,
+    nullptr,
     n_dims,
-    NULL,
+    nullptr,
     mode,
     n_ctx_orig,
     freq_base,
@@ -1858,8 +1825,8 @@ v_tensor* v_argsort(struct v_ctx* ctx,
                     v_tensor* a,
                     enum v_sort_order order) {
   V_ASSERT(a->ne[0] <= INT32_MAX);
-  v_tensor* result = v_new_tensor(ctx, v_TYPE_I32, V_MAX_DIMS, a->ne);
-  v_set_op_params_i32(result, 0, (int32_t)order);
+  v_tensor* result = v_new_tensor(ctx, v_TYPE_I32, V_MAX_DIMS, a->ne.data());
+  v_set_op_params_i32(result, 0, order);
   result->op     = v_OP_ARGSORT;
   result->src[0] = a;
   return result;
@@ -1903,7 +1870,7 @@ v_tensor* v_flash_attn_ext(struct v_ctx* ctx,
 
   if (mask) {
     V_ASSERT(v_is_contiguous(mask));
-    V_ASSERT(mask->ne[1] >= MML_PAD(q->ne[1], v_KQ_MASK_PAD) &&
+    V_ASSERT(mask->ne[1] >= V_PAD(q->ne[1], v_KQ_MASK_PAD) &&
       "the Flash-Attention kernel requires the mask to be padded to v_KQ_MASK_PAD and at least n_queries big");
     //v_ASSERT(v_can_repeat_rows(mask, qk));
 
@@ -1954,11 +1921,11 @@ void v_flash_attn_ext_add_sinks(
   v_tensor* a,
   v_tensor* sinks) {
   if (!sinks) {
-    a->src[4] = NULL;
+    a->src[4] = nullptr;
     return;
   }
   V_ASSERT(a->op == v_OP_FLASH_ATTN_EXT);
-  V_ASSERT(a->src[4] == NULL);
+  V_ASSERT(a->src[4] == nullptr);
   V_ASSERT(a->src[0]->ne[2] == sinks->ne[0]);
   V_ASSERT(sinks->type == v_TYPE_F32);
   a->src[4] = sinks;
@@ -2012,9 +1979,9 @@ v_tensor* v_flash_attn_back(struct v_ctx* ctx,
   const size_t tsize = v_type_size(result_type);
 
   const size_t offs_q = 0;
-  const size_t offs_k = offs_q + MML_PAD(elem_q * tsize, v_MEM_ALIGN);
-  const size_t offs_v = offs_k + MML_PAD(elem_k * tsize, v_MEM_ALIGN);
-  const size_t end    = offs_v + MML_PAD(elem_v * tsize, v_MEM_ALIGN);
+  const size_t offs_k = offs_q + V_PAD(elem_q * tsize, v_MEM_ALIGN);
+  const size_t offs_v = offs_k + V_PAD(elem_k * tsize, v_MEM_ALIGN);
+  const size_t end    = offs_v + V_PAD(elem_v * tsize, v_MEM_ALIGN);
 
   const size_t nelements = (end + tsize - 1) / tsize;
 
@@ -2470,9 +2437,9 @@ v_tensor* v_custom_4d(struct v_ctx* ctx,
                       v_custom_op_t fun,
                       int n_tasks,
                       void* userdata) {
-  V_ASSERT(n_args < v_MAX_SRC);
-  v_tensor* result                 = v_new_tensor_4d(ctx, type, ne0, ne1, ne2, ne3);
-  struct v_custom_op_params params = {
+  V_ASSERT(n_args < V_MAX_SRC);
+  v_tensor* result          = v_new_tensor_4d(ctx, type, ne0, ne1, ne2, ne3);
+  v_custom_op_params params = {
     /*.fun      =*/ fun,
     /*.n_tasks  =*/ n_tasks,
     /*.userdata =*/ userdata
@@ -2485,14 +2452,14 @@ v_tensor* v_custom_4d(struct v_ctx* ctx,
   return result;
 }
 
-v_tensor* v_custom_inplace(struct v_ctx* ctx,
+v_tensor* v_custom_inplace(v_ctx* ctx,
                            v_tensor* a,
                            v_tensor* * args,
                            int n_args,
                            v_custom_op_t fun,
                            int n_tasks,
                            void* userdata) {
-  V_ASSERT(n_args < v_MAX_SRC - 1);
+  V_ASSERT(n_args < V_MAX_SRC - 1);
   v_tensor* result = v_tensor_view(ctx, a);
 
   struct v_custom_op_params params = {
@@ -2579,124 +2546,19 @@ v_tensor* v_opt_step_sgd(struct v_ctx* ctx,
   return result;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-struct v_hash_set v_hash_set_new(size_t size) {
+v_hash_set v_hash_set_new(size_t size) {
   size = v_hash_size(size);
-  struct v_hash_set result;
+  v_hash_set result;
   result.size = size;
-  result.keys = (v_tensor* *)v_MALLOC(sizeof(v_tensor *) * size);
-  result.used = (uint32_t*)v_CALLOC(v_bitset_size(size), sizeof(unsigned));
+  result.keys__ = (v_tensor* *)v_MALLOC(sizeof(v_tensor *) * size);
+  result.used_bits__ = (uint32_t*)v_CALLOC(v_bitset_size(size), sizeof(unsigned));
   return result;
 }
 
 
-void v_hash_set_free(struct v_hash_set* hash_set) {
-  v_FREE(hash_set->used);
-  v_FREE(hash_set->keys);
-}
-
-size_t v_hash_size(size_t min_sz) {
-  // next primes after powers of two
-  static const size_t primes[] = {
-    2, 3, 5, 11, 17, 37, 67, 131, 257, 521, 1031,
-    2053, 4099, 8209, 16411, 32771, 65537, 131101,
-    262147, 524309, 1048583, 2097169, 4194319, 8388617,
-    16777259, 33554467, 67108879, 134217757, 268435459,
-    536870923, 1073741827, 2147483659
-  };
-  static const size_t n_primes = sizeof(primes) / sizeof(primes[0]);
-  // find the smallest prime that is larger or equal than min_sz
-  size_t l = 0;
-  size_t r = n_primes;
-  while (l < r) {
-    size_t m = (l + r) / 2;
-    if (primes[m] < min_sz) {
-      l = m + 1;
-    }
-    else {
-      r = m;
-    }
-  }
-  size_t sz = l < n_primes
-                ? primes[l]
-                : min_sz | 1;
-  return sz;
-}
 
 
-struct hash_map* v_new_hash_map(size_t size) {
-  struct hash_map* result = (struct hash_map*)v_MALLOC(sizeof(struct hash_map));
-  result->set             = v_hash_set_new(size);
-  result->vals            = (v_tensor* *)v_CALLOC(result->set.size, sizeof(v_tensor *));
-  return result;
-}
-
-void v_hash_map_free(struct hash_map* map) {
-  v_hash_set_free(&map->set);
-  v_FREE(map->vals);
-  v_FREE(map);
-}
-
-
-size_t v_visit_parents(struct v_cgraph* cgraph, v_tensor* node) {
-  // check if already visited
-  size_t node_hash_pos = find_hash(&cgraph->visited_hash_set, node);
-  #ifdef MEM_DEBUG
-  std::cout << node_hash_pos << std::endl;
-  #endif
-  V_ASSERT(node_hash_pos != v_HASHSET_FULL);
-  if (!v_bit_set_get(cgraph->visited_hash_set.used, node_hash_pos)) {
-    // This is the first time we see this node in the current graph.
-    cgraph->visited_hash_set.keys[node_hash_pos] = node;
-    v_bitset_set(cgraph->visited_hash_set.used, node_hash_pos);
-    cgraph->use_counts[node_hash_pos] = 0;
-  }
-  else {
-    // already visited
-    return node_hash_pos;
-  }
-
-  for (int i = 0; i < v_MAX_SRC; ++i) {
-    const int k = (cgraph->order == v_CGRAPH_EVAL_ORDER_LEFT_TO_RIGHT)
-                    ? i
-                    : (cgraph->order == v_CGRAPH_EVAL_ORDER_RIGHT_TO_LEFT)
-                    ? (v_MAX_SRC - 1 - i)
-                    :
-                    /* unknown order, just fall back to using i */ i;
-
-    v_tensor* src = node->src[k];
-    if (src) {
-      size_t src_hash_pos = v_visit_parents(cgraph, src);
-      // Update the use count for this operand.
-      cgraph->use_counts[src_hash_pos]++;
-    }
-  }
-
-  if (node->op == v_OP_NONE && !(node->flags & TENSOR_FLAG_PARAM)) {
-    // reached a leaf node, not part of the gradient graph (e.g. a constant)
-    V_ASSERT(cgraph->n_leafs < cgraph->size);
-    if (strlen(node->name) == 0) {
-      v_format_name(node, "leaf_%d", cgraph->n_leafs);
-    }
-
-    cgraph->leafs[cgraph->n_leafs] = node;
-    cgraph->n_leafs++;
-  }
-  else {
-    V_ASSERT(cgraph->n_nodes < cgraph->size);
-    if (strlen(node->name) == 0) {
-      v_format_name(node, "node_%d", cgraph->n_nodes);
-    }
-    cgraph->nodes[cgraph->n_nodes] = node;
-    cgraph->n_nodes++;
-  }
-
-  return node_hash_pos;
-}
-
-
-void v_build_foward_expand(struct v_cgraph* cgraph, v_tensor* tensor) {
+void v_build_foward_expand(v_cgraph* cgraph, v_tensor* tensor) {
   const int n0 = cgraph->n_nodes;
   v_visit_parents(cgraph, tensor);
   const int n_new = cgraph->n_nodes - n0;
@@ -2712,7 +2574,7 @@ void v_build_foward_expand(struct v_cgraph* cgraph, v_tensor* tensor) {
 
 void v_build_backward_expend(struct v_ctx* ctx,
                              struct v_cgraph* cgraph,
-                             v_tensor* * grad_accs) {
+                             v_tensor** grad_accs) {
   V_ASSERT(cgraph->n_nodes > 0);
   V_ASSERT(cgraph->grads);
   V_ASSERT(cgraph->grad_accs);
@@ -2720,7 +2582,7 @@ void v_build_backward_expend(struct v_ctx* ctx,
   const int n_nodes_f = cgraph->n_nodes;
   memset(cgraph->grads, 0, cgraph->visited_hash_set.size * sizeof(v_tensor*));
   memset(cgraph->grad_accs, 0, cgraph->visited_hash_set.size * sizeof(v_tensor*));
-  bool* grads_needed = (bool*)calloc(cgraph->visited_hash_set.size, sizeof(bool));
+  bool* grads_needed = new bool[cgraph->visited_hash_set.size]();
   {
     bool any_params = false;
     bool any_loss   = false;
@@ -2729,8 +2591,8 @@ void v_build_backward_expend(struct v_ctx* ctx,
       any_params     = any_params || (node->flags & TENSOR_FLAG_PARAM);
       any_loss       = any_loss || (node->flags & TENSOR_FLAG_LOSS);
     }
-    //V_ASSERT(any_params && "no trainable parameters found, did you forget to call v_set_param?");
-    //V_ASSERT(any_loss && "no training loss found, did you forget to call v_set_loss?");
+    V_ASSERT(any_params && "no trainable parameters found, did you forget to call v_set_param?");
+    V_ASSERT(any_loss && "no training loss found, did you forget to call v_set_loss?");
   }
 
   for (int i = 0; i < n_nodes_f; ++i) {
@@ -2741,22 +2603,21 @@ void v_build_backward_expend(struct v_ctx* ctx,
     }
 
     bool node_needs_grad       = (node->flags & TENSOR_FLAG_PARAM) || (node->flags & TENSOR_FLAG_LOSS);
-    bool ignore_src[v_MAX_SRC] = {false};
+    bool ignore_src[V_MAX_SRC] = {false};
     switch (node->op) {
       // gradients in node->src[0] for one reason or another have no effect on output gradients
-      case V_OP_IM2COL: // only used for its shape
+      case V_OP_IM2COL: // only used_bits__ for its shape
       case v_OP_IM2COL_BACK: // same as IM2COL
         ignore_src[0] = true;
         break;
       case v_OP_UNARY: {
-        const enum v_unary_op uop = v_get_unary_op(node);
+        const v_unary_op uop = v_get_unary_op(node);
         // SGN and STEP unary ops are piecewise constant
         if (uop == v_UNARY_OP_SGN || uop == v_UNARY_OP_STEP) {
           ignore_src[0] = true;
         }
       }
       break;
-
       // gradients in node->src[1] for one reason or another have no effect on output gradients
       case v_OP_CPY: // gradients in CPY target are irrelevant
       case v_OP_GET_ROWS: // row indices not differentiable
@@ -2768,8 +2629,8 @@ void v_build_backward_expend(struct v_ctx* ctx,
       default:
         break;
     }
-    for (int j = 0; j < v_MAX_SRC; ++j) {
-      if (!node->src[j] || ignore_src[j] || !grads_needed[find_hash(&cgraph->visited_hash_set, node->src[j])]) {
+    for (int j = 0; j < V_MAX_SRC; ++j) {
+      if (!node->src[j] || ignore_src[j] || !grads_needed[cgraph->visited_hash_set.find_hash(node->src[j])]) {
         continue;
       }
       V_ASSERT(node->src[j]->type == v_TYPE_F32 || node->src[j]->type == v_TYPE_F16);
@@ -2784,19 +2645,19 @@ void v_build_backward_expend(struct v_ctx* ctx,
     V_ASSERT(!node->view_src || node->op == v_OP_CPY || node->op == V_OP_VIEW ||
       node->op == v_OP_RESHAPE || node->op == V_OP_PERMUTE || node->op == v_OP_TRANSPOSE);
 
-    const size_t ihash = find_hash(&cgraph->visited_hash_set, node);
-    V_ASSERT(ihash != v_HASHSET_FULL);
-    V_ASSERT(v_bit_set_get(cgraph->visited_hash_set.used, ihash));
+    const std::size_t hash_idx = cgraph->visited_hash_set.find_hash(node);
+    V_ASSERT(hash_idx != V_HASHSET_FULL);
+    V_ASSERT(cgraph->visited_hash_set.get_bitset(cgraph->visited_hash_set.used_bits__, hash_idx));
     if (grad_accs && grad_accs[i]) {
-      cgraph->grad_accs[ihash] = grad_accs[i];
-      cgraph->grads[ihash]     = cgraph->grad_accs[ihash];
+      cgraph->grad_accs[hash_idx] = grad_accs[i];
+      cgraph->grads[hash_idx]     = cgraph->grad_accs[hash_idx];
     }
     else if (node->flags & TENSOR_FLAG_LOSS) {
       // loss tensors always need a gradient accumulator
-      cgraph->grad_accs[ihash] = v_new_tensor(ctx, v_TYPE_F32, V_MAX_DIMS, node->ne);
-      cgraph->grads[ihash]     = cgraph->grad_accs[ihash];
+      cgraph->grad_accs[hash_idx] = v_new_tensor(ctx, v_TYPE_F32, V_MAX_DIMS, node->ne.data());
+      cgraph->grads[hash_idx]     = cgraph->grad_accs[hash_idx];
     }
-    grads_needed[ihash] = true;
+    grads_needed[hash_idx] = true;
   }
 
   for (int i = n_nodes_f - 1; i >= 0; --i) {
@@ -2812,7 +2673,7 @@ void v_graph_reset(struct v_cgraph* cgraph) {
   if (!cgraph) {
     return;
   }
-  V_ASSERT(cgraph->grads != NULL);
+  V_ASSERT(cgraph->grads != nullptr);
 
   for (int i = 0; i < cgraph->n_nodes; i++) {
     v_tensor* node     = cgraph->nodes[i];
@@ -2850,7 +2711,7 @@ v_tensor* v_graph_get_tensor(const struct v_cgraph* cgraph, const char* name) {
   for (int i = 0; i < cgraph->n_leafs; i++) {
     v_tensor* leaf = cgraph->leafs[i];
 
-    if (strcmp(leaf->name, name) == 0) {
+    if (strcmp(leaf->name.data(), name) == 0) {
       return leaf;
     }
   }
@@ -2858,16 +2719,16 @@ v_tensor* v_graph_get_tensor(const struct v_cgraph* cgraph, const char* name) {
   for (int i = 0; i < cgraph->n_nodes; i++) {
     v_tensor* node = cgraph->nodes[i];
 
-    if (strcmp(node->name, name) == 0) {
+    if (strcmp(node->name.data(), name) == 0) {
       return node;
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 
-void v_print_graph(const struct v_cgraph* cgraph) {
+void v_print_graph(const v_cgraph* cgraph) {
   LOG_INFO("=== GRAPH ===\n");
   LOG_INFO("n_nodes = %d\n", cgraph->n_nodes);
   for (int i = 0; i < cgraph->n_nodes; i++) {
@@ -2913,10 +2774,10 @@ static int v_node_list_find_tensor(const struct v_cgraph* cgraph,
   return -1;
 }
 
-bool v_can_fuse_subgraph_ext(const struct v_cgraph* cgraph,
+bool v_can_fuse_subgraph_ext(const v_cgraph* cgraph,
                              const int* node_idxs,
                              int count,
-                             const enum v_operation* ops,
+                             const v_operation* ops,
                              const int* outputs,
                              int num_outputs) {
   V_ASSERT(outputs && num_outputs > 0);
@@ -2943,7 +2804,7 @@ bool v_can_fuse_subgraph_ext(const struct v_cgraph* cgraph,
     int subgraph_uses = 0;
     for (int j = i + 1; j < count; ++j) {
       const v_tensor* other_node = cgraph->nodes[node_idxs[j]];
-      for (int src_idx = 0; src_idx < v_MAX_SRC; src_idx++) {
+      for (int src_idx = 0; src_idx < V_MAX_SRC; src_idx++) {
         if (other_node->src[src_idx] == node) {
           subgraph_uses++;
         }
@@ -2969,7 +2830,7 @@ bool v_can_fuse_subgraph_ext(const struct v_cgraph* cgraph,
 
 // check if node is part of the graph
 static bool v_graph_find(const struct v_cgraph* cgraph, const v_tensor* node) {
-  if (cgraph == NULL) {
+  if (cgraph == nullptr) {
     return true;
   }
 
@@ -2993,7 +2854,7 @@ static v_tensor* v_graph_get_parent(const struct v_cgraph* cgraph, const v_tenso
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 static void v_graph_dump_dot_node_edge(FILE* fp, const struct v_cgraph* gb, v_tensor* node,
@@ -3037,7 +2898,7 @@ void v_graph_dump_dot(const struct v_cgraph* gb, const struct v_cgraph* gf, cons
     v_tensor* node = gb->nodes[i];
     v_tensor* grad = v_graph_get_grad(gb, node);
 
-    if (v_graph_get_parent(gb, node) != NULL) {
+    if (v_graph_get_parent(gb, node) != nullptr) {
       continue;
     }
 
@@ -3060,11 +2921,10 @@ void v_graph_dump_dot(const struct v_cgraph* gb, const struct v_cgraph* gf, cons
             "  \"%p\" [ "
             "style = filled; fillcolor = %s; shape = record; "
             "label=\"",
-            (void*)node,
-            color);
+            static_cast<void*>(node), color);
 
-    if (strlen(node->name) > 0) {
-      fprintf(fp, "%s (%s)|", node->name, v_type_name(node->type));
+    if (strlen(node->name.data()) > 0) {
+      fprintf(fp, "%s (%s)|", node->name.data(), v_type_name(node->type));
     }
     else {
       fprintf(fp, "(%s)|", v_type_name(node->type));
@@ -3103,15 +2963,15 @@ void v_graph_dump_dot(const struct v_cgraph* gb, const struct v_cgraph* gf, cons
             (void*)node,
             color);
 
-    if (strlen(node->name) > 0) {
-      fprintf(fp, "%s (%s)|", node->name, v_type_name(node->type));
+    if (strlen(node->name.data()) > 0) {
+      fprintf(fp, "%s (%s)|", node->name.data(), v_type_name(node->type));
     }
     else {
       fprintf(fp, "(%s)|", v_type_name(node->type));
     }
 
     fprintf(fp, "CONST %d [%" PRId64 ", %" PRId64 "]", i, node->ne[0], node->ne[1]);
-    if (nelements(node) < 5 && node->data != NULL) {
+    if (nelements(node) < 5 && node->data != nullptr) {
       fprintf(fp, " | (");
       for (int j = 0; j < nelements(node); j++) {
         // FIXME: use ggml-backend to obtain the tensor data
@@ -3139,7 +2999,7 @@ void v_graph_dump_dot(const struct v_cgraph* gb, const struct v_cgraph* gf, cons
   for (int i = 0; i < gb->n_nodes; i++) {
     v_tensor* node = gb->nodes[i];
 
-    for (int j = 0; j < v_MAX_SRC; j++) {
+    for (int j = 0; j < V_MAX_SRC; j++) {
       if (node->src[j]) {
         char label[16];
         snprintf(label, sizeof(label), "src %d", j);
@@ -3151,7 +3011,7 @@ void v_graph_dump_dot(const struct v_cgraph* gb, const struct v_cgraph* gf, cons
   for (int i = 0; i < gb->n_leafs; i++) {
     v_tensor* node = gb->leafs[i];
 
-    for (int j = 0; j < v_MAX_SRC; j++) {
+    for (int j = 0; j < V_MAX_SRC; j++) {
       if (node->src[j]) {
         char label[16];
         snprintf(label, sizeof(label), "src %d", j);
@@ -3194,19 +3054,17 @@ void v_quantize_init(enum v_data_type type) {
 
 void v_quantize_free(void) {
   v_critical_section_start();
-
   iq2xs_free_impl(v_TYPE_IQ2_XXS);
   iq2xs_free_impl(v_TYPE_IQ2_XS);
   iq2xs_free_impl(v_TYPE_IQ1_S);
   iq3xs_free_impl(256);
-
   v_critical_section_end();
 }
 
 void set_log(v_log_callback log_callback, void* user_data) {
   g_logger_state.log_callback = log_callback
                                   ? log_callback
-                                  : mml_log_callback_default;
+                                  : v_log_callback_default;
   g_logger_state.log_callback_user_data = user_data;
 }
 

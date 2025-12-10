@@ -1,40 +1,24 @@
-#ifndef MYPROJECT_MML_TENSOR_HPP
-#define MYPROJECT_MML_TENSOR_HPP
+#ifndef MYPROJECT_V_TENSOR_HPP
+#define MYPROJECT_V_TENSOR_HPP
 #include <array>
-#define V_MAX_OP_PARAMS      64
-#define V_MAX_DIMS           4
-#ifndef v_MAX_NAME
-#   define v_MAX_NAME        64
-#endif
-#define v_MAX_SRC            10
+#include "v_common.hpp"
 
-enum v_tensor_flag
-{
-  TENSOR_FLAG_INPUT  = 1, // ...is an input for the GGML compute graph
-  TENSOR_FLAG_OUTPUT = 2, // ...is an output for the GGML compute graph
-  TENSOR_FLAG_PARAM  = 4, // ...contains trainable parameters
-  TENSOR_FLAG_LOSS   = 8, // ...defines loss for numerical optimization (multiple loss tensors add up)
-};
-
-struct v_tensor
-{
+// op params - allocated as int32_t for alignment
+struct v_tensor {
   v_data_type type;
-  struct v_backend_buffer* buffer;
-  int64_t ne[V_MAX_DIMS];
-  size_t nb[V_MAX_DIMS];
+  v_backend_buffer* buffer;
+  std::array<int64_t, V_MAX_DIMS> ne;
+  std::array<int64_t, V_MAX_DIMS> nb;
+  std::array<v_tensor*, V_MAX_SRC> src;
+  std::array<int32_t, V_NUM_OP_PARAMS> op_params;
+  std::array<char, V_MAX_NAME> name;
   v_operation op;
-  // op params - allocated as int32_t for alignment
-  int32_t op_params[V_MAX_OP_PARAMS / sizeof(int32_t)];
+  v_tensor* view_src;
   int32_t flags;
-   v_tensor* src[v_MAX_SRC];
-  // source tensor and offset for views
-  struct v_tensor* view_src;
   size_t view_offs;
   void* data;
-  char name[v_MAX_NAME];
-  void* extra; // extra things e.g. for ggml-cuda.cu
   char padding[8];
 };
 
 
-#endif //MYPROJECT_MML_TENSOR_HPP
+#endif //MYPROJECT_V_TENSOR_HPP

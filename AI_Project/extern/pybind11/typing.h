@@ -27,7 +27,7 @@ PYBIND11_NAMESPACE_BEGIN(PYBIND11_NAMESPACE)
 PYBIND11_NAMESPACE_BEGIN(typing)
 
 /*
-    The following types can be used to direct pybind11-generated docstrings
+    The following types can be used_bits__ to direct pybind11-generated docstrings
     to have have more explicit types (e.g., `list[str]` instead of `list`).
     Just use these in place of existing types.
 

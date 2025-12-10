@@ -1,10 +1,7 @@
-//
-// Created by dlwog on 25. 11. 14..
-//
 
 #include "v_graph.hpp"
-#include  "v_util.h"
-#include "ggml-impl.h"
+#include "v_util.hpp"
+#include "ggml-impl.hpp"
 
 size_t v_graph_nbyte(size_t size, bool grads) {
   size_t hash_size = v_hash_size(size * 2);
@@ -13,7 +10,7 @@ size_t v_graph_nbyte(size_t size, bool grads) {
   incr_ptr_aligned(&p, size * sizeof(struct v_tensor*), sizeof(struct v_tensor*)); // nodes
   incr_ptr_aligned(&p, size * sizeof(struct v_tensor*), sizeof(struct v_tensor*)); // leafs
   incr_ptr_aligned(&p, hash_size * sizeof(int32_t), sizeof(int32_t)); // use_counts
-  incr_ptr_aligned(&p, hash_size * sizeof(struct v_tensor*), sizeof(struct v_tensor*)); // hash keys
+  incr_ptr_aligned(&p, hash_size * sizeof(struct v_tensor*), sizeof(struct v_tensor*)); // hash keys__
   if (grads) {
     incr_ptr_aligned(&p, hash_size * sizeof(struct v_tensor*), sizeof(struct v_tensor*)); // grads
     incr_ptr_aligned(&p, hash_size * sizeof(struct v_tensor*), sizeof(struct v_tensor*)); // grad_accs
@@ -24,36 +21,29 @@ size_t v_graph_nbyte(size_t size, bool grads) {
 }
 
 
-struct v_cgraph* v_new_graph_custom(struct v_ctx* ctx, size_t size, bool grads) {
-  const size_t obj_size   = v_graph_nbyte(size, grads);
-  struct v_object* obj    = v_new_object(ctx, MML_GRAPH, obj_size);
-  struct v_cgraph* cgraph = (struct v_cgraph*)((char*)ctx->mem_buffer + obj->offs);
+v_cgraph* v_new_graph_custom(v_ctx* ctx, size_t size, bool grads) {
+  const size_t obj_size = v_graph_nbyte(size, grads);
+  v_object* obj         = v_new_object(ctx, V_GRAPH, obj_size);
+  v_cgraph* cgraph      = (v_cgraph*)((char*)ctx->mem_buffer + obj->offs);
   // the size of the hash table is doubled since it needs to hold both nodes and leafs
   size_t hash_size = v_hash_size(size * 2);
   void* p          = cgraph + 1;
 
-  struct v_tensor** nodes_ptr =
-    (struct v_tensor**)incr_ptr_aligned(&p, size * sizeof(struct v_tensor*), sizeof(struct v_tensor*));
-  struct v_tensor** leafs_ptr =
-    (struct v_tensor**)incr_ptr_aligned(&p, size * sizeof(struct v_tensor*), sizeof(struct v_tensor*));
-  int32_t* use_counts_ptr         = (int32_t*)incr_ptr_aligned(&p, hash_size * sizeof(int32_t), sizeof(int32_t));
-  struct v_tensor** hash_keys_ptr = (struct v_tensor**)incr_ptr_aligned(&p,
-                                                                        hash_size * sizeof(struct v_tensor*),
-                                                                        sizeof(struct v_tensor*));
-  void* grads_ptr = (struct v_tensor**)grads
-                      ? incr_ptr_aligned(&p,
-                                         hash_size * sizeof(struct v_tensor*),
-                                         sizeof(struct v_tensor*))
-                      : NULL;
+  v_tensor** nodes_ptr     = static_cast<v_tensor**>(incr_ptr_aligned(&p, size * sizeof(v_tensor*), sizeof(v_tensor*)));
+  v_tensor** leafs_ptr     = static_cast<v_tensor**>(incr_ptr_aligned(&p, size * sizeof(v_tensor*), sizeof(v_tensor*)));
+  int32_t* use_counts_ptr  = static_cast<int32_t*>(incr_ptr_aligned(&p, hash_size * sizeof(int32_t), sizeof(int32_t)));
+  v_tensor** hash_keys_ptr = static_cast<v_tensor**>(incr_ptr_aligned(&p, hash_size * sizeof(v_tensor*), sizeof(v_tensor*)));
+  void* grads_ptr          = (struct v_tensor**)grads ? incr_ptr_aligned(&p, hash_size * sizeof(struct v_tensor*), sizeof(struct v_tensor*))
+                      : nullptr;
   void* grad_accs_ptr = grads
                           ? incr_ptr_aligned(&p,
                                              hash_size * sizeof(struct v_tensor*),
                                              sizeof(struct v_tensor*))
-                          : NULL;
+                          : nullptr;
 
   v_bitset_t* hash_used = (v_bitset_t*)incr_ptr_aligned(&p,
-                                                              v_bitset_size(hash_size) * sizeof(v_bitset_t),
-                                                              sizeof(v_bitset_t));
+                                                        v_bitset_size(hash_size) * sizeof(v_bitset_t),
+                                                        sizeof(v_bitset_t));
 
   // check that we allocated the correct amount of memory
   assert(obj_size == (size_t)((char *)p - (char *)cgraph));
@@ -95,9 +85,9 @@ void v_copy_graph(struct v_cgraph* src,
   for (int i = 0; i < src->n_nodes; ++i) { dst->nodes[i] = src->nodes[i]; }
 
   for (size_t i = 0; i < src->visited_hash_set.size; ++i) {
-    // copy all hashset keys (tensors) that are in use
-    if (v_bit_set_get(src->visited_hash_set.used, i)) {
-      size_t new_hash_pos           = v_hash_insert(&dst->visited_hash_set, src->visited_hash_set.keys[i]);
+    // copy all hashset keys__ (tensors) that are in use
+    if (src->visited_hash_set.get_bitset(src->visited_hash_set.used_bits__, i)) {
+      size_t new_hash_pos           = dst->visited_hash_set.insert(src->visited_hash_set.keys__[i]);
       dst->use_counts[new_hash_pos] = src->use_counts[i];
     }
   }
@@ -108,16 +98,16 @@ void v_copy_graph(struct v_cgraph* src,
   }
 
   if (src->grads) {
-    V_ASSERT(dst->grads != NULL);
-    V_ASSERT(dst->grad_accs != NULL);
+    V_ASSERT(dst->grads != nullptr);
+    V_ASSERT(dst->grad_accs != nullptr);
     for (int i = 0; i < src->n_nodes; ++i) {
-      const size_t igrad_src = find_hash(&src->visited_hash_set, src->nodes[i]);
-      const size_t igrad_dst = find_hash(&dst->visited_hash_set, dst->nodes[i]);
+      const size_t igrad_src = src->visited_hash_set.find_hash(src->nodes[i]);
+      const size_t igrad_dst = dst->visited_hash_set.find_hash(dst->nodes[i]);
 
-      V_ASSERT(igrad_src != v_HASHSET_FULL);
-      V_ASSERT(v_bit_set_get(src->visited_hash_set.used, igrad_src));
-      V_ASSERT(igrad_dst != v_HASHSET_FULL);
-      V_ASSERT(v_bit_set_get(dst->visited_hash_set.used, igrad_dst));
+      V_ASSERT(igrad_src != V_HASHSET_FULL);
+      //V_ASSERT(get_bitset(src->visited_hash_set.used_bits__, igrad_src));
+      V_ASSERT(igrad_dst != V_HASHSET_FULL);
+      //V_ASSERT(get_bitset(dst->visited_hash_set.used_bits__, igrad_dst));
 
       dst->grads[igrad_dst]     = src->grads[igrad_src];
       dst->grad_accs[igrad_dst] = src->grad_accs[igrad_src];

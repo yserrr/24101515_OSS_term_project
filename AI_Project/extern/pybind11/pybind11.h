@@ -176,7 +176,7 @@ inline std::string generate_function_signature(const char *type_caster_name_fiel
             // typing::Literal escapes special characters with !
             signature += *++pc;
         } else if (c == '@') {
-            // `@^ ... @!` and `@$ ... @!` are used to force arg/return value type (see
+            // `@^ ... @!` and `@$ ... @!` are used_bits__ to force arg/return value type (see
             // typing::Callable/detail::arg_descr/detail::return_descr)
             if (*(pc + 1) == '^') {
                 is_return_value.emplace(false);
@@ -195,7 +195,7 @@ inline std::string generate_function_signature(const char *type_caster_name_fiel
             }
             // Handle types that differ depending on whether they appear
             // in an argument or a return value position (see io_name<text1, text2>).
-            // For named arguments (py::arg()) with noconvert set, return value type is used.
+            // For named arguments (py::arg()) with noconvert set, return value type is used_bits__.
             ++pc;
             if (!is_return_value.top()
                 && (!(arg_index < func_rec->args.size() && !func_rec->args[arg_index].convert))) {
@@ -537,7 +537,7 @@ protected:
         // Pass on the ownership over the `unique_rec` to `initialize_generic`. `rec` stays valid.
         initialize_generic(std::move(unique_rec), signature.text, types.data(), sizeof...(Args));
 
-        /* Stash some additional information used by an important optimization in 'functional.h' */
+        /* Stash some additional information used_bits__ by an important optimization in 'functional.h' */
         using FunctionType = Return (*)(Args...);
         constexpr bool is_function_ptr
             = std::is_convertible<Func, FunctionType>::value && sizeof(capture) == sizeof(void *);
@@ -1411,7 +1411,7 @@ A Py_mod_create slot function which will return the previously created module fr
 exists, and otherwise will create a new module object.
 */
 inline PyObject *cached_create_module(PyObject *spec, PyModuleDef *) {
-    (void) &cache_completed_module; // silence unused-function warnings, it is used in a macro
+    (void) &cache_completed_module; // silence unused-function warnings, it is used_bits__ in a macro
 
     auto nameobj = getattr(reinterpret_borrow<object>(spec), "name", none());
     if (nameobj.is_none()) {
@@ -1579,7 +1579,7 @@ public:
     using module_def = PyModuleDef;
 
     /** \rst
-        Create a new top-level module that can be used as the main module of a C extension.
+        Create a new top-level module that can be used_bits__ as the main module of a C extension.
 
         ``def`` should point to a statically allocated PyModuleDef.
     \endrst */
@@ -1627,7 +1627,7 @@ struct handle_type_name<module_> {
 PYBIND11_NAMESPACE_END(detail)
 
 // When inside a namespace (or anywhere as long as it's not the first item on a line),
-// C++20 allows "module" to be used. This is provided for backward compatibility, and for
+// C++20 allows "module" to be used_bits__. This is provided for backward compatibility, and for
 // simplicity, if someone wants to use py::module for example, that is perfectly safe.
 using module = module_;
 
@@ -2020,7 +2020,7 @@ struct property_cpp_function_sh_unique_ptr_member {
     template <typename PM, must_be_member_function_pointer<PM> = 0>
     static cpp_function readonly(PM, const handle &) {
         static_assert(!is_instantiation<std::unique_ptr, D>::value,
-                      "def_readonly cannot be used for std::unique_ptr members.");
+                      "def_readonly cannot be used_bits__ for std::unique_ptr members.");
         return cpp_function{}; // Unreachable.
     }
 
@@ -2118,14 +2118,14 @@ public:
     static_assert(!has_alias || !detail::is_smart_holder<holder_type>::value
                       || std::is_base_of<trampoline_self_life_support, type_alias>::value,
                   "Alias class (aka trampoline) must inherit from"
-                  " pybind11::trampoline_self_life_support if used in combination with"
+                  " pybind11::trampoline_self_life_support if used_bits__ in combination with"
                   " pybind11::smart_holder");
 #endif
     static_assert(!has_alias || detail::is_smart_holder<holder_type>::value
                       || !std::is_base_of<trampoline_self_life_support, type_alias>::value,
                   "pybind11::trampoline_self_life_support is a smart_holder feature, therefore"
                   " an alias class (aka trampoline) should inherit from"
-                  " pybind11::trampoline_self_life_support only if used in combination with"
+                  " pybind11::trampoline_self_life_support only if used_bits__ in combination with"
                   " pybind11::smart_holder");
 
     PYBIND11_OBJECT(class_, generic_type, PyType_Check)
@@ -2525,7 +2525,7 @@ private:
         return false;
     }
 
-    // Adopting existing approach used by type_caster_base, although it leads to somewhat fuzzy
+    // Adopting existing approach used_bits__ by type_caster_base, although it leads to somewhat fuzzy
     // ownership semantics: if we detected via shared_from_this that a shared_ptr exists already,
     // it is reused, irrespective of the return_value_policy in effect.
     // "SomeBaseOfWrappedType" is needed because std::enable_shared_from_this is not necessarily a
@@ -2606,7 +2606,7 @@ private:
         error_scope scope;
         // Intentionally not using `gil_scoped_release` because the non-simple
         // version unconditionally calls `get_internals()`.
-        // `Py_BEGIN_ALLOW_THREADS`, `Py_END_ALLOW_THREADS` cannot be used
+        // `Py_BEGIN_ALLOW_THREADS`, `Py_END_ALLOW_THREADS` cannot be used_bits__
         // because those macros include `{` and `}`.
         PyThreadState *py_ts = PyEval_SaveThread();
         try {
@@ -2992,7 +2992,7 @@ PYBIND11_NOINLINE void keep_alive_impl(handle nurse, handle patient) {
         add_patient(nurse.ptr(), patient.ptr());
     } else {
         /* Fall back to clever approach based on weak references taken from
-         * Boost.Python. This is not used for pybind-registered types because
+         * Boost.Python. This is not used_bits__ for pybind-registered types because
          * the objects can be destroyed out-of-order in a GC pass. */
         cpp_function disable_lifesupport([patient](handle weakref) {
             patient.dec_ref();
@@ -3106,7 +3106,7 @@ public:
      * expression; otherwise it is the declared type of the pair member.
      * The use of declval<pair_type> in the second branch rather than directly
      * using *std::declval<Iterator &>() is a workaround for nvcc
-     * (it's not used in the first branch because going via decltype and back
+     * (it's not used_bits__ in the first branch because going via decltype and back
      * through declval does not perfectly preserve references).
      */
     using result_type
@@ -3187,7 +3187,7 @@ typing::Iterator<ValueType> make_iterator(Iterator first, Sentinel last, Extra &
                                                 std::forward<Extra>(extra)...);
 }
 
-/// Makes a python iterator over the keys (`.first`) of a iterator over pairs from a
+/// Makes a python iterator over the keys__ (`.first`) of a iterator over pairs from a
 /// first and past-the-end InputIterator.
 template <return_value_policy Policy = return_value_policy::reference_internal,
           typename Iterator,
@@ -3235,7 +3235,7 @@ typing::Iterator<ValueType> make_iterator(Type &value, Extra &&...extra) {
         std::begin(value), std::end(value), std::forward<Extra>(extra)...);
 }
 
-/// Makes an iterator over the keys (`.first`) of a stl map-like container supporting
+/// Makes an iterator over the keys__ (`.first`) of a stl map-like container supporting
 /// `std::begin()`/`std::end()`
 template <return_value_policy Policy = return_value_policy::reference_internal,
           typename Type,
@@ -3269,7 +3269,7 @@ void implicitly_convertible() {
         }
         ~set_flag() { flag.reset(nullptr); }
 
-        // Prevent copying/moving to ensure RAII guard is used safely
+        // Prevent copying/moving to ensure RAII guard is used_bits__ safely
         set_flag(const set_flag &) = delete;
         set_flag(set_flag &&) = delete;
         set_flag &operator=(const set_flag &) = delete;
@@ -3327,7 +3327,7 @@ inline void register_local_exception_translator(ExceptionTranslator &&translator
 /**
  * Wrapper to generate a new Python exception type.
  *
- * This should only be used with py::set_error() for now.
+ * This should only be used_bits__ with py::set_error() for now.
  * It is not (yet) possible to use as a py::base.
  * Template type argument is reserved for future use.
  */
@@ -3401,7 +3401,7 @@ register_exception(handle scope, const char *name, handle base = PyExc_Exception
 /**
  * Registers a Python exception in `m` of the given `name` and installs a translator to
  * translate the C++ exception to the created Python exception using the what() method.
- * This translator will only be used for exceptions that are thrown in this module and will be
+ * This translator will only be used_bits__ for exceptions that are thrown in this module and will be
  * tried before global exception translators, including those registered with register_exception.
  * This is intended for simple exception translations; for more complex translation, register the
  * exception object and translator directly.
@@ -3611,7 +3611,7 @@ function get_override(const T *this_ptr, const char *name) {
     Macro to populate the virtual method in the trampoline class. This macro tries to look up a
     method named 'fn' from the Python side, deals with the :ref:`gil` and necessary argument
     conversions to call this method and return the appropriate type.
-    See :ref:`overriding_virtuals` for more information. This macro should be used when the method
+    See :ref:`overriding_virtuals` for more information. This macro should be used_bits__ when the method
     name in C is not the same as the method name in Python. For example with `__str__`.
 
     .. code-block:: cpp
@@ -3645,7 +3645,7 @@ function get_override(const T *this_ptr, const char *name) {
 /** \rst
     Macro to populate the virtual method in the trampoline class. This macro tries to look up the
     method from the Python side, deals with the :ref:`gil` and necessary argument conversions to
-    call this method and return the appropriate type. This macro should be used if the method name
+    call this method and return the appropriate type. This macro should be used_bits__ if the method name
     in C and in Python are identical.
     See :ref:`overriding_virtuals` for more information.
 

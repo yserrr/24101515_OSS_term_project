@@ -2,8 +2,8 @@
 #define MYPROJECT_VK_COMP_HPP
 #include "vk_common.h"
 #include "vk_buffer.h"
-#include "v_util.h"
-#include "v_vk.h"
+#include "v_util.hpp"
+#include "v_vk.hpp"
 bool v_vk_compute_forward(vk_backend_ctx* ctx, v_cgraph* cgraph, v_tensor* tensor, int tensor_idx, bool use_fence, bool almost_ready);
 bool vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx, v_tensor* node_begin, int node_idx_begin, bool dryrun, bool last_node, bool almost_ready, bool submit);
 void v_vk_opt_step_adamw(vk_backend_ctx* ctx, vk_context& subctx, v_tensor* dst, bool dryrun = false);

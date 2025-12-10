@@ -98,7 +98,7 @@ struct metaclass {
 };
 
 /// Specifies a custom callback with signature `void (PyHeapTypeObject*)` that
-/// may be used to customize the Python type.
+/// may be used_bits__ to customize the Python type.
 ///
 /// The callback is invoked immediately before `PyType_Ready`.
 ///
@@ -397,7 +397,7 @@ struct is_new_style_constructor {};
 
 /**
  * Partial template specializations to process custom attributes provided to
- * cpp_function_ and class_. These are either used to initialize the respective
+ * cpp_function_ and class_. These are either used_bits__ to initialize the respective
  * fields in the type_record and function_record data structures or executed at
  * runtime to deal with custom call policies (e.g. keep_alive).
  */

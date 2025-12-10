@@ -1,11 +1,11 @@
 #include <vk_constant.h>
-#include <vk_util.h>
+#include <vk_util.hpp>
 #include "vk_op_f32.hpp"
 #include "vk_comp.hpp"
 
 bool v_vk_flash_attn_scalar_shmem_support(const vk_device& device, const uint32_t hsk, uint32_t hsv) {
   // Needs to be kept up to date on shader changes
-  v_UNUSED(hsv);
+  V_UNUSED(hsv);
   const uint32_t wg_size = scalar_flash_attention_workgroup_size;
   const uint32_t Br      = get_fa_scalar_num_large_rows(hsv);
   const uint32_t Bc      = scalar_flash_attention_Bc;
@@ -30,7 +30,7 @@ bool v_vk_flash_attn_scalar_shmem_support(const vk_device& device, const uint32_
 bool v_vk_flash_attn_coopmat_shmem_support(const vk_device& device, const uint32_t hsk, uint32_t hsv,
                                            bool f32acc) {
   // Needs to be kept up to date on shader changes
-  v_UNUSED(hsv);
+  V_UNUSED(hsv);
   const uint32_t wg_size = scalar_flash_attention_workgroup_size;
   const uint32_t Br      = coopmat1_flash_attention_num_large_rows;
   const uint32_t Bc      = scalar_flash_attention_Bc;
@@ -274,9 +274,9 @@ void v_vk_flash_attn(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* q,
   float max_bias      = 0.0f;
   float logit_softcap = 0.0f;
 
-  memcpy(&scale, (const float*)dst->op_params + 0, sizeof(float));
-  memcpy(&max_bias, (const float*)dst->op_params + 1, sizeof(float));
-  memcpy(&logit_softcap, (const float*)dst->op_params + 2, sizeof(float));
+  memcpy(&scale, (const float*)dst->op_params.data() + 0, sizeof(float));
+  memcpy(&max_bias, (const float*)dst->op_params.data() + 1, sizeof(float));
+  memcpy(&logit_softcap, (const float*)dst->op_params.data() + 2, sizeof(float));
 
   if (logit_softcap != 0) { scale /= logit_softcap; }
 

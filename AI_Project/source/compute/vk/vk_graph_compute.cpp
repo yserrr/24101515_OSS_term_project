@@ -1,21 +1,25 @@
 #include "vk_common.h"
-#include "vk_pipeline.h"
-#include "vk_queue.h"
-#include "vk_device.h"
+#include "vk_pipeline.hpp"
+#include "vk_queue.hpp"
+#include "vk_device.hpp"
 #include "vk_constant.h"
 #include "vk_buffer.h"
 #include "vk_context.h"
-#include "vk_util.h"
-#include "v_util.h"
+#include "vk_util.hpp"
+#include "v_util.hpp"
 #include "vk_op_f32.hpp"
 #include "vk_comp.hpp"
+
 bool vk_is_empty(v_tensor* node) {
   return is_empty(node) || node->op == v_OP_NONE || node->op == v_OP_RESHAPE || node->op == v_OP_TRANSPOSE
     || node->op == V_OP_VIEW || node->op == V_OP_PERMUTE;
 }
 
-bool v_vk_can_fuse(const struct v_cgraph* cgraph, int node_idx,
-                   std::initializer_list<enum v_operation> ops) {
+bool v_can_fuse(const v_cgraph* cgraph, int node_idx, const v_operation* ops, int num_ops);
+bool v_can_fuse(const v_cgraph* cgraph, int node_idx, std::initializer_list<v_operation> ops);
+
+bool v_vk_can_fuse(const v_cgraph* cgraph, int node_idx,
+                   std::initializer_list<v_operation> ops) {
   if (!v_can_fuse(cgraph, node_idx, ops)) { return false; }
   if (ops.size() == 2 && ops.begin()[0] == v_OP_RMS_NORM && ops.begin()[1] == v_OP_MUL) {
     // additional constraints specific to this fusion
@@ -53,7 +57,7 @@ bool v_vk_can_fuse_topk_moe(vk_backend_ctx* ctx, const struct v_cgraph* cgraph,
                               ? cgraph->nodes[node_idx + 8]
                               : cgraph->nodes[node_idx + 4];
 
-  const float* op_params = (const float*)softmax->op_params;
+  const float* op_params = (const float*)softmax->op_params.data();
 
   float scale    = op_params[0];
   float max_bias = op_params[1];
@@ -87,29 +91,29 @@ bool v_vk_can_fuse_topk_moe(vk_backend_ctx* ctx, const struct v_cgraph* cgraph,
                                ? cgraph->nodes[node_idx + 8]
                                : nullptr;
 
-  // softmax is used by reshape and argsort
+  // softmax is used_bits__ by reshape and argsort
   if (v_node_get_use_count(cgraph, node_idx) != 2 ||
     reshape1->src[0] != softmax ||
     argsort->src[0] != softmax) { return false; }
-  // reshape is used by get_rows
+  // reshape is used_bits__ by get_rows
   if (v_node_get_use_count(cgraph, node_idx + 1) != 1 ||
     get_rows->src[0] != reshape1) { return false; }
-  // argsort is used by view
+  // argsort is used_bits__ by view
   if (v_node_get_use_count(cgraph, node_idx + 2) != 1 ||
     view->src[0] != argsort) { return false; }
   // view is written (via argsort), we can skip checking it
 
   if (with_norm) {
-    // get_rows is used by reshape
+    // get_rows is used_bits__ by reshape
     if (v_node_get_use_count(cgraph, node_idx + 4) != 1 ||
       reshape5->src[0] != get_rows) { return false; }
 
-    // reshape is used by sum_rows and div
+    // reshape is used_bits__ by sum_rows and div
     if (v_node_get_use_count(cgraph, node_idx + 5) != 2 ||
       sum_rows->src[0] != reshape5 ||
       div->src[0] != reshape5) { return false; }
 
-    // sum_rows is used by div
+    // sum_rows is used_bits__ by div
     if (v_node_get_use_count(cgraph, node_idx + 6) != 1 ||
       div->src[1] != sum_rows) { return false; }
 
@@ -326,7 +330,7 @@ v_status vk_graph_compute(v_backend_t backend, v_cgraph* cgraph) {
 
 bool v_vk_compute_forward(vk_backend_ctx* ctx, v_cgraph* cgraph, v_tensor* tensor,
                           int tensor_idx, bool use_fence = true, bool almost_ready = false) {
-  v_UNUSED(cgraph);
+  V_UNUSED(cgraph);
   v_backend_buffer* buf = nullptr;
 
   switch (tensor->op) {

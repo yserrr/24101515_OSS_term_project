@@ -1,8 +1,7 @@
-
-#include "v.h"
-#include "v_allocator.h"
-#include "v-backend.h"
-#include "v_vk.h"
+#include "v.hpp"
+#include "v_allocator.hpp"
+#include "v-backend.hpp"
+#include "v_vk.hpp"
 #include <cassert>
 #include <cmath>
 #include <cstdio>
@@ -25,8 +24,8 @@
 #include <string>
 #include <utility>
 
-#include "v_fn.h"
-#include "v_util.h"
+#include "v_propagation.hpp"
+#include "v_util.hpp"
 #include "vk_common.h"
 #include "vk_test.h"
 #define FORCE_UTF8_CONSOLE
@@ -91,7 +90,7 @@ void v_init_model(simple_model& model) {
   set_log(log_callback_default, nullptr);
   model.backend        = backend_vk_init(0);
   v_backend_t backends = {model.backend};
-  model.sched          = v_sched_new(backends, nullptr, 1,v_DEFAULT_GRAPH_SIZE, false, true);
+  model.sched          = v_sched_new(backends, nullptr, 1, v_DEFAULT_GRAPH_SIZE, true);
 }
 
 // build the compute graph to perform input matrix multiplication
@@ -109,11 +108,11 @@ struct v_cgraph* build_graph(simple_model& model) {
   model.w      = v_new_tensor_2d(ctx, v_TYPE_F32, cols_B, rows_B);
   model.b      = v_new_tensor_1d(ctx, v_TYPE_F32, 4);
   model.logit  = v_new_tensor_1d(ctx, v_TYPE_F32, 1);
-  model.out1 = v_matmul(ctx, model.input, model.w);
+  model.out1   = v_matmul(ctx, model.input, model.w);
   v_build_foward_expand(gf, model.out1);
-  model.out3  = v_add(ctx, model.out1, model.b);
-  model.out3  = v_log(ctx, model.out3);
-  model.out3  = v_log(ctx, model.out3);
+  model.out3 = v_add(ctx, model.out1, model.b);
+  model.out3 = v_log(ctx, model.out3);
+  model.out3 = v_log(ctx, model.out3);
 
   model.logit = v_sum(ctx, model.out3);
   v_build_foward_expand(gf, model.out3);

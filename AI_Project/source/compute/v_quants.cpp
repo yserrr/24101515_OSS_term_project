@@ -1,7 +1,7 @@
 #define v_COMMON_IMPL_CPP
 #include "ggml-common.h"
-#include "v_quants.h"
-#include "ggml-impl.h"
+#include "v_quants.hpp"
+#include "ggml-impl.hpp"
 
 #include <math.h>
 #include <string.h>
@@ -16,7 +16,7 @@
 #define GROUP_MAX_EPS_IQ1_M 1e-7f
 #define GROUP_MAX_EPS_IQ1_S 1e-12f
 
-#define UNUSED v_UNUSED
+#define UNUSED V_UNUSED
 
 static inline int best_index_int8(int n, const int8_t* val, float x)
 {
@@ -2490,7 +2490,7 @@ size_t quantize_q5_1(const float* v_RESTRICT src, void* v_RESTRICT dst, int64_t 
 size_t quantize_q8_0(const float* v_RESTRICT src, void* v_RESTRICT dst, int64_t nrow, int64_t n_per_row,
                      const float* quant_weights)
 {
-  (void)quant_weights; // not used
+  (void)quant_weights; // not used_bits__
   const size_t row_size = v_row_size(v_TYPE_Q8_0, n_per_row);
   quantize_row_q8_0_ref(src, (block_q8_0*)dst, (int64_t)nrow * n_per_row);
   return nrow * row_size;
@@ -2499,7 +2499,7 @@ size_t quantize_q8_0(const float* v_RESTRICT src, void* v_RESTRICT dst, int64_t 
 size_t quantize_mxfp4(const float* v_RESTRICT src, void* v_RESTRICT dst, int64_t nrow, int64_t n_per_row,
                       const float* quant_weights)
 {
-  v_UNUSED(quant_weights);
+  V_UNUSED(quant_weights);
   quantize_row_mxfp4_ref(src, (block_mxfp4*)dst, (int64_t)nrow * n_per_row);
   return nrow * v_row_size(v_TYPE_MXFP4, n_per_row);
 }
@@ -2624,7 +2624,7 @@ void quantize_row_tq2_0_ref(const float* v_RESTRICT x, block_tq2_0* v_RESTRICT y
 size_t quantize_tq1_0(const float* v_RESTRICT src, void* v_RESTRICT dst, int64_t nrow, int64_t n_per_row,
                       const float* quant_weights)
 {
-  (void)quant_weights; // not used
+  (void)quant_weights; // not used_bits__
   const size_t row_size = v_row_size(v_TYPE_TQ1_0, n_per_row);
   quantize_row_tq1_0_ref(src, (block_tq1_0*)dst, (int64_t)nrow * n_per_row);
   return nrow * row_size;
@@ -2633,7 +2633,7 @@ size_t quantize_tq1_0(const float* v_RESTRICT src, void* v_RESTRICT dst, int64_t
 size_t quantize_tq2_0(const float* v_RESTRICT src, void* v_RESTRICT dst, int64_t nrow, int64_t n_per_row,
                       const float* quant_weights)
 {
-  (void)quant_weights; // not used
+  (void)quant_weights; // not used_bits__
   const size_t row_size = v_row_size(v_TYPE_TQ2_0, n_per_row);
   quantize_row_tq2_0_ref(src, (block_tq2_0*)dst, (int64_t)nrow * n_per_row);
   return nrow * row_size;

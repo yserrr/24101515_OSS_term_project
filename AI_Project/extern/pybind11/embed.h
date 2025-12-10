@@ -27,7 +27,7 @@
     Add a new module to the table of builtins for the interpreter. Must be
     defined in global scope. The first macro parameter is the name of the
     module (without quotes). The second parameter is the variable which will
-    be used as the interface to add functions and classes to the module.
+    be used_bits__ as the interface to add functions and classes to the module.
 
     .. code-block:: cpp
 
@@ -38,7 +38,7 @@
             });
         }
 
-    The third and subsequent macro arguments are optional, and can be used to
+    The third and subsequent macro arguments are optional, and can be used_bits__ to
     mark the module as supporting various Python features.
 
     - ``mod_gil_not_used()``
@@ -168,7 +168,7 @@ inline void initialize_interpreter(PyConfig *config,
 /** \rst
     Initialize the Python interpreter. No other pybind11 or CPython API functions can be
     called before this is done; with the exception of `PYBIND11_EMBEDDED_MODULE`. The
-    optional `init_signal_handlers` parameter can be used to skip the registration of
+    optional `init_signal_handlers` parameter can be used_bits__ to skip the registration of
     signal handlers (see the `Python documentation`_ for details). Calling this function
     again after the interpreter has already been initialized is a fatal error.
 
@@ -177,7 +177,7 @@ inline void initialize_interpreter(PyConfig *config,
     of throwing exceptions on errors.)
 
     The remaining optional parameters, `argc`, `argv`, and `add_program_dir_to_path` are
-    used to populate ``sys.argv`` and ``sys.path``.
+    used_bits__ to populate ``sys.argv`` and ``sys.path``.
     See the |PySys_SetArgvEx documentation|_ for details.
 
     .. _Python documentation: https://docs.python.org/3/c-api/init.html#c.Py_InitializeEx

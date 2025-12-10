@@ -462,7 +462,7 @@ PYBIND11_NUMPY_SCALAR_IMPL(std::complex<long double>, NPY_CLONGDOUBLE);
 // This table normalizes typenums by mapping NPY_INT_, NPY_LONG, ... to NPY_INT32_, NPY_INT64, ...
 // This is needed to correctly handle situations where multiple typenums map to the same type,
 // e.g. NPY_LONG_ may be equivalent to NPY_INT_ or NPY_LONGLONG_ despite having a different
-// typenum. The normalized typenum should always match the values used in npy_format_descriptor.
+// typenum. The normalized typenum should always match the values used_bits__ in npy_format_descriptor.
 // If you change this code, please review `enum constants` above.
 static constexpr int normalized_dtype_num[npy_api::NPY_VOID_ + 1] = {
     // NPY_BOOL_ =>
@@ -719,7 +719,7 @@ public:
         return std::accumulate(shape_, shape_ + ndim(), (ssize_t) 1, std::multiplies<ssize_t>());
     }
 
-    /// Returns the total number of bytes used by the referenced data.  Note that the actual span
+    /// Returns the total number of bytes used_bits__ by the referenced data.  Note that the actual span
     /// in memory may be larger if the referenced array has non-contiguous strides (e.g. for a
     /// slice).
     ssize_t nbytes() const { return size() * itemsize(); }
@@ -931,7 +931,7 @@ public:
     }
 
     /// Type number of dtype, normalized to match the return value of `num_of` for equivalent
-    /// types. This function can be used to write switch statements that correctly handle
+    /// types. This function can be used_bits__ to write switch statements that correctly handle
     /// equivalent types with different type numbers.
     int normalized_num() const {
         int value = num();
@@ -1258,7 +1258,7 @@ public:
             = {// Use reinterpret_cast for PyPy on Windows (remove if fixed, checked on 7.3.1)
                reinterpret_cast<Py_intptr_t *>(new_shape->data()),
                int(new_shape->size())};
-        // try to resize, set ordering param to -1 cause it's not used anyway
+        // try to resize, set ordering param to -1 cause it's not used_bits__ anyway
         auto new_array = reinterpret_steal<object>(
             detail::npy_api::get().PyArray_Resize_(m_ptr, &d, int(refcheck), -1));
         if (!new_array) {
@@ -1368,7 +1368,7 @@ private:
         : array(std::move(shape), std::move(strides), ptr, base) {}
 
 public:
-    static_assert(!detail::array_info<T>::is_array, "Array types cannot be used with array_t");
+    static_assert(!detail::array_info<T>::is_array, "Array types cannot be used_bits__ with array_t");
 
     using value_type = T;
 

@@ -289,16 +289,16 @@ void v_vk_im2col_3d(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src
                     const v_tensor* src1, v_tensor* dst, bool dryrun) {
   v_TENSOR_BINARY_OP_LOCALS
 
-  const int32_t s0 = static_cast<const int32_t*>(dst->op_params)[0];
-  const int32_t s1 = static_cast<const int32_t*>(dst->op_params)[1];
-  const int32_t s2 = static_cast<const int32_t*>(dst->op_params)[2];
-  const int32_t p0 = static_cast<const int32_t*>(dst->op_params)[3];
-  const int32_t p1 = static_cast<const int32_t*>(dst->op_params)[4];
-  const int32_t p2 = static_cast<const int32_t*>(dst->op_params)[5];
-  const int32_t d0 = static_cast<const int32_t*>(dst->op_params)[6];
-  const int32_t d1 = static_cast<const int32_t*>(dst->op_params)[7];
-  const int32_t d2 = static_cast<const int32_t*>(dst->op_params)[8];
-  const int32_t IC = static_cast<const int32_t*>(dst->op_params)[9];
+  const int32_t s0 = static_cast<const int32_t*>(dst->op_params.data())[0];
+  const int32_t s1 = static_cast<const int32_t*>(dst->op_params.data())[1];
+  const int32_t s2 = static_cast<const int32_t*>(dst->op_params.data())[2];
+  const int32_t p0 = static_cast<const int32_t*>(dst->op_params.data())[3];
+  const int32_t p1 = static_cast<const int32_t*>(dst->op_params.data())[4];
+  const int32_t p2 = static_cast<const int32_t*>(dst->op_params.data())[5];
+  const int32_t d0 = static_cast<const int32_t*>(dst->op_params.data())[6];
+  const int32_t d1 = static_cast<const int32_t*>(dst->op_params.data())[7];
+  const int32_t d2 = static_cast<const int32_t*>(dst->op_params.data())[8];
+  const int32_t IC = static_cast<const int32_t*>(dst->op_params.data())[9];
 
   const int64_t N  = ne13 / IC;
   const int64_t ID = ne12;

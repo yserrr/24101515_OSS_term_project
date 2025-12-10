@@ -5,14 +5,14 @@
 #ifndef MYPROJECT_MML_TYPE_HPP
 #define MYPROJECT_MML_TYPE_HPP
 #include <array>
+#include "v_common.hpp"
 #include "ggml-common.h"
-#include "v.h"
+#include "v.hpp"
 
-class MmlTypeTrait
-{
-  public:
+class v_type_trait {
+public:
   std::array<v_type_traits, v_TYPE_COUNT> traits;
-  MmlTypeTrait();
+  v_type_trait();
 };
 
 

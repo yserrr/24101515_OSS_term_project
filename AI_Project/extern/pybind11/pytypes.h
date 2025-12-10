@@ -120,7 +120,7 @@ public:
 
     /** \rst
          Similar to the above attr functions with the difference that the templated Type
-         is used to set the `__annotations__` dict value to the corresponding key. Worth noting
+         is used_bits__ to set the `__annotations__` dict value to the corresponding key. Worth noting
          that attr_with_type_hint is implemented in cast.h.
     \endrst */
     template <typename T>
@@ -334,7 +334,7 @@ private:
             "If you are convinced there is no bug in your code, you can #define "
             "PYBIND11_NO_ASSERT_GIL_HELD_INCREF_DECREF "
             "to disable this check. In that case you have to ensure this #define is consistently "
-            "used for all translation units linked into a given pybind11 extension, otherwise "
+            "used_bits__ for all translation units linked into a given pybind11 extension, otherwise "
             "there will be ODR violations.",
             function_name.c_str());
         if (Py_TYPE(m_ptr)->tp_name != nullptr) {
@@ -1184,7 +1184,7 @@ struct tuple_item {
 };
 PYBIND11_NAMESPACE_END(accessor_policies)
 
-/// STL iterator template used for tuple, list, sequence and dict
+/// STL iterator template used_bits__ for tuple, list, sequence and dict
 template <typename Policy>
 class generic_iterator : public Policy {
     using It = generic_iterator;
@@ -1416,7 +1416,7 @@ PYBIND11_NAMESPACE_END(detail)
 // TODO: After the deprecated constructors are removed, this macro can be simplified by
 //       inheriting ctors: `using Parent::Parent`. It's not an option right now because
 //       the `using` statement triggers the parent deprecation warning even if the ctor
-//       isn't even used.
+//       isn't even used_bits__.
 #define PYBIND11_OBJECT_COMMON(Name, Parent, CheckFun)                                            \
 public:                                                                                           \
     PYBIND11_DEPRECATED("Use reinterpret_borrow<" #Name ">() or reinterpret_steal<" #Name ">()")  \
@@ -1476,11 +1476,11 @@ public:                                                                         
 /// @{
 
 /** \rst
-    Wraps a Python iterator so that it can also be used as a C++ input iterator
+    Wraps a Python iterator so that it can also be used_bits__ as a C++ input iterator
 
     Caveat: copying an iterator does not (and cannot) clone the internal
     state of the Python iterable. This also applies to the post-increment
-    operator. This iterator should only be used to retrieve the current
+    operator. This iterator should only be used_bits__ to retrieve the current
     value using ``operator*()``.
 \endrst */
 class iterator : public object {

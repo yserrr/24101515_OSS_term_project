@@ -1,7 +1,7 @@
-#include "v.h"
-#include "v_allocator.h"
-#include "v-backend.h"
-#include "v_vk.h"
+#include "v.hpp"
+#include "v_allocator.hpp"
+#include "v-backend.hpp"
+#include "v_vk.hpp"
 #include <cassert>
 #include <cmath>
 #include <cstdio>
@@ -98,7 +98,7 @@ int main() {
   auto vk         = backend_vk_init(0);
   v_backend_t a[] = {vk};
 
-  auto backend_sched  = v_sched_new(*a, nullptr, 1,v_DEFAULT_GRAPH_SIZE, false, true);
+  auto backend_sched  = v_sched_new(*a, nullptr, 1, v_DEFAULT_GRAPH_SIZE, false, true);
   model.backend_sched = backend_sched;
 
   int num_tensors = 10;

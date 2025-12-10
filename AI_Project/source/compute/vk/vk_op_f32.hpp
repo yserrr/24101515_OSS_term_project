@@ -1,12 +1,12 @@
 #ifndef MYPROJECT_VK_OP_F32_HPP
 #define MYPROJECT_VK_OP_F32_HPP
 #include "vk_context.h"
-#include "vk_pipeline.h"
-#include "v_vk.h"
+#include "vk_pipeline.hpp"
+#include "v_vk.hpp"
 #include "vk_common.h"
-#include "vk_util.h"
+#include "vk_util.hpp"
 #include "vk_vision_comp.hpp"
-#include "vk_device.h"
+#include "vk_device.hpp"
 #include "vk_constant.h"
 template <typename T>
 inline void v_vk_dispatch_pipeline(vk_backend_ctx* ctx, vk_context& subctx, vk_pipeline& pipeline,
@@ -245,7 +245,7 @@ inline void v_vk_op_f32(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor*
     }
     break;
     case v_OP_IM2COL_3D: {
-      const uint32_t IC = ((const uint32_t*)(dst->op_params))[9];
+      const uint32_t IC = (dst->op_params)[9];
 
       const uint32_t N = ne13 / IC;
 

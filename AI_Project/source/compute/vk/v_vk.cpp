@@ -1,12 +1,12 @@
 #include "vk_common.h"
-#include "vk_pipeline.h"
-#include "vk_queue.h"
-#include "vk_device.h"
+#include "vk_pipeline.hpp"
+#include "vk_queue.hpp"
+#include "vk_device.hpp"
 #include "vk_constant.h"
 #include "vk_buffer.h"
 #include "vk_context.h"
-#include "vk_util.h"
-#include "v_util.h"
+#include "vk_util.hpp"
+#include "v_util.hpp"
 #include "vk_op_f32.hpp"
 #include "vk_comp.hpp"
 
@@ -85,14 +85,14 @@ void vk_backend_free(v_backend_t backend);
 
 // backend interface
 
-#define UNUSED v_UNUSED
+#define UNUSED V_UNUSED
 
 
 #ifndef MYPROJECT_MML_VK_TEST_H
 #define MYPROJECT_MML_VK_TEST_H
 #define v_VULKAN_CHECK_RESULT
-#include "v_vk.h"
-#include "vk_device.h"
+#include "v_vk.hpp"
+#include "vk_device.hpp"
 #include "vk_buffer.h"
 #ifdef v_VULKAN_RUN_TESTS
 static void v_vk_print_matrix_area(const void* data, v_data_type type, int ne0, int ne1, int i0, int i1, int i2) {

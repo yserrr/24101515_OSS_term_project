@@ -1,13 +1,11 @@
 #include "v_opt_common.hpp"
 #include "v_opt_ctx.hpp"
-
-#include "v_fn.h"
+#include "v_propagation.hpp"
 #include "v_opt_dataset.hpp"
 #include "v_opt_result.hpp"
-#include "v_util.h"
+#include "v_util.hpp"
 
-void v_opt_reset(v_opt_ctx* opt_ctx,
-                 bool optimizer) {
+void v_opt_reset(v_opt_ctx* opt_ctx, bool optimizer) {
   if (optimizer) {
     v_graph_reset(opt_ctx->gb_opt);
     opt_ctx->iter = 1;
@@ -16,30 +14,22 @@ void v_opt_reset(v_opt_ctx* opt_ctx,
 }
 
 
-v_tensor* v_map_tensor(std::map<v_tensor*, v_tensor*>& tensor_map,
-                       v_ctx* ctx,
-                       v_tensor* tensor) {
-  if (!tensor) { return nullptr; }
-  if (tensor_map.find(tensor) != tensor_map.end()) { return tensor_map[tensor]; }
+v_tensor* v_map_tensor(std::map<v_tensor*, v_tensor*>& tensor_map, v_ctx* ctx, v_tensor* tensor) {
+  if (!tensor) return nullptr;
+  if (tensor_map.find(tensor) != tensor_map.end()) return tensor_map[tensor];
   v_tensor* new_tensor = v_dup_tensor(ctx, tensor);
   tensor_map[tensor]   = new_tensor;
-
-  new_tensor->op = tensor->op;
+  new_tensor->op       = tensor->op;
   for (int i = 0; i < V_MAX_DIMS; i++) { new_tensor->nb[i] = tensor->nb[i]; }
   new_tensor->flags = tensor->flags;
 
-  memcpy(new_tensor->op_params,
-         tensor->op_params,
-         sizeof(tensor->op_params));
-
-  strcpy(new_tensor->name,
-         tensor->name);
+  memcpy(new_tensor->op_params.data(), tensor->op_params.data(), sizeof(tensor->op_params));
+  strcpy(new_tensor->name.data(), tensor->name.data());
   new_tensor->data      = tensor->data;
   new_tensor->buffer    = tensor->buffer;
-  new_tensor->extra     = tensor->extra;
   new_tensor->view_offs = tensor->view_offs;
   new_tensor->view_src  = v_map_tensor(tensor_map, ctx, tensor->view_src);
-  for (int i = 0; i < v_MAX_SRC; i++) {
+  for (int i = 0; i < V_MAX_SRC; i++) {
     new_tensor->src[i] = v_map_tensor(tensor_map,
                                       ctx,
                                       tensor->src[i]);
@@ -49,7 +39,7 @@ v_tensor* v_map_tensor(std::map<v_tensor*, v_tensor*>& tensor_map,
 }
 
 
-v_opt_ctx* v_opt_init(struct v_opt_struct params) {
+v_opt_ctx* v_opt_init(v_opt_struct params) {
   v_opt_ctx* result        = new struct v_opt_ctx();
   result->backend_sched    = params.backend_sched;
   result->ctx_compute      = params.ctx_compute;
@@ -106,7 +96,6 @@ void v_opt_evaluate(v_opt_ctx* opt_ctx,
         adamw_data[5] = beta1h;
         adamw_data[6] = beta2h;
         v_set_backend_tensor(opt_ctx->opt_step_params__, adamw_data.data(), 0, num_bytes(opt_ctx->opt_step_params__));
-        //printf(" adamw params setted\n");
       }
       break;
       case V_OPTIMIZER_TYPE_SGD: {
@@ -170,7 +159,7 @@ void v_opt_evaluate(v_opt_ctx* opt_ctx,
 }
 
 struct v_opt_params v_opt_get_default_optimizer_params(void* userdata) {
-  v_UNUSED(userdata);
+  V_UNUSED(userdata);
   v_opt_params result{};
   result.adamw.alpha = 1e-3;
   result.adamw.beta1 = 0.95f;
@@ -184,10 +173,8 @@ struct v_opt_params v_opt_get_default_optimizer_params(void* userdata) {
 }
 
 
-struct v_opt_params v_opt_get_constant_optimizer_params(void* userdata) { return *((struct v_opt_params*)userdata); }
-
-struct v_opt_struct v_opt_default_params(v_backend_sched_t backend_sched,
-                                         enum v_opt_loss_type loss_type) {
+v_opt_params v_opt_get_constant_optimizer_params(void* userdata) { return *static_cast<v_opt_params*>(userdata); }
+v_opt_struct v_opt_default_params(v_backend_sched_t backend_sched, v_opt_loss_type loss_type) {
   return {
     /*backend_sched   =*/ backend_sched,
     /*ctx_compute     =*/ nullptr,
@@ -222,17 +209,17 @@ void v_opt_epoch(v_opt_ctx* opt_ctx__,
   V_ASSERT(data->ne[1] % inputs->ne[1] == 0);
   const int64_t nbatches = ndata / ndata_batch;
 
-  idata_split__          = idata_split__ < 0 ? ndata : idata_split__;
+  idata_split__ = idata_split__ < 0 ? ndata : idata_split__;
 
   V_ASSERT(idata_split__ % ndata_batch == 0);
 
   const int64_t ibatch_split = idata_split__ / ndata_batch;
-  int64_t batch_idx             = 0;
+  int64_t batch_idx          = 0;
   int64_t t_loop_start       = v_time_us();
   for (; batch_idx < ibatch_split; ++batch_idx) {
     opt_ctx__->allocate(/*backward =*/ true);
 
-    dataset__->get_batch(inputs,labels,batch_idx);
+    dataset__->get_batch(inputs, labels, batch_idx);
 
     v_opt_evaluate(opt_ctx__,
                    result_train__);
@@ -336,7 +323,7 @@ void v_opt_epoch_callback_progress_bar(bool train,
   if (batch_idx == ibatch_max) fprintf(stderr, "\n");
   fflush(stderr);
 
-  v_UNUSED(dataset);
+  V_UNUSED(dataset);
 }
 
 void v_opt_fit(v_backend_sched_t backend_sched,
@@ -496,13 +483,13 @@ void v_opt_ctx::allocate(bool backward) {
     for (int i = 0; i < src->n_nodes; i++) { v_build_foward_expand(dst, v_map_tensor(tensor_map, ctx, src->nodes[i])); }
     V_ASSERT(dst->n_nodes == src->n_nodes);
     for (int i = 0; i < src->n_nodes; ++i) {
-      const size_t igrad_src = find_hash(&src->visited_hash_set, src->nodes[i]);
-      const size_t igrad_dst = find_hash(&dst->visited_hash_set, dst->nodes[i]);
+      const size_t igrad_src = src->visited_hash_set.find_hash(src->nodes[i]);
+      const size_t igrad_dst = dst->visited_hash_set.find_hash(dst->nodes[i]);
 
-      V_ASSERT(igrad_src != v_HASHSET_FULL);
-      V_ASSERT(v_bit_set_get(src->visited_hash_set.used, igrad_src));
-      V_ASSERT(igrad_dst != v_HASHSET_FULL);
-      V_ASSERT(v_bit_set_get(dst->visited_hash_set.used, igrad_dst));
+      V_ASSERT(igrad_src != V_HASHSET_FULL);
+      //V_ASSERT(src->visited_hash_set.get_bitset(igrad_src));
+      //V_ASSERT(igrad_dst != V_HASHSET_FULL);
+      //V_ASSERT(dst->visited_hash_set.get_bitset(igrad_dst));
 
       dst->grads[igrad_dst]     = src->grads[igrad_src];
       dst->grad_accs[igrad_dst] = src->grad_accs[igrad_src];
@@ -538,7 +525,7 @@ void v_opt_ctx::build() {
     V_ASSERT(!(node->flags & TENSOR_FLAG_LOSS) && "support for extra loss terms not implemented");
   }
   if (!opt_ctx->ctx_static) {
-    // The static context is used for:
+    // The static context is used_bits__ for:
     //   - gradients (1 per loss, 1 tensor per param if using gradient accumulation)
     //   - optimizer momenta (2 tensors per param)
     //   - labels (if using static graphs)
@@ -565,10 +552,10 @@ void v_opt_ctx::build() {
   V_ASSERT(opt_ctx->build_type <= opt_ctx->build_type_alloc);
   {
     // The cpu context is allocated statically if using static graphs, dynamically otherwise.
-    // It is used for:
+    // It is used_bits__ for:
     //   - optimizer parameters (1 shared for all optimizer invocations)
-    const size_t size_meta     = 1 * v_tensor_over_head();
-    struct v_init_param params = {
+    const size_t size_meta = 1 * v_tensor_over_head();
+    v_init_param params    = {
       /*.mem_size   =*/ size_meta,
       /*.mem_buffer =*/ nullptr,
       /*.no_alloc   =*/ true,
@@ -579,9 +566,9 @@ void v_opt_ctx::build() {
     opt_ctx->buf_host = nullptr;
   }
 
-  struct v_ctx* ctx_results = opt_ctx->static_graphs
-                                ? opt_ctx->ctx_static
-                                : opt_ctx->ctx_compute;
+  v_ctx* ctx_results = opt_ctx->static_graphs
+                         ? opt_ctx->ctx_static
+                         : opt_ctx->ctx_compute;
 
   switch (opt_ctx->loss_type) {
     case V_OPT_LOSS_MEAN: {
@@ -683,7 +670,7 @@ void v_opt_ctx::build() {
     opt_ctx->grad_accs.resize(n_nodes);
     for (int i = 0; i < n_nodes; ++i) {
       v_tensor* node = opt_ctx->gf->nodes[i];
-      if ((accumulate && (node->flags & TENSOR_FLAG_PARAM)) || (node->flags & TENSOR_FLAG_LOSS)) { opt_ctx->grad_accs[i] = v_new_tensor(opt_ctx->ctx_static, v_TYPE_F32, V_MAX_DIMS, node->ne); }
+      if ((accumulate && (node->flags & TENSOR_FLAG_PARAM)) || (node->flags & TENSOR_FLAG_LOSS)) { opt_ctx->grad_accs[i] = v_new_tensor(opt_ctx->ctx_static, v_TYPE_F32, V_MAX_DIMS, node->ne.data()); }
       else { opt_ctx->grad_accs[i] = nullptr; }
     }
 
@@ -693,8 +680,8 @@ void v_opt_ctx::build() {
       for (int i = 0; i < n_nodes; ++i) {
         v_tensor* node = opt_ctx->gf->nodes[i];
         if (node->flags & TENSOR_FLAG_PARAM) {
-          opt_ctx->grad_m[i] = v_new_tensor(opt_ctx->ctx_static, v_TYPE_F32, V_MAX_DIMS, node->ne);
-          opt_ctx->grad_v[i] = v_new_tensor(opt_ctx->ctx_static, v_TYPE_F32, V_MAX_DIMS, node->ne);
+          opt_ctx->grad_m[i] = v_new_tensor(opt_ctx->ctx_static, v_TYPE_F32, V_MAX_DIMS, node->ne.data());
+          opt_ctx->grad_v[i] = v_new_tensor(opt_ctx->ctx_static, v_TYPE_F32, V_MAX_DIMS, node->ne.data());
         }
         else {
           opt_ctx->grad_m[i] = nullptr;
@@ -744,7 +731,7 @@ void v_opt_ctx::build() {
         v_format_name(m, "AdamW m for %s", node->name);
         v_format_name(v, "AdamW v for %s", node->name);
       }
-      struct v_tensor* opt_step;
+      v_tensor* opt_step;
       switch (optimizer) {
         case V_OPTIMIZER_TYPE_ADAMW:
           v_norm_l2(opt_ctx->ctx_compute, grad, 1e-3);

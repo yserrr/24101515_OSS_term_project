@@ -1,4 +1,4 @@
-#include "vk_util.h"
+#include "vk_util.hpp"
 
 uint32_t get_subgroup_size(const std::string& pipeline_name, const vk_device_architecture& arch) {
   for (const auto& config : gpu_pipeline_configs) {
@@ -90,8 +90,8 @@ uint32_t get_fa_num_small_rows(FaCodePath path) {
 
 std::array<uint32_t, 2> fa_rows_cols(FaCodePath path, uint32_t hsk, uint32_t hsv, uint32_t clamp, v_data_type type,
                                      bool small_rows) {
-  v_UNUSED(clamp);
-  v_UNUSED(hsv);
+  V_UNUSED(clamp);
+  V_UNUSED(hsv);
 
   if (path == FA_SCALAR) {
     if (small_rows) {

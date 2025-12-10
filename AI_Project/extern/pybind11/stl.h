@@ -66,7 +66,7 @@ to prevent accidents and improve readability:
 
 - However, a Python `set` can still be passed to a C++ `vector`. The rationale
   is that this conversion is not reducing. Implicit conversions of this kind
-  are also fairly commonly used, therefore enforcing explicit conversions
+  are also fairly commonly used_bits__, therefore enforcing explicit conversions
   would have an unfavorable cost : benefit ratio; more sloppily speaking,
   such an enforcement would be more annoying than helpful.
 
@@ -100,7 +100,7 @@ inline bool object_is_convertible_to_std_vector(const handle &src) {
 }
 
 inline bool object_is_convertible_to_std_set(const handle &src, bool convert) {
-    // Allow set/frozenset and dict keys.
+    // Allow set/frozenset and dict keys__.
     // In convert mode: also allow types derived from collections.abc.Set.
     return ((PyAnySet_Check(src.ptr()) != 0)
             || object_is_instance_with_one_of_tp_names(src.ptr(), {"dict_keys"}))
@@ -114,7 +114,7 @@ inline bool object_is_convertible_to_std_map(const handle &src, bool convert) {
     }
     // Allow types conforming to Mapping Protocol.
     // According to https://docs.python.org/3/c-api/mapping.html, `PyMappingCheck()` checks for
-    // `__getitem__()` without checking the type of keys. In order to restrict the allowed types
+    // `__getitem__()` without checking the type of keys__. In order to restrict the allowed types
     // closer to actual Mapping-like types, we also check for the `items()` method.
     if (PyMapping_Check(src.ptr()) != 0) {
         PyObject *items = PyObject_GetAttrString(src.ptr(), "items");
@@ -137,14 +137,14 @@ inline bool object_is_convertible_to_std_map(const handle &src, bool convert) {
 //
 
 /// Extracts an const lvalue reference or rvalue reference for U based on the type of T (e.g. for
-/// forwarding a container element).  Typically used indirect via forwarded_type(), below.
+/// forwarding a container element).  Typically used_bits__ indirect via forwarded_type(), below.
 template <typename T, typename U>
 using forwarded_type = conditional_t<std::is_lvalue_reference<T>::value,
                                      remove_reference_t<U> &,
                                      remove_reference_t<U> &&>;
 
 /// Forwards a value U as rvalue or lvalue according to whether T is rvalue or lvalue; typically
-/// used for forwarding a container's elements.
+/// used_bits__ for forwarding a container's elements.
 template <typename T, typename U>
 constexpr forwarded_type<T, U> forward_like(U &&u) {
     return std::forward<detail::forwarded_type<T, U>>(std::forward<U>(u));
@@ -524,7 +524,7 @@ template <typename Key, typename Value, typename Hash, typename Equal, typename 
 struct type_caster<std::unordered_map<Key, Value, Hash, Equal, Alloc>>
     : map_caster<std::unordered_map<Key, Value, Hash, Equal, Alloc>, Key, Value> {};
 
-// This type caster is intended to be used for std::optional and std::experimental::optional
+// This type caster is intended to be used_bits__ for std::optional and std::experimental::optional
 template <typename Type, typename Value = typename Type::value_type>
 struct optional_caster {
     using value_conv = make_caster<Value>;

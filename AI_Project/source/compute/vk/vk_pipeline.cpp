@@ -1,8 +1,8 @@
-#include "vk_pipeline.h"
-#include "vk_device.h"
+#include "vk_pipeline.hpp"
+#include "vk_device.hpp"
 #include "vk_context.h"
 #include "vk_vision_comp.hpp"
-#include "v_util.h"
+#include "v_util.hpp"
 
 void v_pipeline_request_descriptor_sets(vk_backend_ctx* ctx, vk_pipeline& pipeline, uint32_t n) {
   VK_LOG_DEBUG("v_pipeline_request_descriptor_sets(" << pipeline->name << ", " << n << ")");
@@ -366,7 +366,7 @@ vk_pipeline v_vk_guess_matmul_pipeline(vk_backend_ctx* ctx, vk_matmul_pipeline& 
            ? mmp->a_l
            : mmp->l;
 
-  v_UNUSED(src1_type);
+  V_UNUSED(src1_type);
 }
 uint32_t v_vk_guess_matmul_pipeline_align(vk_backend_ctx* ctx, vk_matmul_pipeline& mmp, int m, int n, v_data_type src0_type, v_data_type src1_type) {
   VK_LOG_DEBUG(
@@ -616,7 +616,7 @@ vk_pipeline v_vk_op_get_pipeline(vk_backend_ctx* ctx, const v_tensor* src0,
       return nullptr;
     case V_OP_ROPE:
     case v_OP_ROPE_BACK: {
-      const int mode       = static_cast<const int32_t*>(dst->op_params)[2];
+      const int mode       = dst->op_params[2];
       const bool is_neox   = mode & v_ROPE_TYPE_NEOX;
       const bool is_mrope  = mode & v_ROPE_TYPE_MROPE;
       const bool is_vision = mode == v_ROPE_TYPE_VISION;
@@ -751,5 +751,5 @@ vk_pipeline v_vk_op_get_pipeline(vk_backend_ctx* ctx, const v_tensor* src0,
     default:
       return nullptr;
   }
-  v_UNUSED(src2);
+  V_UNUSED(src2);
 }

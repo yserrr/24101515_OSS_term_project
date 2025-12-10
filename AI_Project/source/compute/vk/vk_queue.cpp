@@ -1,8 +1,8 @@
 #include <iostream>
-#include "vk_queue.h"
+#include "vk_queue.hpp"
 #include "vk_constant.h"
 #include "vk_context.h"
-#include "vk_device.h"
+#include "vk_device.hpp"
 
 std::mutex queue_mutex;
 

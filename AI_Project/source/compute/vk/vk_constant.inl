@@ -2,19 +2,19 @@
 template <typename T>
 inline size_t push_constant_size(const T& t) {
   static_assert(std::is_class<T>::value, "T must be a struct/class");
-  v_UNUSED(t);
+  V_UNUSED(t);
   return sizeof(T);
 }
 
 template <typename T>
 inline size_t push_constant_size(const std::vector<T>& t) {
-  v_UNUSED(t);
+  V_UNUSED(t);
   return sizeof(T) * t.size();
 }
 
 template <typename T, uint32_t N>
 inline size_t push_constant_size(const std::array<T, N>& t) {
-  v_UNUSED(t);
+  V_UNUSED(t);
   return sizeof(T) * N;
 }
 
@@ -35,11 +35,11 @@ const T* push_constant_data(const std::array<T, N>& t) { return t.data(); }
 template <typename T>
 inline void init_pushconst_tensor_offsets(vk_backend_ctx* ctx, T& p, const v_tensor* src0, const v_tensor* src1,
                                           const v_tensor* src2, v_tensor* dst) {
-  v_UNUSED(p);
-  v_UNUSED(src0);
-  v_UNUSED(src1);
-  v_UNUSED(src2);
-  v_UNUSED(dst);
+  V_UNUSED(p);
+  V_UNUSED(src0);
+  V_UNUSED(src1);
+  V_UNUSED(src2);
+  V_UNUSED(dst);
   static_assert(!std::is_const<T>::value, "unexpected type");
   V_ASSERT(!src0 || get_misalign_bytes(ctx, src0) == 0);
   V_ASSERT(!src1 || get_misalign_bytes(ctx, src1) == 0);
@@ -55,8 +55,8 @@ inline void init_pushconst_tensor_offsets(vk_backend_ctx* ctx, vk_op_unary_push_
 
   p.misalign_offsets = (a_offset << 16) | d_offset;
 
-  v_UNUSED(src1);
-  v_UNUSED(src2);
+  V_UNUSED(src1);
+  V_UNUSED(src2);
 }
 
 template <>
@@ -66,8 +66,8 @@ inline void init_pushconst_tensor_offsets(vk_backend_ctx* ctx, vk_op_sum_rows_pu
   const uint32_t a_offset = get_misalign_bytes(ctx, src0) / v_type_size(src0->type);
   const uint32_t d_offset = get_misalign_bytes(ctx, dst) / v_type_size(dst->type);
   p.misalign_offsets      = (a_offset << 16) | d_offset;
-  v_UNUSED(src1);
-  v_UNUSED(src2);
+  V_UNUSED(src1);
+  V_UNUSED(src2);
 }
 
 template <>
@@ -78,8 +78,8 @@ inline void init_pushconst_tensor_offsets(vk_backend_ctx* ctx, vk_op_pad_push_co
 
   p.misalign_offsets = (a_offset << 16) | d_offset;
 
-  v_UNUSED(src1);
-  v_UNUSED(src2);
+  V_UNUSED(src1);
+  V_UNUSED(src2);
 }
 
 template <>
@@ -91,8 +91,8 @@ inline void init_pushconst_tensor_offsets(vk_backend_ctx* ctx, vk_op_im2col_3d_p
 
   p.misalign_offsets = (a_offset << 16) | d_offset;
 
-  v_UNUSED(src0);
-  v_UNUSED(src2);
+  V_UNUSED(src0);
+  V_UNUSED(src2);
 }
 
 template <>
@@ -107,7 +107,7 @@ inline void init_pushconst_tensor_offsets(vk_backend_ctx* ctx, vk_op_binary_push
 
   p.misalign_offsets = (a_offset << 16) | (b_offset << 8) | d_offset;
 
-  v_UNUSED(src2);
+  V_UNUSED(src2);
 }
 
 template <>
@@ -120,14 +120,14 @@ inline void init_pushconst_tensor_offsets(vk_backend_ctx* ctx, vk_op_upscale_pus
   p.a_offset = a_offset;
   p.d_offset = d_offset;
 
-  v_UNUSED(src1);
-  v_UNUSED(src2);
+  V_UNUSED(src1);
+  V_UNUSED(src2);
 }
 
 
 template <typename T>
 inline void init_pushconst_fastdiv(T& p) {
-  v_UNUSED(p);
+  V_UNUSED(p);
   static_assert(!std::is_const<T>::value, "unexpected type");
 }
 

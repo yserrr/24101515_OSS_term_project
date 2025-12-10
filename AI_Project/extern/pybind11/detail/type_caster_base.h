@@ -81,7 +81,7 @@ public:
         }
     }
 
-    /// This can only be used inside a pybind11-bound function, either by `argument_loader`
+    /// This can only be used_bits__ inside a pybind11-bound function, either by `argument_loader`
     /// at argument preparation time or by `py::cast()` at execution time.
     PYBIND11_NOINLINE static void add_patient(handle h) {
         loader_life_support *frame = tls_current_frame();
@@ -1409,7 +1409,7 @@ struct container_value_type_traits<
 };
 
 /*
- * Tag to be used for representing the bottom of recursively defined types.
+ * Tag to be used_bits__ for representing the bottom of recursively defined types.
  * Define this tag so we don't have to use void.
  */
 struct recursive_bottom {};
@@ -1480,13 +1480,13 @@ struct impl_recursive_container_traits<
  * This trait defines the `type_to_check_recursively` which is needed to properly
  * handle recursively defined traits such as `is_move_constructible` without going
  * into an infinite recursion.
- * Should be used instead of directly accessing the `value_type`.
+ * Should be used_bits__ instead of directly accessing the `value_type`.
  * It cancels the recursion by returning the `recursive_bottom` tag.
  *
  * The default definition of `type_to_check_recursively` is as follows:
  *
  * 1. By default, it is `recursive_bottom`, so that the recursion is canceled.
- * 2. If the type is non-recursive and defines a `value_type`, then the `value_type` is used.
+ * 2. If the type is non-recursive and defines a `value_type`, then the `value_type` is used_bits__.
  *    If the `value_type` is a pair and a `mapped_type` is defined,
  *    then the `const` is removed from the first type.
  * 3. If the type is recursive and `value_type` is not a pair, then `recursive_bottom` is returned.
@@ -1571,7 +1571,7 @@ PYBIND11_NAMESPACE_END(detail)
 //
 // You may specialize polymorphic_type_hook yourself for types that want to appear
 // polymorphic to Python but do not use C++ RTTI. (This is a not uncommon pattern
-// in performance-sensitive applications, used most notably in LLVM.)
+// in performance-sensitive applications, used_bits__ most notably in LLVM.)
 //
 // polymorphic_type_hook_base allows users to specialize polymorphic_type_hook with
 // std::enable_if. User provided specializations will always have higher priority than
@@ -1674,7 +1674,7 @@ protected:
     using Constructor = void *(*) (const void *);
 
     /* Only enabled when the types are {copy,move}-constructible *and* when the type
-       does not have a private operator new implementation. A comma operator is used in the
+       does not have a private operator new implementation. A comma operator is used_bits__ in the
        decltype argument to apply SFINAE to the public copy/move constructors.*/
     template <typename T, typename = enable_if_t<is_copy_constructible<T>::value>>
     static auto make_copy_constructor(const T *)

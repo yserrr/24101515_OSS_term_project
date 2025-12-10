@@ -7,7 +7,6 @@
 // assert that pointer is aligned to v_MEM_ALIGN
 #define v_ASSERT_ALIGNED(ptr) \
 V_ASSERT(((uintptr_t) (ptr))%v_MEM_ALIGN == 0)
-#include <unordered_map>
 struct v_ctx
 {
   size_t mem_size;
@@ -15,9 +14,8 @@ struct v_ctx
   bool mem_buffer_owned;
   bool no_alloc;
   int n_objects;
-  struct v_object* objects_begin;
-  struct v_object* objects_end;
-
+  v_object* objects_begin;
+  v_object* objects_end;
   void reset()
   {
     this->n_objects = 0;

@@ -1,4 +1,4 @@
-// This file contains functionality related to "GGUF" files, the binary file format used by ggml.
+// This file contains functionality related to "GGUF" files, the binary file format used_bits__ by ggml.
 // GGUF files have the following structure:
 //
 // 1. File magic "GGUF" (4 bytes).
@@ -26,14 +26,14 @@
 // Strings are serialized as the string length (uint64_t) followed by the C string without the null terminator.
 // All enums are stored as int32_t.
 // All bool values are stored as int8_t.
-// If the special key "general.alignment" (uint32_t) is defined it is used for alignment,
-//   otherwise GGUF_DEFAULT_ALIGNMENT is used.
+// If the special key "general.alignment" (uint32_t) is defined it is used_bits__ for alignment,
+//   otherwise GGUF_DEFAULT_ALIGNMENT is used_bits__.
 //
 // Module maintainer: Johannes Gäßler (@JohannesGaessler, johannesg@5d6.de)
 
 #pragma once
 
-#include "../v.h"
+#include "../v.hpp"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -78,92 +78,92 @@ struct gguf_init_params
   struct v_ctx** ctx;
 };
 
-v_API struct gguf_context* gguf_init_empty(void);
-v_API struct gguf_context* gguf_init_from_file(const char* fname, struct gguf_init_params params);
-//v_API struct gguf_context * gguf_init_from_buffer(..);
+V_API struct gguf_context* gguf_init_empty(void);
+V_API struct gguf_context* gguf_init_from_file(const char* fname, struct gguf_init_params params);
+//V_API struct gguf_context * gguf_init_from_buffer(..);
 
-v_API void gguf_free(struct gguf_context* ctx);
+V_API void gguf_free(struct gguf_context* ctx);
 
-v_API const char* gguf_type_name(enum gguf_type type);
+V_API const char* gguf_type_name(enum gguf_type type);
 
-v_API uint32_t gguf_get_version(const struct gguf_context* ctx);
-v_API size_t gguf_get_alignment(const struct gguf_context* ctx);
-v_API size_t gguf_get_data_offset(const struct gguf_context* ctx);
+V_API uint32_t gguf_get_version(const struct gguf_context* ctx);
+V_API size_t gguf_get_alignment(const struct gguf_context* ctx);
+V_API size_t gguf_get_data_offset(const struct gguf_context* ctx);
 
-v_API int64_t gguf_get_n_kv(const struct gguf_context* ctx);
-v_API int64_t gguf_find_key(const struct gguf_context* ctx, const char* key); // returns -1 if key is not found
-v_API const char* gguf_get_key(const struct gguf_context* ctx, int64_t key_id);
+V_API int64_t gguf_get_n_kv(const struct gguf_context* ctx);
+V_API int64_t gguf_find_key(const struct gguf_context* ctx, const char* key); // returns -1 if key is not found
+V_API const char* gguf_get_key(const struct gguf_context* ctx, int64_t key_id);
 
-v_API enum gguf_type gguf_get_kv_type(const struct gguf_context* ctx, int64_t key_id);
-v_API enum gguf_type gguf_get_arr_type(const struct gguf_context* ctx, int64_t key_id);
+V_API enum gguf_type gguf_get_kv_type(const struct gguf_context* ctx, int64_t key_id);
+V_API enum gguf_type gguf_get_arr_type(const struct gguf_context* ctx, int64_t key_id);
 
-// will abort if the wrong type is used for the key
-v_API uint8_t gguf_get_val_u8(const struct gguf_context* ctx, int64_t key_id);
-v_API int8_t gguf_get_val_i8(const struct gguf_context* ctx, int64_t key_id);
-v_API uint16_t gguf_get_val_u16(const struct gguf_context* ctx, int64_t key_id);
-v_API int16_t gguf_get_val_i16(const struct gguf_context* ctx, int64_t key_id);
-v_API uint32_t gguf_get_val_u32(const struct gguf_context* ctx, int64_t key_id);
-v_API int32_t gguf_get_val_i32(const struct gguf_context* ctx, int64_t key_id);
-v_API float gguf_get_val_f32(const struct gguf_context* ctx, int64_t key_id);
-v_API uint64_t gguf_get_val_u64(const struct gguf_context* ctx, int64_t key_id);
-v_API int64_t gguf_get_val_i64(const struct gguf_context* ctx, int64_t key_id);
-v_API double gguf_get_val_f64(const struct gguf_context* ctx, int64_t key_id);
-v_API bool gguf_get_val_bool(const struct gguf_context* ctx, int64_t key_id);
-v_API const char* gguf_get_val_str(const struct gguf_context* ctx, int64_t key_id);
-v_API const void* gguf_get_val_data(const struct gguf_context* ctx, int64_t key_id);
-v_API size_t gguf_get_arr_n(const struct gguf_context* ctx, int64_t key_id);
+// will abort if the wrong type is used_bits__ for the key
+V_API uint8_t gguf_get_val_u8(const struct gguf_context* ctx, int64_t key_id);
+V_API int8_t gguf_get_val_i8(const struct gguf_context* ctx, int64_t key_id);
+V_API uint16_t gguf_get_val_u16(const struct gguf_context* ctx, int64_t key_id);
+V_API int16_t gguf_get_val_i16(const struct gguf_context* ctx, int64_t key_id);
+V_API uint32_t gguf_get_val_u32(const struct gguf_context* ctx, int64_t key_id);
+V_API int32_t gguf_get_val_i32(const struct gguf_context* ctx, int64_t key_id);
+V_API float gguf_get_val_f32(const struct gguf_context* ctx, int64_t key_id);
+V_API uint64_t gguf_get_val_u64(const struct gguf_context* ctx, int64_t key_id);
+V_API int64_t gguf_get_val_i64(const struct gguf_context* ctx, int64_t key_id);
+V_API double gguf_get_val_f64(const struct gguf_context* ctx, int64_t key_id);
+V_API bool gguf_get_val_bool(const struct gguf_context* ctx, int64_t key_id);
+V_API const char* gguf_get_val_str(const struct gguf_context* ctx, int64_t key_id);
+V_API const void* gguf_get_val_data(const struct gguf_context* ctx, int64_t key_id);
+V_API size_t gguf_get_arr_n(const struct gguf_context* ctx, int64_t key_id);
 
 // get raw pointer to the first element of the array with the given key_id
 // for bool arrays, note that they are always stored as int8 on all platforms (usually this makes no difference)
-v_API const void* gguf_get_arr_data(const struct gguf_context* ctx, int64_t key_id);
+V_API const void* gguf_get_arr_data(const struct gguf_context* ctx, int64_t key_id);
 
 // get ith C string from array with given key_id
-v_API const char* gguf_get_arr_str(const struct gguf_context* ctx, int64_t key_id, size_t i);
+V_API const char* gguf_get_arr_str(const struct gguf_context* ctx, int64_t key_id, size_t i);
 
-v_API int64_t gguf_get_n_tensors(const struct gguf_context* ctx);
-v_API int64_t gguf_find_tensor(const struct gguf_context* ctx, const char* name);
+V_API int64_t gguf_get_n_tensors(const struct gguf_context* ctx);
+V_API int64_t gguf_find_tensor(const struct gguf_context* ctx, const char* name);
 // returns -1 if the tensor is not found
-v_API size_t gguf_get_tensor_offset(const struct gguf_context* ctx, int64_t tensor_id);
-v_API const char* gguf_get_tensor_name(const struct gguf_context* ctx, int64_t tensor_id);
-v_API enum v_data_type gguf_get_tensor_type(const struct gguf_context* ctx, int64_t tensor_id);
-v_API size_t gguf_get_tensor_size(const struct gguf_context* ctx, int64_t tensor_id);
+V_API size_t gguf_get_tensor_offset(const struct gguf_context* ctx, int64_t tensor_id);
+V_API const char* gguf_get_tensor_name(const struct gguf_context* ctx, int64_t tensor_id);
+V_API enum v_data_type gguf_get_tensor_type(const struct gguf_context* ctx, int64_t tensor_id);
+V_API size_t gguf_get_tensor_size(const struct gguf_context* ctx, int64_t tensor_id);
 
 // removes key if it exists, returns id that the key had prior to removal (-1 if it didn't exist)
-v_API int64_t gguf_remove_key(struct gguf_context* ctx, const char* key);
+V_API int64_t gguf_remove_key(struct gguf_context* ctx, const char* key);
 
 // overrides an existing KV pair or adds a new one, the new KV pair is always at the back
-v_API void gguf_set_val_u8(struct gguf_context* ctx, const char* key, uint8_t val);
-v_API void gguf_set_val_i8(struct gguf_context* ctx, const char* key, int8_t val);
-v_API void gguf_set_val_u16(struct gguf_context* ctx, const char* key, uint16_t val);
-v_API void gguf_set_val_i16(struct gguf_context* ctx, const char* key, int16_t val);
-v_API void gguf_set_val_u32(struct gguf_context* ctx, const char* key, uint32_t val);
-v_API void gguf_set_val_i32(struct gguf_context* ctx, const char* key, int32_t val);
-v_API void gguf_set_val_f32(struct gguf_context* ctx, const char* key, float val);
-v_API void gguf_set_val_u64(struct gguf_context* ctx, const char* key, uint64_t val);
-v_API void gguf_set_val_i64(struct gguf_context* ctx, const char* key, int64_t val);
-v_API void gguf_set_val_f64(struct gguf_context* ctx, const char* key, double val);
-v_API void gguf_set_val_bool(struct gguf_context* ctx, const char* key, bool val);
-v_API void gguf_set_val_str(struct gguf_context* ctx, const char* key, const char* val);
+V_API void gguf_set_val_u8(struct gguf_context* ctx, const char* key, uint8_t val);
+V_API void gguf_set_val_i8(struct gguf_context* ctx, const char* key, int8_t val);
+V_API void gguf_set_val_u16(struct gguf_context* ctx, const char* key, uint16_t val);
+V_API void gguf_set_val_i16(struct gguf_context* ctx, const char* key, int16_t val);
+V_API void gguf_set_val_u32(struct gguf_context* ctx, const char* key, uint32_t val);
+V_API void gguf_set_val_i32(struct gguf_context* ctx, const char* key, int32_t val);
+V_API void gguf_set_val_f32(struct gguf_context* ctx, const char* key, float val);
+V_API void gguf_set_val_u64(struct gguf_context* ctx, const char* key, uint64_t val);
+V_API void gguf_set_val_i64(struct gguf_context* ctx, const char* key, int64_t val);
+V_API void gguf_set_val_f64(struct gguf_context* ctx, const char* key, double val);
+V_API void gguf_set_val_bool(struct gguf_context* ctx, const char* key, bool val);
+V_API void gguf_set_val_str(struct gguf_context* ctx, const char* key, const char* val);
 
 // creates a new array with n elements of the given type and copies the corresponding number of bytes from data
-v_API void gguf_set_arr_data(struct gguf_context* ctx, const char* key, enum gguf_type type, const void* data,
+V_API void gguf_set_arr_data(struct gguf_context* ctx, const char* key, enum gguf_type type, const void* data,
                                 size_t n);
 
 // creates a new array with n strings and copies the corresponding strings from data
-v_API void gguf_set_arr_str(struct gguf_context* ctx, const char* key, const char** data, size_t n);
+V_API void gguf_set_arr_str(struct gguf_context* ctx, const char* key, const char** data, size_t n);
 
 // set or add KV pairs from another context
-v_API void gguf_set_kv(struct gguf_context* ctx, const struct gguf_context* src);
+V_API void gguf_set_kv(struct gguf_context* ctx, const struct gguf_context* src);
 
 // add tensor to GGUF context, tensor name must be unique
-v_API void gguf_add_tensor(struct gguf_context* ctx, const struct v_tensor* tensor);
+V_API void gguf_add_tensor(struct gguf_context* ctx, const struct v_tensor* tensor);
 
 // after changing a tensor's type, the offsets of all tensors with higher indices are immediately recalculated
 //   in such a way that the tensor data remains as one contiguous block (except for padding)
-v_API void gguf_set_tensor_type(struct gguf_context* ctx, const char* name, enum v_data_type type);
+V_API void gguf_set_tensor_type(struct gguf_context* ctx, const char* name, enum v_data_type type);
 
 // assumes that at least gguf_get_tensor_size bytes can be read from data
-v_API void gguf_set_tensor_data(struct gguf_context* ctx, const char* name, const void* data);
+V_API void gguf_set_tensor_data(struct gguf_context* ctx, const char* name, const void* data);
 
 // writing gguf files can be done in 3 ways:
 //
@@ -193,13 +193,13 @@ v_API void gguf_set_tensor_data(struct gguf_context* ctx, const char* name, cons
 //
 
 // write the entire context to a binary file
-v_API bool gguf_write_to_file(const struct gguf_context* ctx, const char* fname, bool only_meta);
+V_API bool gguf_write_to_file(const struct gguf_context* ctx, const char* fname, bool only_meta);
 
 // get the size in bytes of the meta data (header, kv pairs, tensor info) including padding
-v_API size_t gguf_get_meta_size(const struct gguf_context* ctx);
+V_API size_t gguf_get_meta_size(const struct gguf_context* ctx);
 
 // writes the meta data to pointer "data"
-v_API void gguf_get_meta_data(const struct gguf_context* ctx, void* data);
+V_API void gguf_get_meta_data(const struct gguf_context* ctx, void* data);
 
 #ifdef  __cplusplus
 }

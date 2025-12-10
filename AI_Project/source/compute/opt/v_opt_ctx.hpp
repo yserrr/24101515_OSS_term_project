@@ -12,7 +12,7 @@
 ///  update setting for ctx
 struct v_opt_ctx {
   v_opt_ctx() = default;
-  v_opt_ctx(struct v_opt_struct params);
+  v_opt_ctx(v_opt_struct params);
   v_backend_sched_t backend_sched = nullptr;
   v_cgraph* allocated_graph       = nullptr;
   v_cgraph* allocated_graph_copy  = nullptr;

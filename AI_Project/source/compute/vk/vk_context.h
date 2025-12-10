@@ -4,7 +4,7 @@
 #include "vk_common.h"
 #include "vk_buffer.h"
 #include "vk_config.h"
-#include "vk_queue.h"
+#include "vk_queue.hpp"
 void vk_init(vk_backend_ctx* ctx, size_t idx);
 void vk_begin_ctx(vk_device& device, vk_context& subctx);
 void vk_ctx_end(vk_context& ctx);
@@ -53,8 +53,6 @@ bool v_backend_vk_cpy_tensor_async(v_backend_t backend, const v_tensor* src, v_t
 
 void v_backend_vk_synchronize(v_backend_t backend);
 v_backend_t backend_vk_init(size_t dev_num);
-
-int vk_get_device_count();
 
 void vk_get_device_description(int device, char* description, size_t description_size);
 
@@ -112,11 +110,11 @@ struct vk_backend_ctx {
   // write partial sums to accumulate the square of the vector components
   bool do_add_rms_partials;
 
-  // Cache most recent tensor that was converted into prealloc_y, and what pipeline it used to convert.
+  // Cache most recent tensor that was converted into prealloc_y, and what pipeline it used_bits__ to convert.
   vk_pipeline_struct* prealloc_y_last_pipeline_used{};
   const v_tensor* prealloc_y_last_tensor_used{};
 
-  // Track which nodes have been used since the last sync, and whether they were written to
+  // Track which nodes have been used_bits__ since the last sync, and whether they were written to
   std::vector<const v_tensor*> unsynced_nodes_written;
   std::vector<const v_tensor*> unsynced_nodes_read;
   // Track which prealloc buffers have pending reads that need to be synchronized.
