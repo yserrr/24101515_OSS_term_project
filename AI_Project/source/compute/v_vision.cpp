@@ -128,7 +128,7 @@ v_tensor* v_conv_2d(
              v_reshape_2d(ctx, a, (a->ne[0] * a->ne[1] * a->ne[2]), a->ne[3]));
   // [OC，IC, KH, KW] => [OC, IC * KH * KW]
   result = v_reshape_4d(ctx, result, im2col->ne[1], im2col->ne[2], im2col->ne[3], a->ne[3]); // [OC, N, OH, OW]
-  result = v_mem_cont(ctx, v_permute(ctx, result, 0, 1, 3, 2)); // [N, OC, OH, OW]
+  result = v_cont(ctx, v_permute(ctx, result, 0, 1, 3, 2)); // [N, OC, OH, OW]
   return result;
 }
 
@@ -215,7 +215,7 @@ v_tensor* v_conv_3d(
   int64_t OD = im2col->ne[3] / N;
   result     = v_reshape_4d(ctx, result, im2col->ne[1] * im2col->ne[2], OD, N, OC);
   // [OC, N*OD*OH*OW] => [OC, N, OD, OH*OW]
-  result = v_mem_cont(ctx, v_permute(ctx, result, 0, 1, 3, 2)); // [N, OC, OD, OH*OW]
+  result = v_cont(ctx, v_permute(ctx, result, 0, 1, 3, 2)); // [N, OC, OD, OH*OW]
   result = v_reshape_4d(ctx, result, im2col->ne[1], im2col->ne[2], OD, OC * N); // [N*OC, OD, OH, OW]
 
   return result;
@@ -496,8 +496,8 @@ v_tensor* v_pool_2d_back(v_ctx* ctx,
                          int s0, int s1,
                          float p0, float p1) {
   v_tensor* result;
-  auto t_a         = v_mem_cont(ctx, a);
-  auto t_af        = v_mem_cont(ctx, af);
+  auto t_a         = v_cont(ctx, a);
+  auto t_af        = v_cont(ctx, af);
   result           = v_new_tensor(ctx, v_TYPE_F32, 4, af->ne.data());
   int32_t params[] = {
     static_cast<int32_t>(op),
@@ -607,8 +607,8 @@ v_tensor* v_im2col_back(v_ctx* ctx,
   //t_b= src0
   //t_W=  im2col (grad^T, dY_col)
   v_tensor* result = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
-  v_tensor* t_a    = v_mem_cont(ctx, v_transpose(ctx, a));
-  v_tensor* t_b    = v_mem_cont(ctx, v_transpose(ctx, b));
+  v_tensor* t_a    = v_cont(ctx, v_transpose(ctx, a));
+  v_tensor* t_b    = v_cont(ctx, v_transpose(ctx, b));
   int32_t params[] = {
     s0, s1, p0, p1, d0, d1, (is_2D
                                ? 1

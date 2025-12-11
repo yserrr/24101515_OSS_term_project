@@ -1,6 +1,5 @@
 #include "v.hpp"
 #include "v_allocator.hpp"
-#include "v-backend.hpp"
 #include "v_vk.hpp"
 #include "v_util.hpp"
 #include <cassert>
@@ -41,6 +40,12 @@ namespace py = pybind11;
 #define FORCE_UTF8_CONSOLE
 #ifdef FORCE_UTF8_CONSOLE
 #include <windows.h>
+////todo:
+///  object data container
+///  1. hash set -> std::set 으로 변경
+///  2. ctx -> object data container
+///  3. backend simplify
+///  4. allocator-> simplify
 
 struct utf8_console
 {
@@ -85,7 +90,7 @@ int main()
   auto vk         = backend_vk_init(0);
   v_backend_t a[] = {vk};
 
-  auto backend_sched  = v_sched_new(*a, nullptr, 1, v_DEFAULT_GRAPH_SIZE,  true);
+  auto backend_sched  = v_sched_new(*a, nullptr, 1, V_DEFAULT_GRAPH_SIZE,  true);
   model.backend_sched = backend_sched;
 
   int num_tensors = 10;
@@ -94,7 +99,7 @@ int main()
     /*.mem_buffer =*/ NULL,
     /*.no_alloc   =*/ true,
   };
-  const size_t size_meta = v_DEFAULT_GRAPH_SIZE * v_tensor_over_head() + 10 * graph_overhead();
+  const size_t size_meta = V_DEFAULT_GRAPH_SIZE * v_tensor_over_head() + 10 * graph_overhead();
   model.ctx_compute      = v_ctx_init(params);
 
   py::scoped_interpreter guard{};
@@ -153,8 +158,8 @@ int main()
                                               /*ndata_shard =*/
                                               1);
 
-  v_tensor* data  = dataset->getDataset();
-  v_tensor* label = dataset->getLabels();
+  v_tensor* data  = dataset->get_dataset();
+  v_tensor* label = dataset->get_labels();
   float* buf      = v_get_tdata_f32(data);
   float* lbuf     = v_get_tdata_f32(label);
   //#pragma omp parallel for
@@ -198,7 +203,7 @@ int main()
   init_tensors.push_back(model.fc2_bias);
   model.images = v_new_tensor_2d(model.ctx_static, v_TYPE_F32, MNIST_NINPUT, MNIST_NBATCH_PHYSICAL);
   v_set_name(model.images, "images");
-  v_set_inputs(model.images);
+  (model.images)->set_inputs();
 
   model.buf_static = v_backend_alloc_ctx_tensors(model.ctx_static, vk);
   for (v_tensor* t : init_tensors)

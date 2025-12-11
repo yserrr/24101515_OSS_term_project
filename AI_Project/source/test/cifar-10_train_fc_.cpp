@@ -34,8 +34,8 @@ namespace py = pybind11;
 #define CIFAR_NINPUT  (32*32*3)
 #define CIFAR_NCLASSES 10
 #define CIFAR_NHIDDEN  5000
-#define CIFAR_NBATCH_LOGICAL  20000
-#define CIFAR_NBATCH_PHYSICAL 5000
+#define CIFAR_NBATCH_LOGICAL  1000
+#define CIFAR_NBATCH_PHYSICAL 1000
 #define FORCE_UTF8_CONSOLE
 #ifdef FORCE_UTF8_CONSOLE
 #include <windows.h>
@@ -80,7 +80,7 @@ int main() {
   auto vk         = backend_vk_init(0);
   v_backend_t a[] = {vk};
 
-  auto backend_sched  = v_sched_new(*a, nullptr, 1, v_DEFAULT_GRAPH_SIZE, false);
+  auto backend_sched  = v_sched_new(*a, nullptr, 1, V_DEFAULT_GRAPH_SIZE, false);
   model.backend_sched = backend_sched;
 
   int num_tensors = 10;
@@ -89,7 +89,7 @@ int main() {
     /*.mem_buffer =*/ NULL,
     /*.no_alloc   =*/ true,
   };
-  const size_t size_meta = v_DEFAULT_GRAPH_SIZE * v_tensor_over_head() + 10 * graph_overhead();
+  const size_t size_meta = V_DEFAULT_GRAPH_SIZE * v_tensor_over_head() + 10 * graph_overhead();
   model.ctx_compute      = v_ctx_init(params);
 
   py::scoped_interpreter guard{};
@@ -101,7 +101,7 @@ int main() {
     transforms.attr("ToTensor")(),
     transforms.attr("Normalize")(
       py::make_tuple(0.5f, 0.5f, 0.5f), // mean
-      py::make_tuple(0.5f, 0.5f, 0.5f) // std
+      py::make_tuple(0.5f, 0.5f, 0.5f)  // std
     )
   ));
 
@@ -150,8 +150,8 @@ int main() {
                                                 CIFAR_NTRAIN,
                                                 1);
 
-  v_tensor* data  = dataset->getDataset();
-  v_tensor* label = dataset->getLabels();
+  v_tensor* data  = dataset->get_dataset();
+  v_tensor* label = dataset->get_labels();
   float* buf      = v_get_tdata_f32(data);
   float* lbuf     = v_get_tdata_f32(label);
   #pragma omp parallel for
@@ -197,7 +197,7 @@ int main() {
 
   model.images = v_new_tensor_2d(model.ctx_static, v_TYPE_F32, CIFAR_NINPUT, CIFAR_NBATCH_PHYSICAL);
   v_set_name(model.images, "images");
-  v_set_inputs(model.images);
+  (model.images)->set_inputs();
 
   model.buf_static = v_backend_alloc_ctx_tensors(model.ctx_static, vk);
   for (v_tensor* t : init_tensors) {
@@ -221,11 +221,11 @@ int main() {
                                         model.images),
                                model.fc1_bias));
   v_tensor* fc2 = v_relu(model.ctx_compute,
-                           v_add(model.ctx_compute,
-                                 v_matmul(model.ctx_compute,
-                                          model.fc2_weight,
-                                          fc1),
-                                 model.fc2_bias));
+                         v_add(model.ctx_compute,
+                               v_matmul(model.ctx_compute,
+                                        model.fc2_weight,
+                                        fc1),
+                               model.fc2_bias));
 
   model.logits = v_add(model.ctx_compute,
                        v_matmul(model.ctx_compute,
@@ -233,15 +233,15 @@ int main() {
                                 fc2),
                        model.fc3_bias);
 
-  const int64_t ndata      = v_opt_dataset_datas(dataset)->ne[1];
+  const int64_t ndata = v_opt_dataset_datas(dataset)->ne[1];
 
   const int64_t nbatch_physical  = model.images->ne[1];
   const int64_t opt_period       = model.nbatch_logical / nbatch_physical;
   const int64_t nbatches_logical = ndata / model.nbatch_logical;
   const int64_t ibatch_split     = int64_t(((1.0f - 0.05) * nbatches_logical)) * opt_period;
   ///
-  int64_t idata_split            = ibatch_split * nbatch_physical;
-  int64_t epoch                  = 1;
+  int64_t idata_split = ibatch_split * nbatch_physical;
+  int64_t epoch       = 1;
 
   v_opt_struct loss_parmas    = v_opt_default_params(backend_sched, V_OPT_LOSS_CROSS_ENTROPY);
   loss_parmas.ctx_compute     = model.ctx_compute;
@@ -265,9 +265,7 @@ int main() {
     v_tensor* inputs = opt_ctx->getInput();
     v_tensor* labels = opt_ctx->getLabels();
     v_tensor* data   = v_opt_dataset_datas(dataset);
-
     V_ASSERT(data->ne[0] == inputs->ne[0]);
-
     const int64_t ndata       = data->ne[1];
     const int64_t ndata_batch = inputs->ne[1];
     V_ASSERT(data->ne[1] % inputs->ne[1] == 0);
@@ -295,7 +293,7 @@ int main() {
       opt_ctx->allocate(/*backward =*/ false);
       dataset->get_batch(inputs, labels, batch_idx);
       v_opt_evaluate(opt_ctx, result_val);
-      v_opt_epoch_callback_progress_bar(false ,
+      v_opt_epoch_callback_progress_bar(false,
                                         opt_ctx,
                                         dataset,
                                         result_val,
@@ -306,7 +304,6 @@ int main() {
 
     fprintf(stderr, "\n");
   }
-
   opt_ctx->free();
   result_train->reset();
   result_val->reset();

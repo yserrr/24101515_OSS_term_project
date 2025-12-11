@@ -27,7 +27,6 @@ using vk::DispatchLoaderDynamic;
 #endif
 DispatchLoaderDynamic& v_vk_default_dispatcher();
 #define VULKAN_HPP_DEFAULT_DISPATCHER v_vk_default_dispatcher()
-
 #include <vulkan/vulkan.hpp>
 #include <algorithm>
 #include <cmath>

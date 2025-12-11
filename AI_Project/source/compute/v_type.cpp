@@ -4,11 +4,10 @@
 #include <array>
 #include <cstring>
 
-v_type_trait::v_type_trait()
-{
-  traits[v_TYPE_I8].type_name = "i8";
-  traits[v_TYPE_I8].blck_size = 1;
-  traits[v_TYPE_I8].type_size = sizeof(int8_t);
+v_type_trait::v_type_trait() {
+  traits[v_TYPE_I8].type_name    = "i8";
+  traits[v_TYPE_I8].blck_size    = 1;
+  traits[v_TYPE_I8].type_size    = sizeof(int8_t);
   traits[v_TYPE_I8].is_quantized = false;
 
   traits[v_TYPE_I16] = {
@@ -306,7 +305,7 @@ v_type_trait::v_type_trait()
 
 static v_type_trait trait;
 
-static_assert(v_OP_COUNT == 90, "v_OP_COUNT != 90");
+static_assert(V_OP_COUNT == 90, "V_OP_COUNT != 90");
 static const char* v_UNARY_OP_NAME[v_UNARY_OP_COUNT] = {
   "ABS",
   "SGN",
@@ -333,12 +332,11 @@ static const char* v_UNARY_OP_NAME[v_UNARY_OP_COUNT] = {
   "TRUNC",
 };
 
-const char* v_unary_op_name(enum v_unary_op op)
-{
+const char* v_unary_op_name(enum v_unary_op op) {
   return v_UNARY_OP_NAME[op];
 }
 
-static const char* v_OP_SYMBOL[v_OP_COUNT] = {
+static const char* v_OP_SYMBOL[V_OP_COUNT] = {
   "none",
 
   "x",
@@ -440,7 +438,7 @@ static const char* v_OP_SYMBOL[v_OP_COUNT] = {
   "glu(x)",
 };
 
-const char* v_OP_NAME[v_OP_COUNT] = {
+const char* v_OP_NAME[V_OP_COUNT] = {
   "NONE",
 
   "DUP",
@@ -541,7 +539,7 @@ const char* v_OP_NAME[v_OP_COUNT] = {
 
   "GLU",
 };
-const char* v_GLU_OP_NAME[v_GLU_OP_COUNT] = {
+const char* v_GLU_OP_NAME[V_GLU_OP_COUNT] = {
   "REGLU",
   "GEGLU",
   "SWIGLU",
@@ -551,131 +549,118 @@ const char* v_GLU_OP_NAME[v_GLU_OP_COUNT] = {
 };
 
 
-const char* v_op_name(enum v_operation op)
-{
+const char* v_op_name(enum v_operation op) {
   return v_OP_NAME[op];
 }
 
 
-enum v_data_type v_ftype_to_v_type(enum v_ftype ftype)
-{
-  enum v_data_type wtype = v_TYPE_COUNT;
+enum v_data_type v_ftype_to_v_type(enum v_ftype ftype) {
+  enum v_data_type wtype = V_TYPE_COUNT;
 
-  switch (ftype)
-  {
-  case v_FTYPE_ALL_F32: wtype = v_TYPE_F32;
-    break;
-  case v_FTYPE_MOSTLY_F16: wtype = v_TYPE_F16;
-    break;
-  case v_FTYPE_MOSTLY_BF16: wtype = v_TYPE_BF16;
-    break;
-  case v_FTYPE_MOSTLY_Q4_0: wtype = v_TYPE_Q4_0;
-    break;
-  case v_FTYPE_MOSTLY_Q4_1: wtype = v_TYPE_Q4_1;
-    break;
-  case v_FTYPE_MOSTLY_Q5_0: wtype = v_TYPE_Q5_0;
-    break;
-  case v_FTYPE_MOSTLY_Q5_1: wtype = v_TYPE_Q5_1;
-    break;
-  case v_FTYPE_MOSTLY_Q8_0: wtype = v_TYPE_Q8_0;
-    break;
-  case v_FTYPE_MOSTLY_MXFP4: wtype = v_TYPE_MXFP4;
-    break;
-  case v_FTYPE_MOSTLY_Q2_K: wtype = v_TYPE_Q2_K;
-    break;
-  case v_FTYPE_MOSTLY_Q3_K: wtype = v_TYPE_Q3_K;
-    break;
-  case v_FTYPE_MOSTLY_Q4_K: wtype = v_TYPE_Q4_K;
-    break;
-  case v_FTYPE_MOSTLY_Q5_K: wtype = v_TYPE_Q5_K;
-    break;
-  case v_FTYPE_MOSTLY_Q6_K: wtype = v_TYPE_Q6_K;
-    break;
-  case v_FTYPE_MOSTLY_IQ2_XXS: wtype = v_TYPE_IQ2_XXS;
-    break;
-  case v_FTYPE_MOSTLY_IQ2_XS: wtype = v_TYPE_IQ2_XS;
-    break;
-  case v_FTYPE_MOSTLY_IQ3_XXS: wtype = v_TYPE_IQ3_XXS;
-    break;
-  case v_FTYPE_MOSTLY_IQ1_S: wtype = v_TYPE_IQ1_S;
-    break;
-  case v_FTYPE_MOSTLY_IQ1_M: wtype = v_TYPE_IQ1_M;
-    break;
-  case v_FTYPE_MOSTLY_IQ4_NL: wtype = v_TYPE_IQ4_NL;
-    break;
-  case v_FTYPE_MOSTLY_IQ4_XS: wtype = v_TYPE_IQ4_XS;
-    break;
-  case v_FTYPE_MOSTLY_IQ3_S: wtype = v_TYPE_IQ3_S;
-    break;
-  case v_FTYPE_MOSTLY_IQ2_S: wtype = v_TYPE_IQ2_S;
-    break;
-  case v_FTYPE_UNKNOWN: wtype = v_TYPE_COUNT;
-    break;
-  case v_FTYPE_MOSTLY_Q4_1_SOME_F16: wtype = v_TYPE_COUNT;
-    break;
+  switch (ftype) {
+    case v_FTYPE_ALL_F32: wtype = v_TYPE_F32;
+      break;
+    case v_FTYPE_MOSTLY_F16: wtype = v_TYPE_F16;
+      break;
+    case v_FTYPE_MOSTLY_BF16: wtype = v_TYPE_BF16;
+      break;
+    case v_FTYPE_MOSTLY_Q4_0: wtype = v_TYPE_Q4_0;
+      break;
+    case v_FTYPE_MOSTLY_Q4_1: wtype = v_TYPE_Q4_1;
+      break;
+    case v_FTYPE_MOSTLY_Q5_0: wtype = v_TYPE_Q5_0;
+      break;
+    case v_FTYPE_MOSTLY_Q5_1: wtype = v_TYPE_Q5_1;
+      break;
+    case v_FTYPE_MOSTLY_Q8_0: wtype = v_TYPE_Q8_0;
+      break;
+    case v_FTYPE_MOSTLY_MXFP4: wtype = v_TYPE_MXFP4;
+      break;
+    case v_FTYPE_MOSTLY_Q2_K: wtype = v_TYPE_Q2_K;
+      break;
+    case v_FTYPE_MOSTLY_Q3_K: wtype = v_TYPE_Q3_K;
+      break;
+    case v_FTYPE_MOSTLY_Q4_K: wtype = v_TYPE_Q4_K;
+      break;
+    case v_FTYPE_MOSTLY_Q5_K: wtype = v_TYPE_Q5_K;
+      break;
+    case v_FTYPE_MOSTLY_Q6_K: wtype = v_TYPE_Q6_K;
+      break;
+    case v_FTYPE_MOSTLY_IQ2_XXS: wtype = v_TYPE_IQ2_XXS;
+      break;
+    case v_FTYPE_MOSTLY_IQ2_XS: wtype = v_TYPE_IQ2_XS;
+      break;
+    case v_FTYPE_MOSTLY_IQ3_XXS: wtype = v_TYPE_IQ3_XXS;
+      break;
+    case v_FTYPE_MOSTLY_IQ1_S: wtype = v_TYPE_IQ1_S;
+      break;
+    case v_FTYPE_MOSTLY_IQ1_M: wtype = v_TYPE_IQ1_M;
+      break;
+    case v_FTYPE_MOSTLY_IQ4_NL: wtype = v_TYPE_IQ4_NL;
+      break;
+    case v_FTYPE_MOSTLY_IQ4_XS: wtype = v_TYPE_IQ4_XS;
+      break;
+    case v_FTYPE_MOSTLY_IQ3_S: wtype = v_TYPE_IQ3_S;
+      break;
+    case v_FTYPE_MOSTLY_IQ2_S: wtype = v_TYPE_IQ2_S;
+      break;
+    case v_FTYPE_UNKNOWN: wtype = V_TYPE_COUNT;
+      break;
+    case v_FTYPE_MOSTLY_Q4_1_SOME_F16: wtype = V_TYPE_COUNT;
+      break;
   }
 
-  V_ASSERT(wtype != v_TYPE_COUNT);
+  V_ASSERT(wtype != V_TYPE_COUNT);
 
   return wtype;
 }
 
 
-const char* v_glu_op_name(enum v_glu_op op)
-{
+const char* v_glu_op_name(v_glu_op op) {
   return v_GLU_OP_NAME[op];
 }
 
-const char* v_op_symbol(enum v_operation op)
-{
+const char* v_op_symbol(v_operation op) {
   return v_OP_SYMBOL[op];
 }
 
 
-const struct v_type_traits* v_get_type_traits(enum v_data_type type)
-{
-  V_ASSERT(type < v_TYPE_COUNT);
+const v_type_traits* v_get_type_traits(v_data_type type) {
+  V_ASSERT(type < V_TYPE_COUNT);
   return &trait.traits[type];
 }
 
-int64_t block_size(enum v_data_type type)
-{
+int64_t block_size(v_data_type type) {
   return trait.traits[type].blck_size;
 }
 
-size_t v_type_size(enum v_data_type type)
-{
+size_t v_type_size(v_data_type type) {
   return trait.traits[type].type_size;
 }
 
-double v_type_sizef(enum v_data_type type)
-{
+double v_type_sizef(v_data_type type) {
   return ((double)(trait.traits[type].type_size)) / trait.traits[type].blck_size;
 }
 
-const char* v_type_name(enum v_data_type type)
-{
-  return type < v_TYPE_COUNT ? trait.traits[type].type_name : "NONE";
+const char* v_type_name(v_data_type type) {
+  return type < V_TYPE_COUNT ? trait.traits[type].type_name : "NONE";
 }
 
 
-bool v_is_quantized(enum v_data_type type)
-{
+bool v_is_quantized(enum v_data_type type) {
   return trait.traits[type].is_quantized;
 }
 
 size_t v_quantize_chunk(enum v_data_type type,
-                           const float* src,
-                           void* dst,
-                           int64_t start,
-                           int64_t nrows,
-                           int64_t n_per_row,
-                           const float* imatrix)
-{
+                        const float* src,
+                        void* dst,
+                        int64_t start,
+                        int64_t nrows,
+                        int64_t n_per_row,
+                        const float* imatrix) {
   const int64_t n = (int64_t)nrows * n_per_row;
 
-  if (v_quantize_requires_imatrix(type))
-  {
+  if (v_quantize_requires_imatrix(type)) {
     V_ASSERT(imatrix != NULL);
   }
 
@@ -685,137 +670,133 @@ size_t v_quantize_chunk(enum v_data_type type,
   v_quantize_init(type); // this is noop if already initialized
 
   const size_t start_row = start / n_per_row;
-  const size_t row_size = v_row_size(type, n_per_row);
+  const size_t row_size  = v_row_size(type, n_per_row);
 
   size_t result = 0;
 
-  switch (type)
-  {
-  case v_TYPE_Q4_0: result =
-                       quantize_q4_0(src + start, (char*)dst + start_row * row_size, nrows, n_per_row, imatrix);
-    break;
-  case v_TYPE_Q4_1: result =
-                       quantize_q4_1(src + start, (char*)dst + start_row * row_size, nrows, n_per_row, imatrix);
-    break;
-  case v_TYPE_Q5_0: result =
-                       quantize_q5_0(src + start, (char*)dst + start_row * row_size, nrows, n_per_row, imatrix);
-    break;
-  case v_TYPE_Q5_1: result =
-                       quantize_q5_1(src + start, (char*)dst + start_row * row_size, nrows, n_per_row, imatrix);
-    break;
-  case v_TYPE_Q8_0: result =
-                       quantize_q8_0(src + start, (char*)dst + start_row * row_size, nrows, n_per_row, imatrix);
-    break;
-  case v_TYPE_MXFP4: result = quantize_mxfp4(src + start,
-                                                (char*)dst + start_row * row_size,
-                                                nrows,
-                                                n_per_row,
-                                                imatrix);
-    break;
-  case v_TYPE_Q2_K: result =
-                       quantize_q2_K(src + start, (block_q2_K*)dst + start_row * row_size, nrows, n_per_row, imatrix);
-    break;
-  case v_TYPE_Q3_K: result =
-                       quantize_q3_K(src + start, (char*)dst + start_row * row_size, nrows, n_per_row, imatrix);
-    break;
-  case v_TYPE_Q4_K: result =
-                       quantize_q4_K(src + start, (char*)dst + start_row * row_size, nrows, n_per_row, imatrix);
-    break;
-  case v_TYPE_Q5_K: result =
-                       quantize_q5_K(src + start, (char*)dst + start_row * row_size, nrows, n_per_row, imatrix);
-    break;
-  case v_TYPE_Q6_K: result =
-                       quantize_q6_K(src + start, (char*)dst + start_row * row_size, nrows, n_per_row, imatrix);
-    break;
-  case v_TYPE_TQ1_0: result = quantize_tq1_0(src + start,
-                                                (char*)dst + start_row * row_size,
-                                                nrows,
-                                                n_per_row,
-                                                imatrix);
-    break;
-  case v_TYPE_TQ2_0: result = quantize_tq2_0(src + start,
-                                                (char*)dst + start_row * row_size,
-                                                nrows,
-                                                n_per_row,
-                                                imatrix);
-    break;
-  case v_TYPE_IQ2_XXS: result = quantize_iq2_xxs(src + start,
-                                                    (char*)dst + start_row * row_size,
-                                                    nrows,
-                                                    n_per_row,
-                                                    imatrix);
-    break;
-  case v_TYPE_IQ2_XS: result = quantize_iq2_xs(src + start,
-                                                  (char*)dst + start_row * row_size,
-                                                  nrows,
-                                                  n_per_row,
-                                                  imatrix);
-    break;
-  case v_TYPE_IQ3_XXS: result = quantize_iq3_xxs(src + start,
-                                                    (char*)dst + start_row * row_size,
-                                                    nrows,
-                                                    n_per_row,
-                                                    imatrix);
-    break;
-  case v_TYPE_IQ3_S: result = quantize_iq3_s(src + start,
-                                                (char*)dst + start_row * row_size,
-                                                nrows,
-                                                n_per_row,
-                                                imatrix);
-    break;
-  case v_TYPE_IQ2_S: result = quantize_iq2_s(src + start,
-                                                (char*)dst + start_row * row_size,
-                                                nrows,
-                                                n_per_row,
-                                                imatrix);
-    break;
-  case v_TYPE_IQ1_S: result = quantize_iq1_s(src + start,
-                                                (char*)dst + start_row * row_size,
-                                                nrows,
-                                                n_per_row,
-                                                imatrix);
-    break;
-  case v_TYPE_IQ1_M: result = quantize_iq1_m(src + start,
-                                                (char*)dst + start_row * row_size,
-                                                nrows,
-                                                n_per_row,
-                                                imatrix);
-    break;
-  case v_TYPE_IQ4_NL: result = quantize_iq4_nl(src + start,
-                                                  (char*)dst + start_row * row_size,
-                                                  nrows,
-                                                  n_per_row,
-                                                  imatrix);
-    break;
-  case v_TYPE_IQ4_XS: result = quantize_iq4_xs(src + start,
-                                                  (char*)dst + start_row * row_size,
-                                                  nrows,
-                                                  n_per_row,
-                                                  imatrix);
-    break;
-  case v_TYPE_F16:
-    {
+  switch (type) {
+    case v_TYPE_Q4_0: result =
+        quantize_q4_0(src + start, (char*)dst + start_row * row_size, nrows, n_per_row, imatrix);
+      break;
+    case v_TYPE_Q4_1: result =
+        quantize_q4_1(src + start, (char*)dst + start_row * row_size, nrows, n_per_row, imatrix);
+      break;
+    case v_TYPE_Q5_0: result =
+        quantize_q5_0(src + start, (char*)dst + start_row * row_size, nrows, n_per_row, imatrix);
+      break;
+    case v_TYPE_Q5_1: result =
+        quantize_q5_1(src + start, (char*)dst + start_row * row_size, nrows, n_per_row, imatrix);
+      break;
+    case v_TYPE_Q8_0: result =
+        quantize_q8_0(src + start, (char*)dst + start_row * row_size, nrows, n_per_row, imatrix);
+      break;
+    case v_TYPE_MXFP4: result = quantize_mxfp4(src + start,
+                                               (char*)dst + start_row * row_size,
+                                               nrows,
+                                               n_per_row,
+                                               imatrix);
+      break;
+    case v_TYPE_Q2_K: result =
+        quantize_q2_K(src + start, (block_q2_K*)dst + start_row * row_size, nrows, n_per_row, imatrix);
+      break;
+    case v_TYPE_Q3_K: result =
+        quantize_q3_K(src + start, (char*)dst + start_row * row_size, nrows, n_per_row, imatrix);
+      break;
+    case v_TYPE_Q4_K: result =
+        quantize_q4_K(src + start, (char*)dst + start_row * row_size, nrows, n_per_row, imatrix);
+      break;
+    case v_TYPE_Q5_K: result =
+        quantize_q5_K(src + start, (char*)dst + start_row * row_size, nrows, n_per_row, imatrix);
+      break;
+    case v_TYPE_Q6_K: result =
+        quantize_q6_K(src + start, (char*)dst + start_row * row_size, nrows, n_per_row, imatrix);
+      break;
+    case v_TYPE_TQ1_0: result = quantize_tq1_0(src + start,
+                                               (char*)dst + start_row * row_size,
+                                               nrows,
+                                               n_per_row,
+                                               imatrix);
+      break;
+    case v_TYPE_TQ2_0: result = quantize_tq2_0(src + start,
+                                               (char*)dst + start_row * row_size,
+                                               nrows,
+                                               n_per_row,
+                                               imatrix);
+      break;
+    case v_TYPE_IQ2_XXS: result = quantize_iq2_xxs(src + start,
+                                                   (char*)dst + start_row * row_size,
+                                                   nrows,
+                                                   n_per_row,
+                                                   imatrix);
+      break;
+    case v_TYPE_IQ2_XS: result = quantize_iq2_xs(src + start,
+                                                 (char*)dst + start_row * row_size,
+                                                 nrows,
+                                                 n_per_row,
+                                                 imatrix);
+      break;
+    case v_TYPE_IQ3_XXS: result = quantize_iq3_xxs(src + start,
+                                                   (char*)dst + start_row * row_size,
+                                                   nrows,
+                                                   n_per_row,
+                                                   imatrix);
+      break;
+    case v_TYPE_IQ3_S: result = quantize_iq3_s(src + start,
+                                               (char*)dst + start_row * row_size,
+                                               nrows,
+                                               n_per_row,
+                                               imatrix);
+      break;
+    case v_TYPE_IQ2_S: result = quantize_iq2_s(src + start,
+                                               (char*)dst + start_row * row_size,
+                                               nrows,
+                                               n_per_row,
+                                               imatrix);
+      break;
+    case v_TYPE_IQ1_S: result = quantize_iq1_s(src + start,
+                                               (char*)dst + start_row * row_size,
+                                               nrows,
+                                               n_per_row,
+                                               imatrix);
+      break;
+    case v_TYPE_IQ1_M: result = quantize_iq1_m(src + start,
+                                               (char*)dst + start_row * row_size,
+                                               nrows,
+                                               n_per_row,
+                                               imatrix);
+      break;
+    case v_TYPE_IQ4_NL: result = quantize_iq4_nl(src + start,
+                                                 (char*)dst + start_row * row_size,
+                                                 nrows,
+                                                 n_per_row,
+                                                 imatrix);
+      break;
+    case v_TYPE_IQ4_XS: result = quantize_iq4_xs(src + start,
+                                                 (char*)dst + start_row * row_size,
+                                                 nrows,
+                                                 n_per_row,
+                                                 imatrix);
+      break;
+    case v_TYPE_F16: {
       size_t elemsize = sizeof(v_fp16_t);
       v_fp32_to_fp16_row(src + start, (v_fp16_t*)dst + start, n);
       result = n * elemsize;
     }
     break;
-  case v_TYPE_BF16:
-    {
+    case v_TYPE_BF16: {
       size_t elemsize = sizeof(v_bf16_t);
       v_fp32_to_bf16_row_ref(src + start, (v_bf16_t*)dst + start, n);
       result = n * elemsize;
     }
     break;
-  case v_TYPE_F32:
-    {
+    case v_TYPE_F32: {
       size_t elemsize = sizeof(float);
-      result = n * elemsize;
+      result          = n * elemsize;
       std::memcpy((uint8_t*)dst + start * elemsize, src + start, result);
     }
     break;
-  default:
-    V_ASSERT(false);
+    default:
+      V_ASSERT(false);
   }
 
   V_ASSERT(result == nrows * row_size);
@@ -823,8 +804,7 @@ size_t v_quantize_chunk(enum v_data_type type,
   return result;
 }
 
-bool v_quantize_requires_imatrix(enum v_data_type type)
-{
+bool v_quantize_requires_imatrix(enum v_data_type type) {
   return
     type == v_TYPE_IQ2_XXS ||
     type == v_TYPE_IQ2_XS ||

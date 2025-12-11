@@ -11,8 +11,9 @@
 #include "vk_comp.hpp"
 
 bool vk_is_empty(v_tensor* node) {
-  return is_empty(node) || node->op == v_OP_NONE || node->op == v_OP_RESHAPE || node->op == v_OP_TRANSPOSE
-    || node->op == V_OP_VIEW || node->op == V_OP_PERMUTE;
+  return node->is_empty() || node->op == v_OP_NONE ||
+    node->op == V_OP_RESHAPE || node->op == v_OP_TRANSPOSE ||
+    node->op == V_OP_VIEW || node->op == V_OP_PERMUTE;
 }
 
 bool v_can_fuse(const v_cgraph* cgraph, int node_idx, const v_operation* ops, int num_ops);
@@ -46,8 +47,7 @@ bool v_vk_can_fuse_topk_moe(vk_backend_ctx* ctx, const struct v_cgraph* cgraph,
   if (with_norm) {
     if (node_idx + (int)topk_moe_norm.size() > cgraph->n_nodes) { return false; }
     for (size_t i = 0; i < topk_moe_norm.size(); ++i) { if (cgraph->nodes[node_idx + i]->op != topk_moe_norm[i]) { return false; } }
-  }
-  else {
+  } else {
     if (node_idx + (int)topk_moe.size() > cgraph->n_nodes) { return false; }
     for (size_t i = 0; i < topk_moe.size(); ++i) { if (cgraph->nodes[node_idx + i]->op != topk_moe[i]) { return false; } }
   }
@@ -149,14 +149,10 @@ v_status vk_graph_compute(v_backend_t backend, v_cgraph* cgraph) {
   for (int i = 0; i < cgraph->n_nodes; i++) {
     if (!ctx->device->disable_fusion) {
       uint32_t num_adds = v_vk_fuse_multi_add(ctx, cgraph, i);
-      if (num_adds) { ctx->num_additional_fused_ops = num_adds - 1; }
-      else if (v_vk_can_fuse(cgraph, i, {v_OP_RMS_NORM, v_OP_MUL})) { ctx->num_additional_fused_ops = 1; }
-      else if (v_vk_can_fuse_topk_moe(ctx, cgraph, i, true)) { ctx->num_additional_fused_ops = topk_moe_norm.size() - 1; }
-      else if (v_vk_can_fuse_topk_moe(ctx, cgraph, i, false)) { ctx->num_additional_fused_ops = topk_moe.size() - 1; }
+      if (num_adds) { ctx->num_additional_fused_ops = num_adds - 1; } else if (v_vk_can_fuse(cgraph, i, {v_OP_RMS_NORM, v_OP_MUL})) { ctx->num_additional_fused_ops = 1; } else if (v_vk_can_fuse_topk_moe(ctx, cgraph, i, true)) { ctx->num_additional_fused_ops = topk_moe_norm.size() - 1; } else if (v_vk_can_fuse_topk_moe(ctx, cgraph, i, false)) { ctx->num_additional_fused_ops = topk_moe.size() - 1; }
     }
-    vk_build_graph(ctx, cgraph, i, nullptr, 0, true, false, false, false);
-    if (cgraph->nodes[i]->op == v_OP_MUL_MAT || cgraph->nodes[i]->op == v_OP_MUL_MAT_ID) { total_mat_mul_bytes += num_bytes(cgraph->nodes[i]->src[0]); }
-    else if (cgraph->nodes[i]->op == v_OP_CONV_2D || cgraph->nodes[i]->op == v_OP_CONV_TRANSPOSE_2D) {
+    v_vk_build_graph(ctx, cgraph, i, nullptr, 0, true, false, false, false);
+    if (cgraph->nodes[i]->op == V_OP_MUL_MAT || cgraph->nodes[i]->op == v_OP_MUL_MAT_ID) { total_mat_mul_bytes += num_bytes(cgraph->nodes[i]->src[0]); } else if (cgraph->nodes[i]->op == v_OP_CONV_2D || cgraph->nodes[i]->op == v_OP_CONV_TRANSPOSE_2D) {
       // Return CRSxNPQxsizeof(*) to account as many bytes as mul_mat has in im2col->mul_mat mode.
       auto CRS_size =
         cgraph->nodes[i]->src[0]->ne[0] * cgraph->nodes[i]->src[0]->ne[1] * cgraph->nodes[i]->src[1]->ne[2];
@@ -179,7 +175,7 @@ v_status vk_graph_compute(v_backend_t backend, v_cgraph* cgraph) {
   ctx->tensor_ctxs.resize(cgraph->n_nodes);
 
   bool first_node_in_batch = true; // true if next node will be first node in a batch
-  int submit_node_idx      = 0; // index to first node in a batch
+  int submit_node_idx      = 0;    // index to first node in a batch
 
   vk_context compute_ctx;
   if (vk_perf_logger_enabled) {
@@ -210,8 +206,7 @@ v_status vk_graph_compute(v_backend_t backend, v_cgraph* cgraph) {
       compute_ctx      = vk_create_context(ctx, ctx->compute_cmd_pool);
       ctx->compute_ctx = compute_ctx;
       vk_begin_ctx(ctx->device, compute_ctx);
-    }
-    else { compute_ctx = ctx->compute_ctx.lock(); }
+    } else { compute_ctx = ctx->compute_ctx.lock(); }
     // initialize partial sums to zero.
     vk_buffer_memset_async(compute_ctx, ctx->prealloc_add_rms_partials, 0, 0, ctx->prealloc_size_add_rms_partials);
     vk_sync_buffers(ctx, compute_ctx);
@@ -229,14 +224,11 @@ v_status vk_graph_compute(v_backend_t backend, v_cgraph* cgraph) {
   for (int i = 0; i < cgraph->n_nodes; i++) {
     if (first_node_in_batch) { submit_node_idx = i; }
 
-    if (cgraph->nodes[i]->op == v_OP_MUL_MAT || cgraph->nodes[i]->op == v_OP_MUL_MAT_ID) { mul_mat_bytes += num_bytes(cgraph->nodes[i]->src[0]); }
+    if (cgraph->nodes[i]->op == V_OP_MUL_MAT || cgraph->nodes[i]->op == v_OP_MUL_MAT_ID) { mul_mat_bytes += num_bytes(cgraph->nodes[i]->src[0]); }
 
     if (!ctx->device->disable_fusion) {
       uint32_t num_adds = v_vk_fuse_multi_add(ctx, cgraph, i);
-      if (num_adds) { ctx->num_additional_fused_ops = num_adds - 1; }
-      else if (v_vk_can_fuse(cgraph, i, {v_OP_RMS_NORM, v_OP_MUL})) { ctx->num_additional_fused_ops = 1; }
-      else if (v_vk_can_fuse_topk_moe(ctx, cgraph, i, true)) { ctx->num_additional_fused_ops = topk_moe_norm.size() - 1; }
-      else if (v_vk_can_fuse_topk_moe(ctx, cgraph, i, false)) { ctx->num_additional_fused_ops = topk_moe.size() - 1; }
+      if (num_adds) { ctx->num_additional_fused_ops = num_adds - 1; } else if (v_vk_can_fuse(cgraph, i, {v_OP_RMS_NORM, v_OP_MUL})) { ctx->num_additional_fused_ops = 1; } else if (v_vk_can_fuse_topk_moe(ctx, cgraph, i, true)) { ctx->num_additional_fused_ops = topk_moe_norm.size() - 1; } else if (v_vk_can_fuse_topk_moe(ctx, cgraph, i, false)) { ctx->num_additional_fused_ops = topk_moe.size() - 1; }
     }
 
     // Signal the almost_ready fence when the graph is mostly complete (< 20% remaining)
@@ -246,23 +238,22 @@ v_status vk_graph_compute(v_backend_t backend, v_cgraph* cgraph) {
       (i + ctx->num_additional_fused_ops >= last_node) ||
       (almost_ready && !ctx->almost_ready_fence_pending);
 
-    bool enqueued = vk_build_graph(ctx,
-                                   cgraph,
-                                   i,
-                                   cgraph->nodes[submit_node_idx],
-                                   submit_node_idx,
-                                   false,
-                                   i + ctx->num_additional_fused_ops >= last_node,
-                                   almost_ready,
-                                   submit);
+    bool enqueued = v_vk_build_graph(ctx,
+                                     cgraph,
+                                     i,
+                                     cgraph->nodes[submit_node_idx],
+                                     submit_node_idx,
+                                     false,
+                                     i + ctx->num_additional_fused_ops >= last_node,
+                                     almost_ready,
+                                     submit);
 
     if (vk_perf_logger_enabled) {
       if (ctx->compute_ctx.expired()) {
         compute_ctx      = vk_create_context(ctx, ctx->compute_cmd_pool);
         ctx->compute_ctx = compute_ctx;
         vk_begin_ctx(ctx->device, compute_ctx);
-      }
-      else { compute_ctx = ctx->compute_ctx.lock(); }
+      } else { compute_ctx = ctx->compute_ctx.lock(); }
       // If there are fused ops, just write out timestamps for all nodes to keep the accounting simple
       for (int j = 0; j < ctx->num_additional_fused_ops + 1; ++j) {
         compute_ctx->s->buffer.writeTimestamp(vk::PipelineStageFlagBits::eAllCommands,
@@ -344,16 +335,16 @@ bool v_vk_compute_forward(vk_backend_ctx* ctx, v_cgraph* cgraph, v_tensor* tenso
     case v_OP_CONCAT:
     case v_OP_UPSCALE:
     case V_OP_SCALE:
-    case v_OP_SQR:
+    case V_OP_SQR:
     case v_OP_SQRT:
-    case v_OP_SIN:
-    case v_OP_COS:
-    case v_OP_CLAMP:
+    case V_OP_SIN:
+    case V_OP_COS:
+    case V_OP_CLAMP:
     case v_OP_PAD:
     case v_OP_ROLL:
-    case v_OP_CPY:
+    case V_OP_CPY:
     case v_OP_SET_ROWS:
-    case v_OP_CONT:
+    case V_OP_CONT:
     case v_OP_DUP:
     case v_OP_SILU_BACK:
     case v_OP_NORM:
@@ -366,7 +357,7 @@ bool v_vk_compute_forward(vk_backend_ctx* ctx, v_cgraph* cgraph, v_tensor* tenso
     case v_OP_SOFT_MAX_BACK:
     case V_OP_ROPE:
     case v_OP_ROPE_BACK:
-    case v_OP_RESHAPE:
+    case V_OP_RESHAPE:
     case V_OP_VIEW:
     case V_OP_PERMUTE:
     case v_OP_TRANSPOSE:
@@ -390,7 +381,7 @@ bool v_vk_compute_forward(vk_backend_ctx* ctx, v_cgraph* cgraph, v_tensor* tenso
     case v_OP_RWKV_WKV7:
     case v_OP_SSM_SCAN:
     case v_OP_SSM_CONV:
-    case v_OP_LEAKY_RELU:
+    case V_OP_LEAKY_RELU:
     case v_OP_REPEAT:
     case v_OP_REPEAT_BACK:
     case v_OP_OPT_STEP_ADAMW:
@@ -400,7 +391,7 @@ bool v_vk_compute_forward(vk_backend_ctx* ctx, v_cgraph* cgraph, v_tensor* tenso
     case v_OP_UNARY:
       switch (v_get_unary_op(tensor)) {
         case v_UNARY_OP_EXP:
-        case v_UNARY_OP_LOG:
+        case V_UNARY_OP_LOG:
         case v_UNARY_OP_SILU:
         case v_UNARY_OP_GELU:
         case v_UNARY_OP_GELU_ERF:
@@ -430,7 +421,7 @@ bool v_vk_compute_forward(vk_backend_ctx* ctx, v_cgraph* cgraph, v_tensor* tenso
           return false;
       }
       break;
-    case v_OP_MUL_MAT:
+    case V_OP_MUL_MAT:
     case v_OP_MUL_MAT_ID:
     case v_OP_FLASH_ATTN_EXT:
       buf = tensor->buffer;
@@ -467,8 +458,7 @@ bool v_vk_compute_forward(vk_backend_ctx* ctx, v_cgraph* cgraph, v_tensor* tenso
     if (almost_ready && !ctx->almost_ready_fence_pending && !use_fence) {
       vk_submit(subctx, ctx->almost_ready_fence);
       ctx->almost_ready_fence_pending = true;
-    }
-    else {
+    } else {
       vk_submit(subctx, use_fence
                           ? ctx->fence
                           : vk::Fence{});

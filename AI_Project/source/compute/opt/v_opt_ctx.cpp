@@ -1,6 +1,6 @@
 #include "v_opt_common.hpp"
 #include "v_opt_ctx.hpp"
-#include "v_propagation.hpp"
+#include "v_graph_expand.hpp"
 #include "v_opt_dataset.hpp"
 #include "v_opt_result.hpp"
 #include "v_util.hpp"
@@ -9,8 +9,7 @@ void v_opt_reset(v_opt_ctx* opt_ctx, bool optimizer) {
   if (optimizer) {
     v_graph_reset(opt_ctx->gb_opt);
     opt_ctx->iter = 1;
-  }
-  else v_graph_reset(opt_ctx->gb_grad);
+  } else v_graph_reset(opt_ctx->gb_grad);
 }
 
 
@@ -40,7 +39,7 @@ v_tensor* v_map_tensor(std::map<v_tensor*, v_tensor*>& tensor_map, v_ctx* ctx, v
 
 
 v_opt_ctx* v_opt_init(v_opt_struct params) {
-  v_opt_ctx* result        = new struct v_opt_ctx();
+  auto result              = new struct v_opt_ctx();
   result->backend_sched    = params.backend_sched;
   result->ctx_compute      = params.ctx_compute;
   result->loss_type        = params.loss_type;
@@ -63,7 +62,7 @@ v_opt_ctx* v_opt_init(v_opt_struct params) {
 
   V_ASSERT(result->inputs);
   V_ASSERT(result->outputs);
-  result->gf = v_new_graph_custom(result->ctx_compute, v_DEFAULT_GRAPH_SIZE, /*grads =*/ true); // Forward pass.
+  result->gf = v_new_graph_custom(result->ctx_compute, V_DEFAULT_GRAPH_SIZE, /*grads =*/ true); // Forward pass.
   v_build_foward_expand(result->gf, result->outputs);
   result->build();
   return result;
@@ -127,8 +126,7 @@ void v_opt_evaluate(v_opt_ctx* opt_ctx,
   if (result->ndata == 0) {
     result->loss_per_datapoint = opt_ctx->loss_per_datapoint;
     result->opt_period         = opt_ctx->opt_period;
-  }
-  else {
+  } else {
     V_ASSERT(result->loss_per_datapoint == opt_ctx->loss_per_datapoint);
     V_ASSERT(result->opt_period == opt_ctx->opt_period);
   }
@@ -158,7 +156,7 @@ void v_opt_evaluate(v_opt_ctx* opt_ctx,
   result->ncorrect += ncorrect;
 }
 
-struct v_opt_params v_opt_get_default_optimizer_params(void* userdata) {
+v_opt_params v_opt_get_default_optimizer_params(void* userdata) {
   V_UNUSED(userdata);
   v_opt_params result{};
   result.adamw.alpha = 1e-3;
@@ -174,6 +172,7 @@ struct v_opt_params v_opt_get_default_optimizer_params(void* userdata) {
 
 
 v_opt_params v_opt_get_constant_optimizer_params(void* userdata) { return *static_cast<v_opt_params*>(userdata); }
+
 v_opt_struct v_opt_default_params(v_backend_sched_t backend_sched, v_opt_loss_type loss_type) {
   return {
     /*backend_sched   =*/ backend_sched,
@@ -266,7 +265,7 @@ void v_opt_epoch_callback_progress_bar(bool train,
   constexpr int64_t bar_length = 8;
   const int64_t ibatch8        = 8 * batch_idx;
   for (int64_t j = 0; j < bar_length; ++j) {
-    if (ibatch_max * (8 * j + 8) / bar_length < ibatch8) fprintf(stderr, "\u2588"); // full block
+    if (ibatch_max * (8 * j + 8) / bar_length < ibatch8) fprintf(stderr, "\u2588");      // full block
     else if (ibatch_max * (8 * j + 7) / bar_length < ibatch8) fprintf(stderr, "\u2589"); // 7/8 filled
     else if (ibatch_max * (8 * j + 6) / bar_length < ibatch8) fprintf(stderr, "\u258A"); // 6/8 filled
     else if (ibatch_max * (8 * j + 5) / bar_length < ibatch8) fprintf(stderr, "\u258B"); // 5/8 filled
@@ -430,7 +429,7 @@ v_opt_ctx::v_opt_ctx(struct v_opt_struct params) {
   V_ASSERT(result->inputs);
   V_ASSERT(result->outputs);
 
-  result->gf = v_new_graph_custom(result->ctx_compute, v_DEFAULT_GRAPH_SIZE, /*grads =*/ true); // Forward pass.
+  result->gf = v_new_graph_custom(result->ctx_compute, V_DEFAULT_GRAPH_SIZE, /*grads =*/ true); // Forward pass.
   v_build_foward_expand(result->gf, result->outputs);
   result->build();
 }
@@ -446,8 +445,7 @@ void v_opt_ctx::allocate(bool backward) {
     opt_ctx->build_type      = (opt_i_next == 0)
                             ? V_OPT_TYPE_OPT
                             : V_OPT_BUILD_TYPE_GRAD;
-  }
-  else { opt_ctx->build_type = V_OPT_TYPE_FORWARD; }
+  } else { opt_ctx->build_type = V_OPT_TYPE_FORWARD; }
   if (!opt_ctx->static_graphs) { opt_ctx->build(); }
   struct v_cgraph* graph = nullptr;
   switch (opt_ctx->build_type) {
@@ -468,11 +466,11 @@ void v_opt_ctx::allocate(bool backward) {
   v_sched_reset(opt_ctx->backend_sched); // clear allocation of previous graph
   if (opt_ctx->static_graphs) {
     v_init_param params = {
-      /*.mem_size   =*/ graph->size * v_tensor_over_head() + v_graph_overhead_custom(graph->size, graph->grads),
+      /*.mem_size   =*/ graph->size * v_tensor_over_head() + v_graph_overhead_custom(graph->size, graph->grads.data()),
       /*.mem_buffer =*/ nullptr,
       /*.no_alloc   =*/ true,
     };
-    free_ctx(opt_ctx->ctx_copy);
+    v_free_ctx(opt_ctx->ctx_copy);
     opt_ctx->ctx_copy = v_ctx_init(params);
     auto ctx          = opt_ctx->ctx_copy;
     auto src          = graph;
@@ -495,8 +493,7 @@ void v_opt_ctx::allocate(bool backward) {
       dst->grad_accs[igrad_dst] = src->grad_accs[igrad_src];
     }
     opt_ctx->allocated_graph_copy = dst;
-  }
-  else { opt_ctx->allocated_graph_copy = graph; }
+  } else { opt_ctx->allocated_graph_copy = graph; }
   v_sched_alloc_graph(opt_ctx->backend_sched, opt_ctx->allocated_graph_copy);
   opt_ctx->allocated_graph = graph;
   opt_ctx->eval_ready      = true;
@@ -515,12 +512,12 @@ void v_opt_ctx::build() {
   const bool need_momenta = opt_ctx->build_type_alloc == V_OPT_TYPE_OPT &&
     opt_ctx->optimizer == V_OPTIMIZER_TYPE_ADAMW;
 
-  v_set_inputs(opt_ctx->inputs);
-  v_set_outputs(opt_ctx->outputs);
+  opt_ctx->inputs->set_inputs();
+  opt_ctx->outputs->set_outputs();
 
   int n_param = 0;
   for (int i = 0; i < opt_ctx->gf->n_nodes; ++i) {
-    const struct v_tensor* node = opt_ctx->gf->nodes[i];
+    const v_tensor* node = opt_ctx->gf->nodes[i];
     if (node->flags & TENSOR_FLAG_PARAM) { n_param++; }
     V_ASSERT(!(node->flags & TENSOR_FLAG_LOSS) && "support for extra loss terms not implemented");
   }
@@ -541,8 +538,8 @@ void v_opt_ctx::build() {
     const size_t tensors_const = opt_ctx->static_graphs
                                    ? 9
                                    : 0;
-    const size_t size_meta     = (n_loss + tensors_per_param * n_param + tensors_const) * v_tensor_over_head();
-    struct v_init_param params = {
+    const size_t size_meta = (n_loss + tensors_per_param * n_param + tensors_const) * v_tensor_over_head();
+    v_init_param params    = {
       /*.mem_size   =*/ size_meta,
       /*.mem_buffer =*/ nullptr,
       /*.no_alloc   =*/ true,
@@ -560,7 +557,7 @@ void v_opt_ctx::build() {
       /*.mem_buffer =*/ nullptr,
       /*.no_alloc   =*/ true,
     };
-    free_ctx(opt_ctx->ctx_gpu);
+    v_free_ctx(opt_ctx->ctx_gpu);
     opt_ctx->ctx_gpu = v_ctx_init(params);
     v_backend_buffer_free(opt_ctx->buf_host);
     opt_ctx->buf_host = nullptr;
@@ -589,7 +586,7 @@ void v_opt_ctx::build() {
     case V_OPT_LOSS_CROSS_ENTROPY: {
       opt_ctx->labels = v_dup_tensor(ctx_results, opt_ctx->outputs);
 
-      v_set_inputs(opt_ctx->labels);
+      (opt_ctx->labels)->set_inputs();
       v_set_name(opt_ctx->labels, "labels_one_hot");
 
       opt_ctx->loss = v_soft_max(ctx_results, opt_ctx->outputs);
@@ -627,7 +624,7 @@ void v_opt_ctx::build() {
 
     case V_OPT_LOSS_SQUARED_ERROR: {
       opt_ctx->labels = v_dup_tensor(ctx_results, opt_ctx->outputs);
-      v_set_inputs(opt_ctx->labels);
+      (opt_ctx->labels)->set_inputs();
       v_set_name(opt_ctx->labels, "labels");
 
       opt_ctx->loss = v_sub(ctx_results, opt_ctx->outputs, opt_ctx->labels);
@@ -656,8 +653,7 @@ void v_opt_ctx::build() {
   v_build_foward_expand(opt_ctx->gf, opt_ctx->loss);
 
 
-  if (opt_ctx->buf_static) { if (opt_ctx->build_type == V_OPT_TYPE_FORWARD) { return; } }
-  else if (opt_ctx->build_type_alloc == V_OPT_TYPE_FORWARD) {
+  if (opt_ctx->buf_static) { if (opt_ctx->build_type == V_OPT_TYPE_FORWARD) { return; } } else if (opt_ctx->build_type_alloc == V_OPT_TYPE_FORWARD) {
     opt_ctx->buf_static = v_backend_alloc_ctx_tensors(
       opt_ctx->ctx_static,
       v_sched_get_backend(opt_ctx->backend_sched, 0));
@@ -670,8 +666,7 @@ void v_opt_ctx::build() {
     opt_ctx->grad_accs.resize(n_nodes);
     for (int i = 0; i < n_nodes; ++i) {
       v_tensor* node = opt_ctx->gf->nodes[i];
-      if ((accumulate && (node->flags & TENSOR_FLAG_PARAM)) || (node->flags & TENSOR_FLAG_LOSS)) { opt_ctx->grad_accs[i] = v_new_tensor(opt_ctx->ctx_static, v_TYPE_F32, V_MAX_DIMS, node->ne.data()); }
-      else { opt_ctx->grad_accs[i] = nullptr; }
+      if ((accumulate && (node->flags & TENSOR_FLAG_PARAM)) || (node->flags & TENSOR_FLAG_LOSS)) { opt_ctx->grad_accs[i] = v_new_tensor(opt_ctx->ctx_static, v_TYPE_F32, V_MAX_DIMS, node->ne.data()); } else { opt_ctx->grad_accs[i] = nullptr; }
     }
 
     if (need_momenta && opt_ctx->build_type_alloc >= V_OPT_TYPE_OPT) {
@@ -682,8 +677,7 @@ void v_opt_ctx::build() {
         if (node->flags & TENSOR_FLAG_PARAM) {
           opt_ctx->grad_m[i] = v_new_tensor(opt_ctx->ctx_static, v_TYPE_F32, V_MAX_DIMS, node->ne.data());
           opt_ctx->grad_v[i] = v_new_tensor(opt_ctx->ctx_static, v_TYPE_F32, V_MAX_DIMS, node->ne.data());
-        }
-        else {
+        } else {
           opt_ctx->grad_m[i] = nullptr;
           opt_ctx->grad_v[i] = nullptr;
         }
@@ -701,8 +695,7 @@ void v_opt_ctx::build() {
                           opt_ctx->gb_grad,
                           opt_ctx->grad_accs.data());
 
-  if (opt_ctx->buf_static) { if (opt_ctx->build_type == V_OPT_BUILD_TYPE_GRAD) { return; } }
-  else if (opt_ctx->build_type_alloc == V_OPT_BUILD_TYPE_GRAD) {
+  if (opt_ctx->buf_static) { if (opt_ctx->build_type == V_OPT_BUILD_TYPE_GRAD) { return; } } else if (opt_ctx->build_type_alloc == V_OPT_BUILD_TYPE_GRAD) {
     opt_ctx->buf_static = v_backend_alloc_ctx_tensors(opt_ctx->ctx_static,
                                                       v_sched_get_backend(opt_ctx->backend_sched, 0));
     v_graph_reset(opt_ctx->gb_grad);
@@ -716,12 +709,12 @@ void v_opt_ctx::build() {
                                                  ? 7
                                                  : 2);
   v_tensor* adamw_params = opt_ctx->opt_step_params__;
-  v_set_inputs(adamw_params);
+  adamw_params->set_inputs();
   const char* optimizer_name = opt_ctx->get_opt_name();
   v_format_name(adamw_params, "%s_params", optimizer_name);
   for (int i = opt_ctx->gf->n_nodes - 1; i >= 0; --i) {
-    struct v_tensor* node = opt_ctx->gb_opt->nodes[i];
-    struct v_tensor* grad = v_graph_get_grad(opt_ctx->gb_opt, node);
+    v_tensor* node = opt_ctx->gb_opt->nodes[i];
+    v_tensor* grad = v_graph_get_grad(opt_ctx->gb_opt, node);
     if (grad && (node->flags & TENSOR_FLAG_PARAM)) {
       struct v_tensor* m = nullptr;
       struct v_tensor* v = nullptr;

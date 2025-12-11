@@ -98,7 +98,7 @@ int main() {
   auto vk         = backend_vk_init(0);
   v_backend_t a[] = {vk};
 
-  auto backend_sched  = v_sched_new(*a, nullptr, 1, v_DEFAULT_GRAPH_SIZE, false, true);
+  auto backend_sched  = v_sched_new(*a, nullptr, 1, V_DEFAULT_GRAPH_SIZE, false, true);
   model.backend_sched = backend_sched;
 
   int num_tensors = 10;
@@ -107,7 +107,7 @@ int main() {
     /*.mem_buffer =*/ NULL,
     /*.no_alloc   =*/ true,
   };
-  const size_t size_meta = v_DEFAULT_GRAPH_SIZE * v_tensor_over_head() + 10 * graph_overhead();
+  const size_t size_meta = V_DEFAULT_GRAPH_SIZE * v_tensor_over_head() + 10 * graph_overhead();
   model.ctx_compute      = v_ctx_init(params);
 
   py::scoped_interpreter guard{};
@@ -165,8 +165,8 @@ int main() {
                                                 /*ndata_shard =*/
                                                 1);
 
-  v_tensor* data  = dataset->getDataset();
-  v_tensor* label = dataset->getLabels();
+  v_tensor* data  = dataset->get_dataset();
+  v_tensor* label = dataset->get_labels();
   float* buf      = v_get_tdata_f32(data);
   float* lbuf     = v_get_tdata_f32(label);
   #pragma omp parallel for

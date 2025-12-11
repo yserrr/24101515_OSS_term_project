@@ -203,10 +203,9 @@ void v_vk_op_f32_wkv(vk_backend_ctx* ctx, vk_context& subctx, v_tensor* dst,
     return;
   }
 
-  v_backend_vk_buffer_ctx* dst_buf_ctx     = (v_backend_vk_buffer_ctx*)dst->buffer->context;
+  v_backend_vk_buffer_ctx* dst_buf_ctx     = dst->buffer->context;
   v_backend_vk_buffer_ctx* src_buf_ctxs[7] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
-  for (int i = 0; i < num_srcs; i++) { src_buf_ctxs[i] = (v_backend_vk_buffer_ctx*)dst->src[i]->buffer->context; }
-
+  for (int i = 0; i < num_srcs; i++) { src_buf_ctxs[i] = dst->src[i]->buffer->context; }
   vk_buffer d_D     = nullptr, d_srcs[7] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
   size_t dst_offset = 0, src_offsets[7]  = {0, 0, 0, 0, 0, 0, 0};
   bool dst_uma      = false, srcs_uma[7] = {false, false, false, false, false, false, false};
@@ -257,8 +256,7 @@ void v_vk_op_f32_wkv(vk_backend_ctx* ctx, vk_context& subctx, v_tensor* dst,
                            },
                            pc,
                            elements);
-  }
-  else if (version == 7) {
+  } else if (version == 7) {
     v_vk_dispatch_pipeline(ctx,
                            subctx,
                            pipeline,
@@ -274,8 +272,7 @@ void v_vk_op_f32_wkv(vk_backend_ctx* ctx, vk_context& subctx, v_tensor* dst,
                            },
                            pc,
                            elements);
-  }
-  else {
+  } else {
     // shouldn't happen
     V_ASSERT(false);
   }
@@ -667,7 +664,7 @@ void v_vk_sqr(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_t
               nullptr,
               nullptr,
               dst,
-              v_OP_SQR,
+              V_OP_SQR,
               vk_op_unary_push_constants_init(src0, dst),
               dryrun);
 }
@@ -693,7 +690,7 @@ void v_vk_sin(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_t
               nullptr,
               nullptr,
               dst,
-              v_OP_SIN,
+              V_OP_SIN,
               vk_op_unary_push_constants_init(src0, dst),
               dryrun);
 }
@@ -706,7 +703,7 @@ void v_vk_cos(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_t
               nullptr,
               nullptr,
               dst,
-              v_OP_COS,
+              V_OP_COS,
               vk_op_unary_push_constants_init(src0, dst),
               dryrun);
 }
@@ -717,7 +714,7 @@ void v_vk_clamp(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v
   p.param1                     = v_get_op_params_f32(dst, 0);
   p.param2                     = v_get_op_params_f32(dst, 1);
 
-  v_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, dst, v_OP_CLAMP, std::move(p), dryrun);
+  v_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, dst, V_OP_CLAMP, std::move(p), dryrun);
 }
 
 void v_vk_pad(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst,
@@ -762,7 +759,7 @@ void v_vk_set_rows(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0
   // Skip empty skip_rows operations. For most ops the empty check at the start
   // of v_vk_build_graph is sufficient, but set_rows can have a nonempty dst
   // with empty srcs.
-  if (is_empty(src0) || is_empty(src1)) { return; }
+  if ((src0)->is_empty() || src1->is_empty()) { return; }
 
   v_vk_op_f32<vk_op_binary_push_constants>(ctx,
                                            subctx,
@@ -952,8 +949,7 @@ void v_vk_glu(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0,
 
   V_ASSERT(v_is_contiguous(src0));
 
-  if (!split) { V_ASSERT(src0->ne[0] / 2 == dst->ne[0]); }
-  else {
+  if (!split) { V_ASSERT(src0->ne[0] / 2 == dst->ne[0]); } else {
     V_ASSERT(src0->ne[0] == src1->ne[0]);
     V_ASSERT(src0->ne[0] == dst->ne[0]);
     V_ASSERT(src0->type == src1->type);
@@ -1176,7 +1172,7 @@ void v_vk_rope(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0,
   const float beta_fast   = ((float*)dst->op_params.data())[9];
   const float beta_slow   = ((float*)dst->op_params.data())[10];
   int sections[4]{};
-  if (mode & v_ROPE_TYPE_MROPE) { memcpy(sections, dst->op_params.data() + 11, sizeof(int) * 4); }
+  if (mode & V_ROPE_TYPE_MROPE) { memcpy(sections, dst->op_params.data() + 11, sizeof(int) * 4); }
 
   float corr_dims[2];
   v_rope_yarn_corr_dims(n_dims, n_ctx_orig, freq_base, beta_fast, beta_slow, corr_dims);
@@ -1278,7 +1274,7 @@ void v_vk_leaky_relu(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* sr
                                     nullptr,
                                     nullptr,
                                     dst,
-                                    v_OP_LEAKY_RELU,
+                                    V_OP_LEAKY_RELU,
                                     {static_cast<uint32_t>(nelements(src0)), 0, op_params[0], 0.0f},
                                     dryrun);
 }
@@ -1372,8 +1368,7 @@ void v_vk_multi_add(vk_backend_ctx* ctx, vk_context& subctx, v_cgraph* cgraph, i
   tensors[1] = first_node->src[1];
   for (int32_t i = 0; i < ctx->num_additional_fused_ops; ++i) {
     // check whether the previous result is src[0] or src[1]
-    if (cgraph->nodes[node_idx + i] == cgraph->nodes[node_idx + i + 1]->src[0]) { tensors[i + 2] = cgraph->nodes[node_idx + i + 1]->src[1]; }
-    else { tensors[i + 2] = cgraph->nodes[node_idx + i + 1]->src[0]; }
+    if (cgraph->nodes[node_idx + i] == cgraph->nodes[node_idx + i + 1]->src[0]) { tensors[i + 2] = cgraph->nodes[node_idx + i + 1]->src[1]; } else { tensors[i + 2] = cgraph->nodes[node_idx + i + 1]->src[0]; }
   }
   tensors[num_srcs] = dst;
 
@@ -1438,9 +1433,7 @@ void v_vk_multi_add(vk_backend_ctx* ctx, vk_context& subctx, v_cgraph* cgraph, i
   std::array<uint32_t, 3> elements;
 
   uint32_t ne = nelements(dst);
-  if (ne > 262144) { elements = {512, 512, CEIL_DIV(ne, 262144)}; }
-  else if (ne > 512) { elements = {512, CEIL_DIV(ne, 512), 1}; }
-  else { elements = {ne, 1, 1}; }
+  if (ne > 262144) { elements = {512, 512, CEIL_DIV(ne, 262144)}; } else if (ne > 512) { elements = {512, CEIL_DIV(ne, 512), 1}; } else { elements = {ne, 1, 1}; }
 
   static_assert(MAX_PARAMETER_COUNT == 12);
   v_vk_dispatch_pipeline(ctx,

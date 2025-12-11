@@ -81,12 +81,10 @@ struct v_backend_vk_buffer_ctx {
   vk_device_ref device;
   vk_buffer dev_buffer;
   std::string name;
-
   v_backend_vk_buffer_ctx(vk_device_ref device, vk_buffer&& dev_buffer, std::string& name) :
     device(device),
     dev_buffer(dev_buffer),
     name(name) {}
-
   ~v_backend_vk_buffer_ctx() { vk_destroy_buffer(dev_buffer); }
 };
 

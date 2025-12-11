@@ -11,11 +11,11 @@
 uint32_t v_vk_rms_partials_size(vk_backend_ctx* ctx, const v_tensor* node);
 // Returns true if node has enqueued work into the queue, false otherwise
 // If submit is true the current all operations queued so far are being submitted to Vulkan to overlap cmdlist creation and GPU execution.
-bool vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
+bool v_vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
                     v_tensor* node_begin, int node_idx_begin, bool dryrun, bool last_node,
                     bool almost_ready, bool submit) {
   v_tensor* node = cgraph->nodes[node_idx];
-  if (is_empty(node) || !node->buffer) { return false; }
+  if ((node)->is_empty() || !node->buffer) { return false; }
 
   VK_LOG_DEBUG("v_vk_build_graph(" << node << ", " << op_name(node->op) << ")");
   ctx->semaphore_idx = 0;
@@ -27,7 +27,7 @@ bool vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
 
   switch (node->op) {
     // Return on empty ops to avoid generating a compute_ctx and setting exit_tensor
-    case v_OP_RESHAPE:
+    case V_OP_RESHAPE:
     case V_OP_VIEW:
     case V_OP_PERMUTE:
     case v_OP_TRANSPOSE:
@@ -38,7 +38,7 @@ bool vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
         case v_UNARY_OP_EXP:
         case v_UNARY_OP_SILU:
         case v_UNARY_OP_GELU:
-        case v_UNARY_OP_LOG:
+        case V_UNARY_OP_LOG:
         case v_UNARY_OP_GELU_ERF:
         case v_UNARY_OP_GELU_QUICK:
         case v_UNARY_OP_RELU:
@@ -89,16 +89,16 @@ bool vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
     case v_OP_CONCAT:
     case v_OP_UPSCALE:
     case V_OP_SCALE:
-    case v_OP_SQR:
+    case V_OP_SQR:
     case v_OP_SQRT:
-    case v_OP_SIN:
-    case v_OP_COS:
-    case v_OP_CLAMP:
+    case V_OP_SIN:
+    case V_OP_COS:
+    case V_OP_CLAMP:
     case v_OP_PAD:
     case v_OP_ROLL:
-    case v_OP_CPY:
+    case V_OP_CPY:
     case v_OP_SET_ROWS:
-    case v_OP_CONT:
+    case V_OP_CONT:
     case v_OP_DUP:
     case v_OP_SILU_BACK:
     case v_OP_NORM:
@@ -111,7 +111,7 @@ bool vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
     case v_OP_SOFT_MAX_BACK:
     case V_OP_ROPE:
     case v_OP_ROPE_BACK:
-    case v_OP_MUL_MAT:
+    case V_OP_MUL_MAT:
     case v_OP_MUL_MAT_ID:
     case v_OP_ARGSORT:
     case v_OP_SUM:
@@ -132,7 +132,7 @@ bool vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
     case v_OP_RWKV_WKV7:
     case v_OP_SSM_SCAN:
     case v_OP_SSM_CONV:
-    case v_OP_LEAKY_RELU:
+    case V_OP_LEAKY_RELU:
     case v_OP_FLASH_ATTN_EXT:
     case v_OP_OPT_STEP_ADAMW:
     case v_OP_OPT_STEP_SGD:
@@ -165,15 +165,15 @@ bool vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
       case v_OP_CONCAT:
       case v_OP_UPSCALE:
       case V_OP_SCALE:
-      case v_OP_SQR:
+      case V_OP_SQR:
       case v_OP_SQRT:
-      case v_OP_SIN:
-      case v_OP_COS:
-      case v_OP_CLAMP:
+      case V_OP_SIN:
+      case V_OP_COS:
+      case V_OP_CLAMP:
       case v_OP_PAD:
-      case v_OP_CPY:
+      case V_OP_CPY:
       case v_OP_SET_ROWS:
-      case v_OP_CONT:
+      case V_OP_CONT:
       case v_OP_DUP:
       case v_OP_SILU_BACK:
       case v_OP_NORM:
@@ -203,7 +203,7 @@ bool vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
       case v_OP_CONV_2D:
       case v_OP_CONV_TRANSPOSE_2D:
       case v_OP_CONV_2D_DW:
-      case v_OP_LEAKY_RELU:
+      case V_OP_LEAKY_RELU:
       case v_OP_OPT_STEP_SGD: {
         // These operations all go through v_vk_op_f32, so short-circuit and
         // do the only thing needed for the dryrun.
@@ -335,7 +335,7 @@ bool vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
       v_vk_scale(ctx, compute_ctx, src0, node, dryrun);
 
       break;
-    case v_OP_SQR:
+    case V_OP_SQR:
       v_vk_sqr(ctx, compute_ctx, src0, node, dryrun);
 
       break;
@@ -343,15 +343,15 @@ bool vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
       v_vk_sqrt(ctx, compute_ctx, src0, node, dryrun);
 
       break;
-    case v_OP_SIN:
+    case V_OP_SIN:
       v_vk_sin(ctx, compute_ctx, src0, node, dryrun);
 
       break;
-    case v_OP_COS:
+    case V_OP_COS:
       v_vk_cos(ctx, compute_ctx, src0, node, dryrun);
 
       break;
-    case v_OP_CLAMP:
+    case V_OP_CLAMP:
       v_vk_clamp(ctx, compute_ctx, src0, node, dryrun);
 
       break;
@@ -363,8 +363,8 @@ bool vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
       v_vk_roll(ctx, compute_ctx, src0, node, dryrun);
 
       break;
-    case v_OP_CPY:
-    case v_OP_CONT:
+    case V_OP_CPY:
+    case V_OP_CONT:
     case v_OP_DUP:
       v_vk_cpy(ctx, compute_ctx, src0, node, dryrun);
 
@@ -410,7 +410,7 @@ bool vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
         case v_UNARY_OP_RELU:
         case v_UNARY_OP_TANH:
         case v_UNARY_OP_SIGMOID:
-        case v_UNARY_OP_LOG:
+        case V_UNARY_OP_LOG:
         case v_UNARY_OP_HARDSIGMOID:
         case v_UNARY_OP_HARDSWISH:
           v_vk_unary(ctx, compute_ctx, src0, node, dryrun);
@@ -516,11 +516,11 @@ bool vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
       v_vk_conv_2d_dw(ctx, compute_ctx, src0, src1, node, dryrun);
 
       break;
-    case v_OP_LEAKY_RELU:
+    case V_OP_LEAKY_RELU:
       v_vk_leaky_relu(ctx, compute_ctx, src0, node, dryrun);
 
       break;
-    case v_OP_MUL_MAT:
+    case V_OP_MUL_MAT:
       v_vk_mul_mat(ctx, compute_ctx, src0, src1, node, dryrun);
 
       break;
@@ -610,7 +610,7 @@ void vk_graph_optimize(v_backend_t backend, struct v_cgraph* graph) {
   vk_backend_ctx* ctx = (vk_backend_ctx*)backend->context;
   if (ctx->device->disable_graph_optimize) { return; }
   auto const& is_empty = [](v_tensor* node) -> bool {
-    return node->op == v_OP_NONE || node->op == v_OP_RESHAPE || node->op == v_OP_TRANSPOSE || node->op ==
+    return node->op == v_OP_NONE || node->op == V_OP_RESHAPE || node->op == v_OP_TRANSPOSE || node->op ==
       V_OP_VIEW || node->op == V_OP_PERMUTE;
   };
 

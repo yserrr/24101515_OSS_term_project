@@ -266,16 +266,10 @@ vk::CommandBuffer v_vk_create_cmd_buffer(vk_device& device, vk_command_pool& p) 
     // Reuse command buffer
     return p.cmd_buffers[p.cmd_buffer_idx++];
   }
-
-  vk::CommandBufferAllocateInfo command_buffer_alloc_info(
-    p.pool,
-    vk::CommandBufferLevel::ePrimary,
-    1);
+  vk::CommandBufferAllocateInfo command_buffer_alloc_info(p.pool, vk::CommandBufferLevel::ePrimary, 1);
   const std::vector<vk::CommandBuffer> cmd_buffers = device->device.allocateCommandBuffers(command_buffer_alloc_info);
   auto buf                                         = cmd_buffers.front();
-
   p.cmd_buffers.push_back(buf);
   p.cmd_buffer_idx++;
-
   return buf;
 }

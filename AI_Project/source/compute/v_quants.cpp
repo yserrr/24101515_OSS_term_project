@@ -6048,7 +6048,7 @@ static bool validate_e_e8m0(uint8_t e, size_t i)
 
 bool v_validate_row_data(enum v_data_type type, const void* data, size_t nbytes)
 {
-  if (type < 0 || type >= v_TYPE_COUNT)
+  if (type < 0 || type >= V_TYPE_COUNT)
   {
     fprintf(stderr, "%s: invalid type %d\n", __func__, type);
     return false;

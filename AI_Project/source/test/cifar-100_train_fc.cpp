@@ -1,6 +1,6 @@
 #include "v.hpp"
 #include "v_allocator.hpp"
-#include "v-backend.hpp"
+#include "v_backend.hpp"
 #include "v_vk.hpp"
 #include <cassert>
 #include <cmath>
@@ -25,14 +25,13 @@
 #include <omp.h>
 
 namespace py = pybind11;
-
 #define CIFAR_NTRAIN 50000
 #define CIFAR_NTEST  10000
 #define CIFAR_NINPUT  (32*32*3)
 #define CIFAR_NCLASSES 100
-#define CIFAR_NHIDDEN  3000
-#define CIFAR_NBATCH_LOGICAL  5000
-#define CIFAR_NBATCH_PHYSICAL 5000
+#define CIFAR_NHIDDEN  10000
+#define CIFAR_NBATCH_LOGICAL  1000
+#define CIFAR_NBATCH_PHYSICAL 1000
 
 #define FORCE_UTF8_CONSOLE
 #ifdef FORCE_UTF8_CONSOLE
@@ -44,7 +43,6 @@ struct utf8_console {
     SetConsoleCP(CP_UTF8);
   }
 } _utf8_console_init;
-
 #endif
 
 static void log_callback_default(v_log_level level, const char* text, void* user_data) {
@@ -68,6 +66,8 @@ int main() {
     v_tensor* fc1_bias            = nullptr;
     v_tensor* fc2_weight          = nullptr;
     v_tensor* fc2_bias            = nullptr;
+    v_tensor* fc3_weight          = nullptr;
+    v_tensor* fc3_bias            = nullptr;
     v_ctx* ctx_static             = nullptr;
     v_ctx* ctx_compute            = nullptr;
     v_backend_buffer_t buf_static = nullptr;
@@ -76,7 +76,7 @@ int main() {
   auto vk         = backend_vk_init(0);
   v_backend_t a[] = {vk};
 
-  auto backend_sched  = v_sched_new(*a, nullptr, 1, v_DEFAULT_GRAPH_SIZE, false, true);
+  auto backend_sched  = v_sched_new(*a, nullptr, 1, V_DEFAULT_GRAPH_SIZE, false);
   model.backend_sched = backend_sched;
 
   int num_tensors = 10;
@@ -85,7 +85,7 @@ int main() {
     /*.mem_buffer =*/ NULL,
     /*.no_alloc   =*/ true,
   };
-  const size_t size_meta = v_DEFAULT_GRAPH_SIZE * v_tensor_over_head() + 10 * graph_overhead();
+  const size_t size_meta = V_DEFAULT_GRAPH_SIZE * v_tensor_over_head() + 10 * graph_overhead();
   model.ctx_compute      = v_ctx_init(params);
 
   py::scoped_interpreter guard{};
@@ -129,17 +129,13 @@ int main() {
     py::object np_imgs     = imgs.attr("contiguous")().attr("cpu")().attr("numpy")();
     py::array_t<float> arr = np_imgs.cast<py::array_t<float>>();
     py::buffer_info buf    = arr.request();
-
-    float* ptr  = static_cast<float*>(buf.ptr);
-    size_t size = 1;
+    float* ptr             = static_cast<float*>(buf.ptr);
+    size_t size            = 1;
     for (auto s : buf.shape) size *= s;
-
     std::vector<float> data(ptr, ptr + size);
     images.push_back(std::move(data));
-
     std::vector<long> lbl_vec = lbls.attr("cpu")().attr("numpy")().cast<std::vector<long>>();
     labels.insert(labels.end(), lbl_vec.begin(), lbl_vec.end());
-
     if ((int)images.size() >= CIFAR_NTRAIN) break;
   }
   v_time_init();
@@ -151,8 +147,8 @@ int main() {
                                                 CIFAR_NTRAIN,
                                                 1);
 
-  v_tensor* data  = dataset->getDataset();
-  v_tensor* label = dataset->getLabels();
+  v_tensor* data  = dataset->get_dataset();
+  v_tensor* label = dataset->get_labels();
   float* buf      = v_get_tdata_f32(data);
   float* lbuf     = v_get_tdata_f32(label);
   int64_t nfill   = std::min<int64_t>(data->ne[1], (int64_t)images.size());
@@ -184,19 +180,22 @@ int main() {
     };
     model.ctx_static = v_ctx_init(params);
   }
-
   model.fc1_weight = v_new_tensor_2d(model.ctx_static, v_TYPE_F32, CIFAR_NINPUT, CIFAR_NHIDDEN);
   model.fc1_bias   = v_new_tensor_1d(model.ctx_static, v_TYPE_F32, CIFAR_NHIDDEN);
-  model.fc2_weight = v_new_tensor_2d(model.ctx_static, v_TYPE_F32, CIFAR_NHIDDEN, CIFAR_NCLASSES);
+  model.fc2_weight = v_new_tensor_2d(model.ctx_static, v_TYPE_F32, CIFAR_NHIDDEN, CIFAR_NHIDDEN);
   model.fc2_bias   = v_new_tensor_1d(model.ctx_static, v_TYPE_F32, CIFAR_NCLASSES);
+  model.fc3_weight = v_new_tensor_2d(model.ctx_static, v_TYPE_F32, CIFAR_NHIDDEN, CIFAR_NCLASSES);
+  model.fc3_bias   = v_new_tensor_1d(model.ctx_static, v_TYPE_F32, CIFAR_NCLASSES);
 
   init_tensors.push_back(model.fc1_weight);
   init_tensors.push_back(model.fc1_bias);
   init_tensors.push_back(model.fc2_weight);
   init_tensors.push_back(model.fc2_bias);
+  init_tensors.push_back(model.fc3_weight);
+  init_tensors.push_back(model.fc3_bias);
   model.images = v_new_tensor_2d(model.ctx_static, v_TYPE_F32, CIFAR_NINPUT, CIFAR_NBATCH_PHYSICAL);
   v_set_name(model.images, "images");
-  v_set_inputs(model.images);
+  (model.images)->set_inputs();
 
   model.buf_static = v_backend_alloc_ctx_tensors(model.ctx_static, vk);
   for (v_tensor* t : init_tensors) {
@@ -210,21 +209,26 @@ int main() {
   v_set_params(model.fc1_bias);
   v_set_params(model.fc2_weight);
   v_set_params(model.fc2_bias);
-
+  v_set_params(model.fc3_weight);
+  v_set_params(model.fc3_bias);
   v_tensor* fc1 = v_relu(model.ctx_compute,
                          v_add(model.ctx_compute,
                                v_matmul(model.ctx_compute,
                                         model.fc1_weight,
                                         model.images),
                                model.fc1_bias));
-
+  v_tensor* fc2 = v_relu(model.ctx_compute,
+                         v_add(model.ctx_compute,
+                               v_matmul(model.ctx_compute,
+                                        model.fc2_weight,
+                                        fc1),
+                               model.fc2_bias));
   model.logits = v_add(model.ctx_compute,
                        v_matmul(model.ctx_compute,
-                                model.fc2_weight,
-                                fc1),
-                       model.fc2_bias);
-  const int64_t ndata = v_opt_dataset_datas(dataset)->ne[1];
-
+                                model.fc3_weight,
+                                fc2),
+                       model.fc3_bias);
+  const int64_t ndata            = v_opt_dataset_datas(dataset)->ne[1];
   const int64_t nbatch_physical  = model.images->ne[1];
   const int64_t opt_period       = model.nbatch_logical / nbatch_physical;
   const int64_t nbatches_logical = ndata / model.nbatch_logical;
@@ -250,7 +254,7 @@ int main() {
     dataset->shuffle(opt_ctx, idata_split);
     result_train->reset();
     result_val->reset();
-    fprintf(stderr, "%s: epoch %04" PRId64 "/%04" PRId64 ":\n", __func__, epoch, 100);
+    fprintf(stderr, "%s: epoch %04" PRId64 "/%04" PRId64 ":\n", __func__, epoch, 10000);
     v_tensor* inputs = opt_ctx->getInput();
     v_tensor* labels = opt_ctx->getLabels();
     v_tensor* data   = v_opt_dataset_datas(dataset);
@@ -292,7 +296,6 @@ int main() {
                                         ibatch_split,
                                         t_loop_start);
     }
-
     fprintf(stderr, "\n");
   }
 

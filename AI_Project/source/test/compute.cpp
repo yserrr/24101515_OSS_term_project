@@ -1,6 +1,5 @@
 #include "v.hpp"
 #include "v_allocator.hpp"
-#include "v-backend.hpp"
 #include "v_vk.hpp"
 #include <cassert>
 #include <cmath>
@@ -24,7 +23,7 @@
 #include <string>
 #include <utility>
 
-#include "v_propagation.hpp"
+#include "v_graph_expand.hpp"
 #include "v_util.hpp"
 #include "vk_common.h"
 #include "vk_test.h"
@@ -90,12 +89,12 @@ void v_init_model(simple_model& model) {
   set_log(log_callback_default, nullptr);
   model.backend        = backend_vk_init(0);
   v_backend_t backends = {model.backend};
-  model.sched          = v_sched_new(backends, nullptr, 1, v_DEFAULT_GRAPH_SIZE, true);
+  model.sched          = v_sched_new(backends, nullptr, 1, V_DEFAULT_GRAPH_SIZE, true);
 }
 
 // build the compute graph to perform input matrix multiplication
 struct v_cgraph* build_graph(simple_model& model) {
-  size_t buf_size = v_tensor_over_head() * v_DEFAULT_GRAPH_SIZE + graph_overhead();
+  size_t buf_size = v_tensor_over_head() * V_DEFAULT_GRAPH_SIZE + graph_overhead();
   model.buf.resize(buf_size);
   v_init_param params0 = {
     /*.mem_size   =*/ buf_size,
@@ -111,14 +110,8 @@ struct v_cgraph* build_graph(simple_model& model) {
   model.out1   = v_matmul(ctx, model.input, model.w);
   v_build_foward_expand(gf, model.out1);
   model.out3 = v_add(ctx, model.out1, model.b);
-  model.out3 = v_log(ctx, model.out3);
-  model.out3 = v_log(ctx, model.out3);
-
-  model.logit = v_sum(ctx, model.out3);
   v_build_foward_expand(gf, model.out3);
-  model.loss = v_sqr(ctx, model.logit);
-  v_build_foward_expand(gf, model.loss);
-  free_ctx(ctx);
+  v_free_ctx(ctx);
   return gf;
 }
 
@@ -140,9 +133,9 @@ int main(void) {
   v_time_init();
   simple_model model;
   v_init_model(model);
-  struct v_cgraph* gf     = build_graph(model);
-  struct v_tensor* result = compute(model, gf);
-
+  v_cgraph* gf     = build_graph(model);
+  v_tensor* result = compute(model, gf);
+  v_print_tensor2d(result);
   v_sched_free(model.sched);
   v_backend_free(model.backend);
   return 0;

@@ -398,7 +398,7 @@ void v_vk_im2col(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0,
 
   const uint32_t pelements = OW * KW * KH;
 
-  const v_backend_vk_buffer_ctx* d_buf_ctx = (v_backend_vk_buffer_ctx*)dst->buffer->context;
+  const v_backend_vk_buffer_ctx* d_buf_ctx = dst->buffer->context;
   const vk_buffer d_buf                    = d_buf_ctx->dev_buffer;
 
   const vk::DeviceAddress dst_addr = d_buf->bda_addr + vk_tensor_offset(dst) + dst->view_offs;

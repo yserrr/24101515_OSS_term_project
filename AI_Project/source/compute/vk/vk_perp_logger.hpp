@@ -61,14 +61,14 @@ public:
       timings[v_unary_op_name(v_get_unary_op(node))].push_back(time);
       return;
     }
-    if (node->op == v_OP_MUL_MAT || node->op == v_OP_MUL_MAT_ID)
+    if (node->op == V_OP_MUL_MAT || node->op == v_OP_MUL_MAT_ID)
     {
       const uint64_t m = node->src[0]->ne[1];
       const uint64_t n = node->ne[1];
       const uint64_t k = node->src[1]->ne[0];
       const uint64_t batch = node->src[1]->ne[2] * node->src[1]->ne[3];
       std::string name = v_op_name(node->op);
-      if ((node->op == v_OP_MUL_MAT && n <= mul_mat_vec_max_cols) ||
+      if ((node->op == V_OP_MUL_MAT && n <= mul_mat_vec_max_cols) ||
           (node->op == v_OP_MUL_MAT_ID && node->src[2]->ne[1] == 1))
       {
         name += "_VEC";

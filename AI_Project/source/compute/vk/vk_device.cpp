@@ -763,7 +763,7 @@ vk_device v_vk_get_device(size_t idx) {
       if (device->coopmat_m == 0 || !device->coopmat_acc_f32_support) {
         // No suitable matmul mode found
 
-        v_LOG_DEBUG("v_vulkan: WARNING: No suitable matrix core mode found. Disabling matrix cores.\n");
+        V_LOG_DEBUG("v_vulkan: WARNING: No suitable matrix core mode found. Disabling matrix cores.\n");
         device->coopmat_support = false;
       }
       if (getenv("v_VK_DISABLE_BFLOAT16")) { device->coopmat_bf16_support = false; }
@@ -797,7 +797,7 @@ vk_device v_vk_get_device(size_t idx) {
 
     // Shaders
     // Disable matmul tile sizes early if performance low or not supported
-    for (uint32_t i = 0; i < v_TYPE_COUNT; ++i) {
+    for (uint32_t i = 0; i < V_TYPE_COUNT; ++i) {
       switch (device->vendor_id) {
         #ifndef V_VULKAN_RUN_TESTS
       case VK_VENDOR_ID_AMD:
@@ -958,7 +958,7 @@ void vk_instance_init() {
     };
     validation_features.setPNext(nullptr);
     instance_create_info.setPNext(&validation_features);
-    v_LOG_DEBUG("v_vulkan: Validation layers enabled\n");
+    V_LOG_DEBUG("v_vulkan: Validation layers enabled\n");
   }
   vk_instance.instance    = vk::createInstance(instance_create_info);
   vk_instance_initialized = true;
@@ -1013,7 +1013,7 @@ void vk_instance_init() {
   else {
     // If no vulkan devices are found, return early
     if (devices.empty()) {
-      LOG_INFO("v_vulkan: No devices found.\n");
+      V_LOG_INFO("v_vulkan: No devices found.\n");
       return;
     }
 
@@ -1120,11 +1120,11 @@ void vk_instance_init() {
     }
 
     if (vk_instance.device_indices.empty()) {
-      LOG_INFO("v_vulkan: No devices found.\n");
+      V_LOG_INFO("v_vulkan: No devices found.\n");
       return;
     }
   }
-  v_LOG_DEBUG("v_vulkan: Found %zu Vulkan devices:\n", vk_instance.device_indices.size());
+  V_LOG_DEBUG("v_vulkan: Found %zu Vulkan devices:\n", vk_instance.device_indices.size());
 
   for (size_t i = 0; i < vk_instance.device_indices.size(); i++) {
     vk::PhysicalDevice vkdev                            = devices[vk_instance.device_indices[i]];

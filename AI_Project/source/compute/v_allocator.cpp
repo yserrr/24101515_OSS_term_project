@@ -17,7 +17,7 @@
 #define AT_PRINTF(...)
 bool v_is_view(const v_tensor* t) { return t->view_src != nullptr; }
 
-bool op_can_inplace(v_operation op) {
+bool v_op_can_inplace(v_operation op) {
   switch (op) {
     case V_OP_SCALE:
     case V_OP_DIAG_MASK_ZERO:
@@ -28,9 +28,9 @@ bool op_can_inplace(v_operation op) {
     case v_OP_SUB:
     case v_OP_MUL:
     case v_OP_DIV:
-    case v_OP_SQR:
+    case V_OP_SQR:
     case v_OP_SQRT:
-    case v_OP_LOG:
+    case V_OP_LOG:
     case v_OP_UNARY:
     case V_OP_ROPE:
     case v_OP_ROPE_BACK:
@@ -68,7 +68,7 @@ v_status v_tensor_allocate(v_tensor_alloc* talloc, v_tensor* tensor) {
   size_t size = num_bytes(tensor);
   size        = V_PAD(size, talloc->alignment);
   if (talloc->offset + size > v_backend_buffer_get_size(talloc->buffer)) {
-    v_LOG_ERROR("%s: not enough space in the buffer to allocate %s (needed %zu, available %zu)\n",
+    V_LOG_ERROR("%s: not enough space in the buffer to allocate %s (needed %zu, available %zu)\n",
                 __func__,
                 tensor->name,
                 size,
@@ -168,7 +168,7 @@ static struct buffer_address v_dyn_tallocr_alloc(struct dyn_tensor_alloc* alloc,
   }
   if (best_fit_chunk == -1) {
     // since the last chunk always has virtually endless memory, this should never happen
-    v_LOG_ERROR("%s: not enough space in the buffer to allocate %zu bytes, largest block available %zu bytes\n",
+    V_LOG_ERROR("%s: not enough space in the buffer to allocate %zu bytes, largest block available %zu bytes\n",
                 __func__,
                 size,
                 max_avail);
@@ -384,7 +384,6 @@ void v_gallocr_free(v_graph_allocator_t galloc) {
     }
   }
 
-  v_hash_set_free(&galloc->hash_set);
   free(galloc);
 }
 
@@ -433,7 +432,7 @@ static void v_graph_allocate_node(v_graph_allocator_t galloc,
     hn->allocated = true;
     assert(hn->addr.offset == 0);
     // try to reuse a parent's buffer (inplace)
-    if (op_can_inplace(node->op)) {
+    if (v_op_can_inplace(node->op)) {
       for (int i = 0; i < V_MAX_SRC; i++) {
         v_tensor* parent = node->src[i];
         if (parent == nullptr) { continue; }
@@ -470,8 +469,7 @@ static void v_graph_allocate_node(v_graph_allocator_t galloc,
               v_gallocr_free_extra_space(galloc, node, view_src);
               return;
             }
-          }
-          else {
+          } else {
             AT_PRINTF("reusing parent %s for %s\n", parent->name, node->name);
             hn->buffer_id   = p_hn->buffer_id;
             hn->addr        = p_hn->addr;
@@ -498,11 +496,11 @@ static void v_gallocr_free_node(v_graph_allocator_t galloc, v_tensor* node) {
     return;
   }
 
-  struct hash_node* hn           = v_gallocr_hash_get(galloc, node);
-  int buffer_id                  = hn->buffer_id;
-  struct dyn_tensor_alloc* alloc = galloc->buf_tallocs[buffer_id];
-  v_backend_buffer_type_t buft   = galloc->bufts[buffer_id];
-  size_t size                    = v_get_backend_buffer_alloc_size(buft, node);
+  hash_node* hn                = v_gallocr_hash_get(galloc, node);
+  int buffer_id                = hn->buffer_id;
+  dyn_tensor_alloc* alloc      = galloc->buf_tallocs[buffer_id];
+  v_backend_buffer_type_t buft = galloc->bufts[buffer_id];
+  size_t size                  = v_get_backend_buffer_alloc_size(buft, node);
   v_dyn_tallocr_free_tensor(alloc, hn->addr, size, node);
   hn->allocated = false;
 }
@@ -510,26 +508,21 @@ static void v_gallocr_free_node(v_graph_allocator_t galloc, v_tensor* node) {
 static int get_node_buffer_id(const int* node_buffer_ids, int i) { return node_buffer_ids ? node_buffer_ids[i] : 0; }
 
 //todo :
-bool v_gallocr_reserve_n(v_graph_allocator_t galloc,
-                         struct v_cgraph* graph,
-                         const int* node_buffer_ids,
-                         const int* leaf_buffer_ids) {
+bool v_gallocr_reserve_n(v_graph_allocator_t galloc, v_cgraph* graph, const int* node_buffer_ids, const int* leaf_buffer_ids) {
   size_t min_hash_size = graph->n_nodes + graph->n_leafs;
   // add 25% margin to avoid hash collisions
   min_hash_size += min_hash_size / 4;
 
   // initialize hash table
   if (galloc->hash_set.size < min_hash_size) {
-    v_hash_set_free(&galloc->hash_set);
-    galloc->hash_set = v_hash_set_new(min_hash_size);
-    V_ASSERT(galloc->hash_set.keys__ != nullptr);
+    galloc->hash_set = v_hash_set(min_hash_size);
     galloc->hash_values.resize(galloc->hash_set.size);
   }
 
   // reset allocators
   for (int i = 0; i < galloc->buffers.size(); i++) { v_dyn_tallocr_reset(galloc->buf_tallocs[i]); }
   v_hash_set_reset(&galloc->hash_set);
-  memset(galloc->hash_values.data(), 0, sizeof(struct hash_node) * galloc->hash_set.size);
+  memset(galloc->hash_values.data(), 0, sizeof(hash_node) * galloc->hash_set.size);
 
   // allocate leafs
   // these may be tensors that the application is not using in the graph, but may still want to allocate for other purposes
@@ -595,7 +588,7 @@ bool v_gallocr_reserve_n(v_graph_allocator_t galloc,
     for (int j = 0; j < V_MAX_SRC; j++) {
       v_tensor* parent = node->src[j];
       if (parent == nullptr) { continue; }
-      struct hash_node* p_hn = v_gallocr_hash_get(galloc, parent);
+      hash_node* p_hn = v_gallocr_hash_get(galloc, parent);
       p_hn->n_children -= 1;
 
       AT_PRINTF("parent %s: %d children, %d views, allocated: %d\n",
@@ -606,8 +599,8 @@ bool v_gallocr_reserve_n(v_graph_allocator_t galloc,
 
       if (p_hn->n_children == 0 && p_hn->n_views == 0) {
         if (v_is_view(parent)) {
-          v_tensor* view_src            = parent->view_src;
-          struct hash_node* view_src_hn = v_gallocr_hash_get(galloc, view_src);
+          v_tensor* view_src     = parent->view_src;
+          hash_node* view_src_hn = v_gallocr_hash_get(galloc, view_src);
           view_src_hn->n_views -= 1;
           AT_PRINTF("view_src %s: %d children, %d views\n",
                     view_src->name,
@@ -616,8 +609,7 @@ bool v_gallocr_reserve_n(v_graph_allocator_t galloc,
           if (view_src_hn->n_views == 0 && view_src_hn->n_children == 0 && view_src_hn->allocated) {
             v_gallocr_free_node(galloc, view_src);
           }
-        }
-        else if (p_hn->allocated) { v_gallocr_free_node(galloc, parent); }
+        } else if (p_hn->allocated) { v_gallocr_free_node(galloc, parent); }
       }
       AT_PRINTF("\n");
     }
@@ -628,15 +620,14 @@ bool v_gallocr_reserve_n(v_graph_allocator_t galloc,
     galloc->node_allocs.resize(graph->n_nodes);
   }
   for (int i = 0; i < graph->n_nodes; i++) {
-    v_tensor* node                     = graph->nodes[i];
-    struct node_allocation* node_alloc = &galloc->node_allocs[i];
+    v_tensor* node              = graph->nodes[i];
+    node_allocation* node_alloc = &galloc->node_allocs[i];
     if (node->view_src || node->data) {
       node_alloc->dst.buffer_id = -1;
       node_alloc->dst.addr      = v_BUFFER_ADDRESS_INVALID;
       node_alloc->dst.size_max  = 0;
-    }
-    else {
-      struct hash_node* hn      = v_gallocr_hash_get(galloc, node);
+    } else {
+      hash_node* hn             = v_gallocr_hash_get(galloc, node);
       node_alloc->dst.buffer_id = hn->buffer_id;
       node_alloc->dst.addr      = hn->addr;
       node_alloc->dst.size_max  = v_get_backend_buffer_alloc_size(galloc->bufts[hn->buffer_id], node);
@@ -647,8 +638,7 @@ bool v_gallocr_reserve_n(v_graph_allocator_t galloc,
         node_alloc->src[j].buffer_id = -1;
         node_alloc->src[j].addr      = v_BUFFER_ADDRESS_INVALID;
         node_alloc->src[j].size_max  = 0;
-      }
-      else {
+      } else {
         hash_node* hn                = v_gallocr_hash_get(galloc, src);
         node_alloc->src[j].buffer_id = hn->buffer_id;
         node_alloc->src[j].addr      = hn->addr;
@@ -666,8 +656,7 @@ bool v_gallocr_reserve_n(v_graph_allocator_t galloc,
       galloc->leaf_allocs[i].leaf.buffer_id = -1;
       galloc->leaf_allocs[i].leaf.addr      = v_BUFFER_ADDRESS_INVALID;
       galloc->leaf_allocs[i].leaf.size_max  = 0;
-    }
-    else {
+    } else {
       galloc->leaf_allocs[i].leaf.buffer_id = hn->buffer_id;
       galloc->leaf_allocs[i].leaf.addr      = hn->addr;
       galloc->leaf_allocs[i].leaf.size_max  = v_get_backend_buffer_alloc_size(galloc->bufts[hn->buffer_id], leaf);
@@ -696,16 +685,14 @@ bool v_gallocr_reserve_n(v_graph_allocator_t galloc,
     if (realloc) {
       #ifndef NDEBUG
       //size_t cur_size = galloc->buffers[i] ? v_vbuffer_size(galloc->buffers[i]) : 0;
-      //v_LOG_DEBUG("%s: reallocating %s buffer from size %.02f MiB to %.02f MiB\n", __func__,
+      //V_LOG_DEBUG("%s: reallocating %s buffer from size %.02f MiB to %.02f MiB\n", __func__,
       //               mmlBackendBufferTypeName(galloc->bufts[i]), cur_size / 1024.0 / 1024.0, new_size / 1024.0 / 1024.0);
       #endif
 
       v_vbuffer_free(galloc->buffers[i]);
-      galloc->buffers[i] = v_vbuffer_alloc(galloc->bufts[i],
-                                           galloc->buf_tallocs[i],
-                                           V_BACKEND_BUFFER_USAGE_COMPUTE);
+      galloc->buffers[i] = v_vbuffer_alloc(galloc->bufts[i], galloc->buf_tallocs[i], V_BACKEND_BUFFER_USAGE_COMPUTE);
       if (galloc->buffers[i] == nullptr) {
-        v_LOG_ERROR("%s: failed to allocate %s buffer of size %zu\n",
+        V_LOG_ERROR("%s: failed to allocate %s buffer of size %zu\n",
                     __func__,
                     v_get_backend_buffer_name(galloc->bufts[i]),
                     new_size);
@@ -717,14 +704,10 @@ bool v_gallocr_reserve_n(v_graph_allocator_t galloc,
 }
 
 
-void v_graph_alloc_init_tensor(v_graph_allocator_t galloc,
-                               v_tensor* tensor,
-                               struct tensor_allocation* tensor_alloc) {
+void v_graph_alloc_init_tensor(v_graph_allocator_t galloc, v_tensor* tensor, tensor_allocation* tensor_alloc) {
   int buffer_id = tensor_alloc->buffer_id;
-  assert(tensor->data ||
-    tensor->view_src ||
-    v_get_backend_buffer_alloc_size(galloc->bufts[buffer_id], tensor) <=
-    tensor_alloc->size_max);
+  assert(tensor->data ||tensor->view_src ||
+    v_get_backend_buffer_alloc_size(galloc->bufts[buffer_id], tensor) <= tensor_alloc->size_max);
   if (tensor->view_src != nullptr) {
     if (tensor->buffer == nullptr) {
       assert(tensor_alloc->addr.offset == SIZE_MAX);
@@ -734,14 +717,12 @@ void v_graph_alloc_init_tensor(v_graph_allocator_t galloc,
       }
       v_backend_tensor_view_init(tensor);
     }
-  }
-  else {
+  } else {
     if (tensor->data == nullptr) {
       assert(tensor_alloc->addr.offset != SIZE_MAX);
       assert(v_get_backend_buffer_alloc_size(galloc->bufts[buffer_id], tensor) <= tensor_alloc->size_max);
       v_vbuffer_tensor_alloc(galloc->buffers[buffer_id], tensor, tensor_alloc->addr);
-    }
-    else {
+    } else {
       if (tensor->buffer == nullptr) {
         // this tensor was allocated without ggml-backend
         return;
@@ -752,7 +733,7 @@ void v_graph_alloc_init_tensor(v_graph_allocator_t galloc,
 
 static bool v_gallocr_node_needs_realloc(v_graph_allocator_t galloc,
                                          v_tensor* node,
-                                         struct tensor_allocation* talloc) {
+                                         tensor_allocation* talloc) {
   size_t node_size = 0;
   if (!node->data && !node->view_src) {
     // If we previously had data but don't now then reallocate
@@ -769,18 +750,18 @@ static bool v_gallocr_needs_realloc(v_graph_allocator_t galloc, struct v_cgraph*
 
   if (galloc->leaf_allocs.size() != graph->n_leafs) {
     #ifndef NDEBUG
-    v_LOG_DEBUG("%s: graph has different number of leafs\n", __func__);
+    V_LOG_DEBUG("%s: graph has different number of leafs\n", __func__);
     #endif
     return true;
   }
 
   for (int i = 0; i < graph->n_nodes; i++) {
-    v_tensor* node                     = graph->nodes[i];
-    struct node_allocation* node_alloc = &galloc->node_allocs[i];
+    v_tensor* node              = graph->nodes[i];
+    node_allocation* node_alloc = &galloc->node_allocs[i];
 
     if (!v_gallocr_node_needs_realloc(galloc, node, &node_alloc->dst)) {
       #ifndef NDEBUG
-      v_LOG_DEBUG("%s: node %s is not valid\n", __func__, node->name);
+      V_LOG_DEBUG("%s: node %s is not valid\n", __func__, node->name);
       #endif
       return true;
     }
@@ -790,7 +771,7 @@ static bool v_gallocr_needs_realloc(v_graph_allocator_t galloc, struct v_cgraph*
       if (src == nullptr) { continue; }
       if (!v_gallocr_node_needs_realloc(galloc, src, &node_alloc->src[j])) {
         #ifndef NDEBUG
-        v_LOG_DEBUG("%s: src %d (%s) of node %s is not valid\n", __func__, j, src->name, node->name);
+        V_LOG_DEBUG("%s: src %d (%s) of node %s is not valid\n", __func__, j, src->name, node->name);
         #endif
         return true;
       }
@@ -800,23 +781,20 @@ static bool v_gallocr_needs_realloc(v_graph_allocator_t galloc, struct v_cgraph*
   return false;
 }
 
-bool v_gallocr_alloc_graph(v_graph_allocator_t galloc, struct v_cgraph* graph) {
+bool v_gallocr_alloc_graph(v_graph_allocator_t galloc, v_cgraph* graph) {
   if (v_gallocr_needs_realloc(galloc, graph)) {
     if (galloc->buffers.size() == 1) {
       #ifndef NDEBUG
-      //v_LOG_DEBUG("%s: reallocating buffers automatically\n", __func__);
+      //V_LOG_DEBUG("%s: reallocating buffers automatically\n", __func__);
       #endif
       if (!v_gallocr_reserve_n(galloc, graph, 0, 0)) { return false; }
-    }
-    else {
+    } else {
       #ifndef NDEBUG
-      v_LOG_DEBUG("%s: cannot reallocate multi buffer graph automatically, call reserve\n", __func__);
+      V_LOG_DEBUG("%s: cannot reallocate multi buffer graph automatically, call reserve\n", __func__);
       #endif
       return false;
     }
   }
-
-
   // allocate the graph tensors from the previous assignments
   // leafs
   for (int i = 0; i < graph->n_leafs; i++) {
@@ -840,46 +818,41 @@ bool v_gallocr_alloc_graph(v_graph_allocator_t galloc, struct v_cgraph* graph) {
 }
 
 
-// utils
-
 static void free_buffers(v_backend_buffer_t** buffers, const size_t* n_buffers) {
   for (size_t i = 0; i < *n_buffers; i++) { v_backend_buffer_free((*buffers)[i]); }
   free(*buffers);
 }
 
 //todo:
-static bool alloc_tensor_range(struct v_ctx* ctx,
-                               v_tensor* first,
-                               v_tensor* last,
+static bool alloc_tensor_range(v_ctx* ctx,
+                               v_tensor* first, v_tensor* last,
                                v_backend_buffer_type_t buft,
                                size_t size,
                                v_backend_buffer_t** buffers,
                                size_t* n_buffers) {
   v_backend_buffer_t buffer = v_backend_buffer_alloc(buft, size);
   if (buffer == nullptr) {
-    v_LOG_ERROR("%s: failed to allocate %s buffer of size %zu\n", __func__, v_get_backend_buffer_name(buft), size);
+    V_LOG_ERROR("%s: failed to allocate %s buffer of size %zu\n", __func__, v_get_backend_buffer_name(buft), size);
     free_buffers(buffers, n_buffers);
     return false;
   }
   *buffers                   = (v_backend_buffer_t*)realloc(*buffers, sizeof(v_backend_buffer_t) * (*n_buffers + 1));
   (*buffers)[(*n_buffers)++] = buffer;
 
-  struct v_tensor_alloc tallocr = v_tallocr_new(buffer);
+  v_tensor_alloc tallocr = v_tallocr_new(buffer);
 
-  for (v_tensor* t = first; t != last; t = v_get_next_tensor(ctx, t)) {
-    enum v_status status = v_STATUS_SUCCESS;
+  for (v_tensor* t = first; t != last; t = ctx->get_next_tensor(t)) {
+    v_status status = v_STATUS_SUCCESS;
     if (t->data == nullptr) {
-      if (t->view_src == nullptr) { status = v_tensor_allocate(&tallocr, t); }
-      else if (t->buffer == nullptr) { status = v_backend_tensor_view_init(t); }
-    }
-    else {
+      if (t->view_src == nullptr) { status = v_tensor_allocate(&tallocr, t); } else if (t->buffer == nullptr) { status = v_backend_tensor_view_init(t); }
+    } else {
       if (t->view_src != nullptr && t->buffer == nullptr) {
         // view of a pre-allocated tensor
         status = v_backend_tensor_view_init(t);
       }
     }
     if (status != v_STATUS_SUCCESS) {
-      v_LOG_ERROR("%s: failed to initialize tensor %s\n", __func__, t->name);
+      V_LOG_ERROR("%s: failed to initialize tensor %s\n", __func__, t->name);
       free_buffers(buffers, n_buffers);
       return false;
     }
@@ -891,13 +864,13 @@ static bool alloc_tensor_range(struct v_ctx* ctx,
 v_backend_buffer_t v_backend_alloc_ctx_tensor_from_buffer_t(v_ctx* ctx,
                                                             v_backend_buffer_type_t buft) {
   V_ASSERT(v_get_no_alloc(ctx) == true);
-  size_t alignment = v_get_backend_buffer_align(buft);
-  size_t max_size  = v_get_backend_buffer_max_size(buft);
+  size_t alignment            = v_get_backend_buffer_align(buft);
+  size_t max_size             = v_get_backend_buffer_max_size(buft);
   v_backend_buffer_t* buffers = nullptr;
-  size_t n_buffers    = 0;
-  size_t cur_buf_size = 0;
-  v_tensor* first     = v_get_first_tensor(ctx);
-  for (v_tensor* t = first; t != nullptr; t = v_get_next_tensor(ctx, t)) {
+  size_t n_buffers            = 0;
+  size_t cur_buf_size         = 0;
+  v_tensor* first             = ctx->get_first_tensor();
+  for (v_tensor* t = first; t != nullptr; t = ctx->get_next_tensor(t)) {
     size_t this_size = 0;
     if (t->data == nullptr && t->view_src == nullptr) {
       this_size = V_PAD(v_get_backend_buffer_alloc_size(buft, t), alignment);
@@ -914,8 +887,7 @@ v_backend_buffer_t v_backend_alloc_ctx_tensor_from_buffer_t(v_ctx* ctx,
                               &n_buffers)) { return nullptr; }
       first        = t;
       cur_buf_size = this_size;
-    }
-    else { cur_buf_size += this_size; }
+    } else { cur_buf_size += this_size; }
   }
 
   // allocate remaining tensors
@@ -925,13 +897,12 @@ v_backend_buffer_t v_backend_alloc_ctx_tensor_from_buffer_t(v_ctx* ctx,
 
   if (n_buffers == 0) {
     #ifndef NDEBUG
-    v_LOG_DEBUG("%s: all tensors in the context are already allocated\n", __func__);
+    V_LOG_DEBUG("%s: all tensors in the context are already allocated\n", __func__);
     #endif
     return nullptr;
   }
   v_backend_buffer_t buffer;
-  if (n_buffers == 1) { buffer = buffers[0]; }
-  else { throw std::runtime_error("2 buffers "); }
+  if (n_buffers == 1) { buffer = buffers[0]; } else { throw std::runtime_error("2 buffers "); }
   free(buffers);
   return buffer;
 }

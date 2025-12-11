@@ -314,7 +314,7 @@ void vk_load_shaders(vk_device& device) {
     m_align         = 64;
     s_align         = 32;
 
-    for (uint32_t i = 0; i < v_TYPE_COUNT; ++i) {
+    for (uint32_t i = 0; i < V_TYPE_COUNT; ++i) {
       v_data_type t = (v_data_type)i;
       // Disable medium and large matrix multiplication if not enough shared memory is available
       // Check mmq warptiles as the largest configuration

@@ -86,7 +86,7 @@ int main() {
   auto vk         = backend_vk_init(0);
   v_backend_t a[] = {vk};
 
-  auto backend_sched  = v_sched_new(*a, nullptr, 1, v_DEFAULT_GRAPH_SIZE, false, true);
+  auto backend_sched  = v_sched_new(*a, nullptr, 1, V_DEFAULT_GRAPH_SIZE, false, true);
   model.backend_sched = backend_sched;
 
   int num_tensors = 10;
@@ -95,9 +95,8 @@ int main() {
     /*.mem_buffer =*/ NULL,
     /*.no_alloc   =*/ true,
   };
-  const size_t size_meta = v_DEFAULT_GRAPH_SIZE * v_tensor_over_head() + 10 * graph_overhead();
+  const size_t size_meta = V_DEFAULT_GRAPH_SIZE * v_tensor_over_head() + 10 * graph_overhead();
   model.ctx_compute      = v_ctx_init(params);
-
   py::scoped_interpreter guard{};
   py::module_ torch      = py::module_::import("torch");
   py::module_ datasets   = py::module_::import("torchvision.datasets");
@@ -110,25 +109,20 @@ int main() {
       py::make_tuple(0.5f, 0.5f, 0.5f) // std
     )
   ));
-
-
   auto cifar_train = datasets.attr("CIFAR10")(
     "./data",
     py::arg("train")     = true,
     py::arg("download")  = true,
     py::arg("transform") = transform
   );
-
   py::object DataLoader = torch.attr("utils").attr("data").attr("DataLoader");
   auto loader           = DataLoader(
     cifar_train,
     py::arg("batch_size") = 1,
     py::arg("shuffle")    = true
   );
-
   std::vector<std::vector<float>> images;
   std::vector<long> labels;
-
   for (auto batch : loader) {
     py::tuple pair  = batch.cast<py::tuple>();
     py::object imgs = pair[0];
@@ -157,8 +151,8 @@ int main() {
                                                 CIFAR_NTRAIN,
                                                 1);
 
-  v_tensor* data  = dataset->getDataset();
-  v_tensor* label = dataset->getLabels();
+  v_tensor* data  = dataset->get_dataset();
+  v_tensor* label = dataset->get_labels();
   float* buf      = v_get_tdata_f32(data);
   float* lbuf     = v_get_tdata_f32(label);
 
@@ -207,7 +201,7 @@ int main() {
   model.images = v_new_tensor_2d(model.ctx_static, v_TYPE_F32, CIFAR_NINPUT,CIFAR_NBATCH_PHYSICAL);
   v_tensor* conv_input = v_reshape_4d(model.ctx_compute, model.images, 32, 32, 3, model.images->ne[1]);
   v_set_name(model.images, "images");
-  v_set_inputs(model.images);
+  (model.images)->set_inputs();
   model.buf_static = v_backend_alloc_ctx_tensors(model.ctx_static, vk);
 
   for (v_tensor* t : init_tensors) {
@@ -237,7 +231,7 @@ int main() {
                                      model.bias_2));
   v_tensor* dense_in = v_pool_2d(model.ctx_compute, conv_out2, V_OP_POOL_MAX, 2, 2, 2, 2, 0, 0);
   dense_in           = v_reshape_2d(model.ctx_compute,
-                          v_mem_cont(model.ctx_compute, v_permute(model.ctx_compute, dense_in, 1, 2, 0, 3))
+                          v_cont(model.ctx_compute, v_permute(model.ctx_compute, dense_in, 1, 2, 0, 3))
                           ,64 * 16,CIFAR_NBATCH_PHYSICAL);
 
 

@@ -46,7 +46,7 @@ void init_fastdiv_values(uint32_t d, uint32_t& mp, uint32_t& L) {
 
 bool v_vk_op_supports_incontiguous(v_operation op) {
   switch (op) {
-    case v_OP_CPY:
+    case V_OP_CPY:
     case v_OP_GET_ROWS:
     case v_OP_ADD:
     case v_OP_SUB:
@@ -55,11 +55,11 @@ bool v_vk_op_supports_incontiguous(v_operation op) {
     case v_OP_ADD_ID:
     case v_OP_CONCAT:
     case v_OP_UPSCALE:
-    case v_OP_SQR:
+    case V_OP_SQR:
     case v_OP_SQRT:
-    case v_OP_SIN:
-    case v_OP_COS:
-    case v_OP_CLAMP:
+    case V_OP_SIN:
+    case V_OP_COS:
+    case V_OP_CLAMP:
     case v_OP_PAD:
     case v_OP_REPEAT:
     case v_OP_REPEAT_BACK:
@@ -300,13 +300,13 @@ void v_vk_print_gpu_info(size_t idx) {
   std::string matrix_cores = coopmat2_support ? "NV_coopmat2" : coopmat_support ? "KHR_coopmat" : "none";
 
   std::string device_name = props2.properties.deviceName.data();
-  v_LOG_DEBUG(
+  V_LOG_DEBUG(
     "v_vulkan: %zu = %s (%s) | uma: %d | fp16: %d | bf16: %d | warp size: %zu | shared memory: %d | int dot: %d | matrix cores: %s\n",
     idx, device_name.c_str(), driver_props.driverName.data(), uma, fp16, bf16, subgroup_size,
     props2.properties.limits.maxComputeSharedMemorySize, integer_dot_product, matrix_cores.c_str());
 
   if (props2.properties.deviceType == vk::PhysicalDeviceType::eCpu) {
-    v_LOG_DEBUG("v_vulkan: Warning: Device type is CPU. This is probably not the device you want.\n");
+    V_LOG_DEBUG("v_vulkan: Warning: Device type is CPU. This is probably not the device you want.\n");
   }
 }
 

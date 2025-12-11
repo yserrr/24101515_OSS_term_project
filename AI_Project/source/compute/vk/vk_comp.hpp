@@ -1,11 +1,10 @@
-#ifndef MYPROJECT_VK_COMP_HPP
-#define MYPROJECT_VK_COMP_HPP
+#pragma once
 #include "vk_common.h"
 #include "vk_buffer.h"
 #include "v_util.hpp"
 #include "v_vk.hpp"
 bool v_vk_compute_forward(vk_backend_ctx* ctx, v_cgraph* cgraph, v_tensor* tensor, int tensor_idx, bool use_fence, bool almost_ready);
-bool vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx, v_tensor* node_begin, int node_idx_begin, bool dryrun, bool last_node, bool almost_ready, bool submit);
+bool v_vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx, v_tensor* node_begin, int node_idx_begin, bool dryrun, bool last_node, bool almost_ready, bool submit);
 void v_vk_opt_step_adamw(vk_backend_ctx* ctx, vk_context& subctx, v_tensor* dst, bool dryrun = false);
 void v_vk_opt_step_sgd(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, const v_tensor* src2, v_tensor* dst, bool dryrun = false);
 void v_vk_concat(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, const v_tensor* src1, v_tensor* dst, bool dryrun = false);
@@ -67,4 +66,3 @@ vk_pipeline v_vk_get_cpy_pipeline(vk_backend_ctx* ctx, const v_tensor* src, cons
 void v_vk_flash_attn(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* q, const v_tensor* k, const v_tensor* v, const v_tensor* mask, const v_tensor* sinks, v_tensor* dst, bool dryrun);
 bool v_vk_flash_attn_coopmat_shmem_support(const vk_device& device, const uint32_t hsk, uint32_t hsv, bool f32acc);
 bool v_vk_flash_attn_scalar_shmem_support(const vk_device& device, const uint32_t hsk, uint32_t hsv);
-#endif //MYPROJECT_VK_COMP_HPP

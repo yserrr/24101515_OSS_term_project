@@ -65,7 +65,7 @@ inline void v_vk_op_f32(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor*
     << dst->ne[1] << ", ne2=" << dst->ne[2] << ", ne3=" << dst->ne[3] << ", nb0=" << dst->nb[0] << ", nb1=" << dst->nb[1
     ] << ", nb2=" << dst->nb[2] << ", nb3=" << dst->nb[3];
     std::cerr << "), " << op_name(op) << ", " << (dryrun ? "dryrun" : "") << ")");
-  V_ASSERT(op == v_OP_GET_ROWS || op == v_OP_CPY || (!v_is_quantized(src0->type) && (src1 == nullptr || !v_is_quantized(src1->type)))); // NOLINT
+  V_ASSERT(op == v_OP_GET_ROWS || op == V_OP_CPY || (!v_is_quantized(src0->type) && (src1 == nullptr || !v_is_quantized(src1->type)))); // NOLINT
   V_ASSERT(v_vk_op_supports_incontiguous(op) || v_vk_dim01_contiguous(src0)); // NOLINT
   V_ASSERT(dst->buffer != nullptr);
   const uint64_t ne00 = src0->ne[0];
@@ -298,23 +298,23 @@ inline void v_vk_op_f32(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor*
     case v_OP_DIV:
     case v_OP_MUL:
     case V_OP_SCALE:
-    case v_OP_SQR:
+    case V_OP_SQR:
     case v_OP_SQRT:
-    case v_OP_SIN:
-    case v_OP_COS:
-    case v_OP_CLAMP:
+    case V_OP_SIN:
+    case V_OP_COS:
+    case V_OP_CLAMP:
     case v_OP_PAD:
     case v_OP_ROLL:
     case v_OP_REPEAT:
     case v_OP_REPEAT_BACK:
-    case v_OP_CPY:
+    case V_OP_CPY:
     case v_OP_CONCAT:
     case v_OP_UPSCALE:
     case v_OP_UNARY:
     case v_OP_GLU:
     case v_OP_CONV_2D_DW: {
       uint32_t ne = nelements(dst);
-      if (op == v_OP_CPY && v_is_quantized(src0->type) && v_is_quantized(dst->type)) {
+      if (op == V_OP_CPY && v_is_quantized(src0->type) && v_is_quantized(dst->type)) {
         // Convert from number of logical elements to 2- or 4-byte units.
         ne /= block_size(src0->type);
         if ((v_type_size(src0->type) % 4) == 0) { ne *= v_type_size(src0->type) / 4; }
@@ -323,7 +323,7 @@ inline void v_vk_op_f32(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor*
       // copy_to_quant has block size of 32, and each thread does QUANT_K elements.
       // Splitting into 512x512xZ wouldn't work well since each workgroup does 1024 elements.
       // So divide by block size here before splitting into 512x512 groups.
-      if (op == v_OP_CPY && !v_is_quantized(src0->type) && v_is_quantized(dst->type)) { ne = CEIL_DIV(ne, block_size(dst->type)); }
+      if (op == V_OP_CPY && !v_is_quantized(src0->type) && v_is_quantized(dst->type)) { ne = CEIL_DIV(ne, block_size(dst->type)); }
       if (ne > 262144) { elements = {512, 512, CEIL_DIV(ne, 262144)}; }
       else if (ne > 512) { elements = {512, CEIL_DIV(ne, 512), 1}; }
       else { elements = {ne, 1, 1}; }

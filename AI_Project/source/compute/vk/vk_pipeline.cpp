@@ -467,19 +467,19 @@ vk_pipeline v_vk_op_get_pipeline(vk_backend_ctx* ctx, const v_tensor* src0,
     case V_OP_SCALE:
       if (src0->type == v_TYPE_F32 && dst->type == v_TYPE_F32) { return ctx->device->pipeline_scale_f32; }
       return nullptr;
-    case v_OP_SQR:
+    case V_OP_SQR:
       if (src0->type == v_TYPE_F32 && dst->type == v_TYPE_F32) { return ctx->device->pipeline_sqr_f32; }
       return nullptr;
     case v_OP_SQRT:
       if (src0->type == v_TYPE_F32 && dst->type == v_TYPE_F32) { return ctx->device->pipeline_sqrt_f32; }
       return nullptr;
-    case v_OP_SIN:
+    case V_OP_SIN:
       if (src0->type == v_TYPE_F32 && dst->type == v_TYPE_F32) { return ctx->device->pipeline_sin_f32; }
       return nullptr;
-    case v_OP_COS:
+    case V_OP_COS:
       if (src0->type == v_TYPE_F32 && dst->type == v_TYPE_F32) { return ctx->device->pipeline_cos_f32; }
       return nullptr;
-    case v_OP_CLAMP:
+    case V_OP_CLAMP:
       if (src0->type == v_TYPE_F32 && dst->type == v_TYPE_F32) { return ctx->device->pipeline_clamp_f32; }
       return nullptr;
     case v_OP_PAD:
@@ -494,8 +494,8 @@ vk_pipeline v_vk_op_get_pipeline(vk_backend_ctx* ctx, const v_tensor* src0,
     case v_OP_REPEAT_BACK:
       if (src0->type == v_TYPE_F32 && dst->type == v_TYPE_F32) { return ctx->device->pipeline_repeat_back_f32; }
       return nullptr;
-    case v_OP_CPY:
-    case v_OP_CONT:
+    case V_OP_CPY:
+    case V_OP_CONT:
     case v_OP_DUP:
       return v_vk_get_cpy_pipeline(ctx, src0, dst, dst->type);
     case v_OP_SET_ROWS:
@@ -539,7 +539,7 @@ vk_pipeline v_vk_op_get_pipeline(vk_backend_ctx* ctx, const v_tensor* src0,
         case v_UNARY_OP_EXP:
           return ctx->device->pipeline_exp[dst->type == v_TYPE_F16];
 
-        case v_UNARY_OP_LOG:
+        case V_UNARY_OP_LOG:
           return ctx->device->pipeline_log[dst->type == v_TYPE_F16];
 
         case v_UNARY_OP_SILU:
@@ -617,9 +617,9 @@ vk_pipeline v_vk_op_get_pipeline(vk_backend_ctx* ctx, const v_tensor* src0,
     case V_OP_ROPE:
     case v_OP_ROPE_BACK: {
       const int mode       = dst->op_params[2];
-      const bool is_neox   = mode & v_ROPE_TYPE_NEOX;
-      const bool is_mrope  = mode & v_ROPE_TYPE_MROPE;
-      const bool is_vision = mode == v_ROPE_TYPE_VISION;
+      const bool is_neox   = mode & V_ROPE_TYPE_NEOX;
+      const bool is_mrope  = mode & V_ROPE_TYPE_MROPE;
+      const bool is_vision = mode == V_ROPE_TYPE_VISION;
 
       if (is_neox) {
         if (src0->type == v_TYPE_F32 && dst->type == v_TYPE_F32) { return ctx->device->pipeline_rope_neox_f32; }
@@ -699,7 +699,7 @@ vk_pipeline v_vk_op_get_pipeline(vk_backend_ctx* ctx, const v_tensor* src0,
     case v_OP_OPT_STEP_SGD:
       if (src0->type == v_TYPE_F32 && dst->type == v_TYPE_F32) { return ctx->device->pipeline_opt_step_sgd_f32; }
       return nullptr;
-    case v_OP_LEAKY_RELU:
+    case V_OP_LEAKY_RELU:
       if (src0->type == v_TYPE_F32 && dst->type == v_TYPE_F32) { return ctx->device->pipeline_leaky_relu_f32; }
       return nullptr;
     case v_OP_CONV_2D:

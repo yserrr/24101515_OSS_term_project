@@ -4,10 +4,10 @@
 
 struct v_opt_dataset
 {
-  struct v_ctx* ctx = nullptr;
+  v_ctx* ctx = nullptr;
   v_backend_buffer_t buf = nullptr;
-  struct v_tensor* data = nullptr;
-  struct v_tensor* labels = nullptr;
+  v_tensor* data = nullptr;
+  v_tensor* labels = nullptr;
   int64_t ndata__ = -1;
   int64_t ndata_shard = -1;
   size_t nbs_data = -1;
@@ -18,7 +18,7 @@ struct v_opt_dataset
   void free()
   {
     v_backend_buffer_free(buf);
-    free_ctx(ctx);
+    v_free_ctx(ctx);
     delete this;
   }
 
@@ -30,11 +30,11 @@ struct v_opt_dataset
   void get_batch(struct v_tensor* data_batch,
                 struct v_tensor* labels_batch,
                 int64_t ibatch);
-  struct v_tensor* getDataset()
+  struct v_tensor* get_dataset()
   {
     return data;
   }
-  struct v_tensor* getLabels()
+  struct v_tensor* get_labels()
   {
     return labels;
   }

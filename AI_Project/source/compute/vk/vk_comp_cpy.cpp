@@ -3,16 +3,15 @@
 #include "vk_constant.h"
 
 void v_vk_cpy(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0, v_tensor* dst, bool dryrun) {
-  uint32_t ne = (uint32_t)nelements(src0);
+  auto ne = static_cast<uint32_t>(nelements(src0));
   if (v_is_quantized(src0->type) && v_is_quantized(dst->type)) {
     // Convert from number of logical elements to 2- or 4-byte units.
     ne /= block_size(src0->type);
     if ((v_type_size(src0->type) % 4) == 0) { ne *= v_type_size(src0->type) / 4; }
     else { ne *= v_type_size(src0->type) / 2; }
   }
-
   vk_op_unary_push_constants p = vk_op_unary_push_constants_init(src0, dst, ne);
-  v_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, dst, v_OP_CPY, std::move(p), dryrun);
+  v_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, dst, V_OP_CPY, std::move(p), dryrun);
 }
 
 void v_vk_cpy_to_contiguous(vk_backend_ctx* ctx, vk_context& subctx, vk_pipeline pipeline,

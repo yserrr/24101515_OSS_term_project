@@ -15,7 +15,7 @@ v_opt_data_set_t v_opt_dataset_init(enum v_data_type type_data__,
   result->ndata__     = ndata__;
   result->ndata_shard = ndata_shard__;
   {
-    struct v_init_param params = {
+     v_init_param params = {
       .mem_size = 2 * v_tensor_over_head(),
       .mem_buffer = nullptr,
       .no_alloc = true,

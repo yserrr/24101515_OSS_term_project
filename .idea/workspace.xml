@@ -7,7 +7,7 @@
     <option name="/Default/Environment/Hierarchy/GeneratedFilesCacheKey/Timestamp/@EntryValue" value="5" type="long" />
     <option name="/Default/Housekeeping/FeatureSuggestion/FeatureSuggestionManager/DisabledSuggesters/=SwitchToGoToActionSuggester/@EntryIndexedValue" value="true" type="bool" />
     <option name="/Default/Housekeeping/GlobalSettingsUpgraded/IsUpgraded/@EntryValue" value="true" type="bool" />
-    <option name="/Default/Housekeeping/OptionsDialog/SelectedPageId/@EntryValue" value="CppFormatterWrappingPage" type="string" />
+    <option name="/Default/Housekeeping/OptionsDialog/SelectedPageId/@EntryValue" value="CppBracesLayoutPage" type="string" />
     <option name="/Default/Housekeeping/RefactoringsMru/RenameRefactoring/DoSearchForTextInStrings/@EntryValue" value="true" type="bool" />
     <option name="/Default/RiderDebugger/RiderRestoreDecompile/RestoreDecompileSetting/@EntryValue" value="false" type="bool" />
   </component>
@@ -40,82 +40,61 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="dfc7e882-8ede-4b19-a19c-bd7dac50264a" name="변경" comment="zz">
+      <change afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/MyProject.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_binary.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_binary.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_log.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_op_unary.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_op_unary.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_tensor.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/editor.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/editor.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/myproject_CG_AI.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/myproject_CG_AI.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/extern/pybind11/attr.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/extern/pybind11/attr.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/extern/pybind11/cast.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/extern/pybind11/cast.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/extern/pybind11/detail/class.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/extern/pybind11/detail/class.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/extern/pybind11/detail/common.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/extern/pybind11/detail/common.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/extern/pybind11/detail/descr.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/extern/pybind11/detail/descr.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/extern/pybind11/detail/init.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/extern/pybind11/detail/init.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/extern/pybind11/detail/internals.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/extern/pybind11/detail/internals.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/extern/pybind11/detail/type_caster_base.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/extern/pybind11/detail/type_caster_base.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/extern/pybind11/detail/value_and_holder.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/extern/pybind11/detail/value_and_holder.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/extern/pybind11/embed.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/extern/pybind11/embed.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/extern/pybind11/gil.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/extern/pybind11/gil.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/extern/pybind11/numpy.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/extern/pybind11/numpy.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/extern/pybind11/pybind11.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/extern/pybind11/pybind11.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/extern/pybind11/pytypes.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/extern/pybind11/pytypes.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/extern/pybind11/stl.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/extern/pybind11/stl.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/extern/pybind11/typing.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/extern/pybind11/typing.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/ggml-common.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/ggml-common.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/ggml-impl.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/gguf/gguf.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/gguf/gguf.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/opt/v_opt_common.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/opt/v_opt_common.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AI_Project/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/opt/v_opt_ctx.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/opt/v_opt_ctx.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/opt/v_opt_ctx.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/opt/v_opt_ctx.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v-backend.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_backend.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v-backend.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/opt/v_opt_dataset.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/opt/v_opt_dataset.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/opt/v_opt_dataset.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/opt/v_opt_dataset.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/v.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_allocator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_allocator.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_allocator.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_backend.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_backend.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_comp.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_comp.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_context.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_context.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_context.cpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_ctx.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_ctx.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_fn.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_fn.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_graph.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_graph.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_graph.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_graph.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_hash.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_log.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_log.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_object.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_object.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_op.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_object.hpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_quants.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_quants.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_quants.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_shape.cpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_tensor.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_tensor.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_type.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_type.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_type.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_type.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_util.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_vision.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_vision.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/v_vision.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/v_vision.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/v_vk.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/v_vk.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/v_vk.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_buffer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_buffer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_buffer.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_buffer.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_common.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_common.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_comp.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_comp.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_comp.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_comp.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_comp_cpy.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_comp_cpy.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_comp_flash_atten.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_comp_flash_atten.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_comp_mat_mul.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_comp_mat_mul.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_constant.inl" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_constant.inl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_context.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_context.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_context.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_context.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_config.h" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_config.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_device.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_device.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_device.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_device_kernel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_device_kernel.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_graph_build.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_graph_build.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_graph_compute.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_graph_compute.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_op_f32.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_op_f32.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_perp_logger.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_perp_logger.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_pipeline.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_pipeline.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_pipeline.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_queue.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_queue.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_queue.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_util.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_util.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_util.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_vision_comp.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_vision_comp.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_vision_comp.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/compute/vk/vk_vision_comp.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/test/cifar-100_train_fc.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/test/cifar-100_train_fc.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/test/cifar-10_train_cnn.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/test/cifar-10_train_cnn.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AI_Project/source/test/cifar-10_train_fc_.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AI_Project/source/test/cifar-10_train_fc_.cpp" afterDir="false" />
@@ -150,11 +129,13 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/../../../../../../Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/include/array" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../../../../../Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/include/cstdint" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../../../../../Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/include/stdint.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../../../../../Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/include/vector" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/AI_Project/source/test/cifar-10_train_fc_.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/AI_Project/source/test/compute.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/AI_Project/source/test/mnist_train.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/AI_Project/source/test/python__test.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../../../../../VulkanSDK/1.4.328.1/Include/vulkan/vulkan_core.h" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProblemsViewState">
     <hideBySeverity>
@@ -182,6 +163,8 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;CMake 애플리케이션.cifar-100_train_fc.executor&quot;: &quot;Run&quot;,
+    &quot;CMake 애플리케이션.cifar-10_train_fc_.executor&quot;: &quot;Run&quot;,
     &quot;CMake 애플리케이션.compute.executor&quot;: &quot;Run&quot;,
     &quot;CMake 애플리케이션.mnist_train.executor&quot;: &quot;Run&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
@@ -192,6 +175,7 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.west.config.association.type.startup.service&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
@@ -305,10 +289,10 @@
       <item itemvalue="CMake 애플리케이션.cifar-10_train_cnn" />
       <item itemvalue="CMake 애플리케이션.cifar-10_train_fc_" />
       <item itemvalue="CMake 애플리케이션.compute" />
+      <item itemvalue="CMake 애플리케이션.mml" />
       <item itemvalue="CMake 애플리케이션.mnist_train" />
       <item itemvalue="CMake 애플리케이션.python__test" />
       <item itemvalue="CMake 애플리케이션.vanila_gan_mnist" />
-      <item itemvalue="CMake 애플리케이션.mml" />
       <item itemvalue="CMake 애플리케이션.vulkan-kernels-gen" />
     </list>
   </component>
@@ -332,9 +316,26 @@
       <workItem from="1765113765655" duration="24116000" />
       <workItem from="1765238270326" duration="75000" />
       <workItem from="1765247765042" duration="2221000" />
-      <workItem from="1765328038682" duration="1475000" />
+      <workItem from="1765328038682" duration="10004000" />
+      <workItem from="1765338088177" duration="1382000" />
+      <workItem from="1765339481056" duration="8209000" />
+      <workItem from="1765357730846" duration="1021000" />
+      <workItem from="1765358913736" duration="778000" />
+      <workItem from="1765359720280" duration="10000" />
+      <workItem from="1765359741604" duration="1988000" />
+      <workItem from="1765403142437" duration="6999000" />
+      <workItem from="1765412765970" duration="16652000" />
+      <workItem from="1765470351128" duration="10087000" />
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="zz">
+      <option name="closed" value="true" />
+      <created>1765329665065</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1765329665065</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -362,5 +363,9 @@
     </ignored-roots>
     <MESSAGE value="zz" />
     <option name="LAST_COMMIT_MESSAGE" value="zz" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

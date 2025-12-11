@@ -1,10 +1,9 @@
 #ifndef MYPROJECT_V_VISION_HPP
 #define MYPROJECT_V_VISION_HPP
 #include "v.hpp"
-#include "v_common.hpp"
+#include "v_header.hpp"
 // converts data into a format that effectively results in a convolution when combined with matrix multiplication
-V_API v_tensor* v_im2col(
-  struct v_ctx* ctx,
+V_API v_tensor* v_im2col(v_ctx* ctx,
   v_tensor* a, // convolution kernel
   v_tensor* b, // data
   int s0, // stride dimension 0

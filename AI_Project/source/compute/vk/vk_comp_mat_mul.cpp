@@ -956,8 +956,8 @@ void v_vk_mul_mat_vec_nc_f16_f32(vk_backend_ctx* ctx, vk_context& subctx, v_tens
     << dst->ne[1] << ", ne2=" << dst->ne[2] << ", ne3=" << dst->ne[3] << ", nb0=" << dst->nb[0] << ", nb1=" << dst->nb[1
     ] << ", nb2=" << dst->nb[2] << ", nb3=" << dst->nb[3];
     std::cerr << "), " << (dryrun ? "dryrun" : "") << ")");
-  V_ASSERT(!v_is_transposed(src0));
-  V_ASSERT(!v_is_transposed(src1));
+  V_ASSERT(!src0->is_transposed());
+  V_ASSERT(!src1->is_transposed());
   V_ASSERT(!v_is_permuted(src0));
   V_ASSERT(src0->type == v_TYPE_F16);
   V_ASSERT(src1->type == v_TYPE_F32);
@@ -1102,7 +1102,7 @@ void v_vk_mul_mat(vk_backend_ctx* ctx, vk_context& subctx, v_tensor* src0, v_ten
     src1->nb[1] <= src1->nb[3] &&
     src0->ne[3] == 1 &&
     src1->ne[3] == 1) { v_vk_mul_mat_vec_p021_f16_f32(ctx, subctx, src0, src1, dst, dryrun); }
-  else if (src0->type == v_TYPE_F16 && !v_is_contiguous(src0) && !v_is_transposed(src1) && dst->ne[1] == 1 &&
+  else if (src0->type == v_TYPE_F16 && !v_is_contiguous(src0) && !src1->is_transposed() && dst->ne[1] == 1 &&
     !v_is_permuted(src0) && !v_is_permuted(src1)) {
     v_vk_mul_mat_vec_nc_f16_f32(ctx, subctx, src0, src1, dst, dryrun);
     // mul_mat_vec supports batching ne12*ne13 when ne11==1, or treating ne11 as the batch size (up to four)

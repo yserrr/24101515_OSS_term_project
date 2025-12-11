@@ -639,7 +639,7 @@ v_backend_buffer_t vk_host_buffer_alloc(v_backend_buffer_type_t buft, size_t siz
   void* ptr = nullptr;
   try { ptr = vk_host_malloc(vk_instance.devices[0], size); }
   catch (vk::SystemError& e) {
-    v_LOG_WARN("v_vulkan: Failed to allocate pinned memory (%s)\n", e.what());
+    V_LOG_WARN("v_vulkan: Failed to allocate pinned memory (%s)\n", e.what());
     throw std::runtime_error("fail to alloc host mem");
   }
   v_backend_buffer* buffer = v_backend_cpu_buffer_from_ptr(ptr, size);

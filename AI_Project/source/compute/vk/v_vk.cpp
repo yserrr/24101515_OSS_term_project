@@ -697,8 +697,8 @@ void vk_check_results_0(vk_backend_ctx* ctx, v_cgraph* cgraph, int tensor_idx) {
                                     params[2]);
     if (src_clone[4]) { v_flash_attn_ext_add_sinks(tensor_clone, src_clone[4]); }
   }
-  else if (tensor->op == v_OP_MUL_MAT) { tensor_clone = v_matmul(v_ctx, src_clone[0], src_clone[1]); }
-  else if (tensor->op == v_OP_MUL_MAT_ID) { tensor_clone = mmlMatrixMulId(v_ctx, src_clone[0], src_clone[1], src_clone[2]); }
+  else if (tensor->op == V_OP_MUL_MAT) { tensor_clone = v_matmul(v_ctx, src_clone[0], src_clone[1]); }
+  else if (tensor->op == v_OP_MUL_MAT_ID) { tensor_clone = v_mat_mul_id(v_ctx, src_clone[0], src_clone[1], src_clone[2]); }
   else if (tensor->op == v_OP_SUB) { tensor_clone = v_sub(v_ctx, src_clone[0], src_clone[1]); }
   else if (tensor->op == v_OP_MUL) {
     if (fused_rms_norm_mul) {
@@ -722,11 +722,11 @@ void vk_check_results_0(vk_backend_ctx* ctx, v_cgraph* cgraph, int tensor_idx) {
     const float* params = (const float*)tensor->op_params;
     tensor_clone        = v_scale_bias(v_ctx, src_clone[0], params[0], params[1]);
   }
-  else if (tensor->op == v_OP_SQR) { tensor_clone = v_sqr(v_ctx, src_clone[0]); }
+  else if (tensor->op == V_OP_SQR) { tensor_clone = v_sqr(v_ctx, src_clone[0]); }
   else if (tensor->op == v_OP_SQRT) { tensor_clone = v_sqrt(v_ctx, src_clone[0]); }
-  else if (tensor->op == v_OP_SIN) { tensor_clone = v_sin(v_ctx, src_clone[0]); }
-  else if (tensor->op == v_OP_COS) { tensor_clone = v_cos(v_ctx, src_clone[0]); }
-  else if (tensor->op == v_OP_CLAMP) {
+  else if (tensor->op == V_OP_SIN) { tensor_clone = v_sin(v_ctx, src_clone[0]); }
+  else if (tensor->op == V_OP_COS) { tensor_clone = v_cos(v_ctx, src_clone[0]); }
+  else if (tensor->op == V_OP_CLAMP) {
     const float* params = (const float*)tensor->op_params;
     tensor_clone        = v_clamp(v_ctx, src_clone[0], params[0], params[1]);
   }
@@ -889,7 +889,7 @@ void vk_check_results_0(vk_backend_ctx* ctx, v_cgraph* cgraph, int tensor_idx) {
       case v_UNARY_OP_SIGMOID:
         tensor_clone = v_sigmoid(v_ctx, src_clone[0]);
         break;
-      case v_UNARY_OP_LOG:
+      case V_UNARY_OP_LOG:
         tensor_clone = v_log(v_ctx, src_clone[0]);
         break;
       case v_UNARY_OP_HARDSIGMOID:
@@ -909,15 +909,15 @@ void vk_check_results_0(vk_backend_ctx* ctx, v_cgraph* cgraph, int tensor_idx) {
     v_set_op_params_i32(tensor_clone, 2, v_get_op_params_i32(tensor, 2));
     v_set_op_params_i32(tensor_clone, 3, v_get_op_params_i32(tensor, 3));
   }
-  else if (tensor->op == v_OP_CPY || tensor->op == v_OP_DUP) {
+  else if (tensor->op == V_OP_CPY || tensor->op == v_OP_DUP) {
     if (src1 == nullptr) {
       tensor_clone       = v_dup(v_ctx, src_clone[0]);
       tensor_clone->type = tensor->type;
     }
     else { tensor_clone = v_cpy(v_ctx, src_clone[0], src_clone[1]); }
   }
-  else if (tensor->op == v_OP_CONT) { tensor_clone = v_cont_4d(v_ctx, src_clone[0], tensor->ne[0], tensor->ne[1], tensor->ne[2], tensor->ne[3]); }
-  else if (tensor->op == v_OP_RESHAPE) { tensor_clone = v_reshape_4d(v_ctx, src_clone[0], tensor->ne[0], tensor->ne[1], tensor->ne[2], tensor->ne[3]); }
+  else if (tensor->op == V_OP_CONT) { tensor_clone = v_cont_4d(v_ctx, src_clone[0], tensor->ne[0], tensor->ne[1], tensor->ne[2], tensor->ne[3]); }
+  else if (tensor->op == V_OP_RESHAPE) { tensor_clone = v_reshape_4d(v_ctx, src_clone[0], tensor->ne[0], tensor->ne[1], tensor->ne[2], tensor->ne[3]); }
   else if (tensor->op == V_OP_VIEW) {
     tensor_clone = v_view_4d(v_ctx,
                              src_clone[0],
@@ -1015,7 +1015,7 @@ void vk_check_results_0(vk_backend_ctx* ctx, v_cgraph* cgraph, int tensor_idx) {
     const int32_t s = tensor->op_params[0];
     tensor_clone    = v_conv_transpose_2d_p0(v_ctx, src_clone[0], src_clone[1], s);
   }
-  else if (tensor->op == v_OP_LEAKY_RELU) {
+  else if (tensor->op == V_OP_LEAKY_RELU) {
     const float* op_params = (const float*)tensor->op_params;
     tensor_clone           = v_leaky_relu(v_ctx, src_clone[0], op_params[0], false);
   }
@@ -1054,7 +1054,7 @@ void vk_check_results_0(vk_backend_ctx* ctx, v_cgraph* cgraph, int tensor_idx) {
                                   src_clone[1],
                                   src_clone[2]);
   }
-  else if (tensor->op == v_OP_ADD_ID) { tensor_clone = add_id(v_ctx, src_clone[0], src_clone[1], src_clone[2]); }
+  else if (tensor->op == v_OP_ADD_ID) { tensor_clone = v_add_id(v_ctx, src_clone[0], src_clone[1], src_clone[2]); }
   else if (tensor->op == v_OP_SSM_SCAN) {
     tensor_clone = v_ssm_scan(v_ctx,
                               src_clone[0],
@@ -1086,7 +1086,7 @@ void vk_check_results_0(vk_backend_ctx* ctx, v_cgraph* cgraph, int tensor_idx) {
 
   for (int i = 0; i < v_MAX_SRC; i++) { if (src_buffer[i] != nullptr) { free(src_buffer[i]); } }
 
-  free_ctx(v_ctx);
+  v_free_ctx(v_ctx);
 
   VK_LOG_DEBUG("END v_vk_check_results_0(" << tensor->name << ")");
 }

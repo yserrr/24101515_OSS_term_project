@@ -36,19 +36,19 @@ enum shader_reduction_mode
 
 constexpr std::array topk_moe_norm{
   V_OP_SOFT_MAX,
-  v_OP_RESHAPE,
+  V_OP_RESHAPE,
   v_OP_ARGSORT,
   V_OP_VIEW,
   v_OP_GET_ROWS,
-  v_OP_RESHAPE,
+  V_OP_RESHAPE,
   v_OP_SUM_ROWS,
   v_OP_DIV,
-  v_OP_RESHAPE
+  V_OP_RESHAPE
 };
 
 constexpr std::array topk_moe{
   V_OP_SOFT_MAX,
-  v_OP_RESHAPE,
+  V_OP_RESHAPE,
   v_OP_ARGSORT,
   V_OP_VIEW,
   v_OP_GET_ROWS
