@@ -106,7 +106,7 @@ void v_opt_evaluate(v_opt_ctx* opt_ctx,
       }
       break;
       default:
-        v_ABORT("fatal error");
+        V_ABORT("fatal error");
     }
   }
   v_sched_graph_compute(opt_ctx->backend_sched,
@@ -133,7 +133,7 @@ void v_opt_evaluate(v_opt_ctx* opt_ctx,
   const int64_t ndata = opt_ctx->outputs->ne[1];
   V_ASSERT(result->ndata == ndata * int64_t(result->loss.size()) && "varying batch size not supported");
   result->ndata += ndata;
-  V_ASSERT(v_is_scalar(opt_ctx->loss));
+  V_ASSERT(opt_ctx->loss->is_scalar());
   V_ASSERT(opt_ctx->loss->type == v_TYPE_F32);
   float loss;
   v_get_backend_tensor(opt_ctx->loss, &loss, 0, num_bytes(opt_ctx->loss));
@@ -149,7 +149,7 @@ void v_opt_evaluate(v_opt_ctx* opt_ctx,
     result->ncorrect = -1;
     return;
   }
-  V_ASSERT(v_is_scalar(opt_ctx->ncorrect));
+  V_ASSERT(opt_ctx->ncorrect->is_scalar());
   V_ASSERT(opt_ctx->ncorrect->type == v_TYPE_I64);
   int64_t ncorrect;
   v_get_backend_tensor(opt_ctx->ncorrect, &ncorrect, 0, num_bytes(opt_ctx->ncorrect));
@@ -196,9 +196,9 @@ void v_opt_epoch(v_opt_ctx* opt_ctx__,
                  int64_t idata_split__,
                  v_opt_epoch_callback callback_train__,
                  v_opt_epoch_callback callback_eval__) {
-  V_ASSERT((opt_ctx__)->isStaticGraph() && "v_opt_epoch requires static graphs");
-  v_tensor* inputs = opt_ctx__->getInput();
-  v_tensor* labels = opt_ctx__->getLabels();
+  V_ASSERT((opt_ctx__)->is_static_graph() && "v_opt_epoch requires static graphs");
+  v_tensor* inputs = opt_ctx__->get_input();
+  v_tensor* labels = opt_ctx__->get_labels();
   v_tensor* data   = v_opt_dataset_datas(dataset__);
 
   V_ASSERT(data->ne[0] == inputs->ne[0]);
@@ -276,7 +276,7 @@ void v_opt_epoch_callback_progress_bar(bool train,
     else fprintf(stderr, " ");
   }
 
-  const int64_t batch_size = (opt_ctx)->getInput()->ne[1];
+  const int64_t batch_size = (opt_ctx)->get_input()->ne[1];
   const int64_t idata      = batch_idx * batch_size;
   const int64_t idata_max  = ibatch_max * batch_size;
 
@@ -483,11 +483,9 @@ void v_opt_ctx::allocate(bool backward) {
     for (int i = 0; i < src->n_nodes; ++i) {
       const size_t igrad_src = src->visited_hash_set.find_hash(src->nodes[i]);
       const size_t igrad_dst = dst->visited_hash_set.find_hash(dst->nodes[i]);
-
-      V_ASSERT(igrad_src != V_HASHSET_FULL);
-      //V_ASSERT(src->visited_hash_set.get_bitset(igrad_src));
+      //V_ASSERT(src->visited_hash_set.is_contains(igrad_src));
       //V_ASSERT(igrad_dst != V_HASHSET_FULL);
-      //V_ASSERT(dst->visited_hash_set.get_bitset(igrad_dst));
+      //V_ASSERT(dst->visited_hash_set.is_contains(igrad_dst));
 
       dst->grads[igrad_dst]     = src->grads[igrad_src];
       dst->grad_accs[igrad_dst] = src->grad_accs[igrad_src];
@@ -735,7 +733,7 @@ void v_opt_ctx::build() {
           opt_step = v_opt_step_sgd(opt_ctx->ctx_compute, node, grad, adamw_params);
           break;
         default:
-          v_ABORT("fatal error");
+          V_ABORT("fatal error");
       }
       v_format_name(opt_step, "%s step for %s", optimizer_name, node->name);
       v_build_foward_expand(opt_ctx->gb_opt, opt_step);
@@ -748,4 +746,23 @@ void v_opt_ctx::build() {
     v_graph_reset(opt_ctx->gb_opt);
   }
   opt_ctx->buf_static = v_backend_alloc_ctx_tensor_from_buffer_t(opt_ctx->ctx_gpu, vk_device_buffer_type(0));
+}
+
+const char* v_opt_ctx::get_opt_name() {
+  switch (optimizer) {
+    case V_OPTIMIZER_TYPE_ADAMW:
+      return "adamw";
+    case V_OPTIMIZER_TYPE_SGD:
+      return "sgd";
+    default:
+      return "undefined";
+  };
+}
+
+void v_opt_ctx::free() {
+  v_backend_buffer_free(this->buf_static);
+  v_backend_buffer_free(this->buf_host);
+  v_free_ctx(this->ctx_static);
+  v_free_ctx(this->ctx_gpu);
+  delete this;
 }

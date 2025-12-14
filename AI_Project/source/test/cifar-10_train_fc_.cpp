@@ -80,7 +80,7 @@ int main() {
   auto vk         = backend_vk_init(0);
   v_backend_t a[] = {vk};
 
-  auto backend_sched  = v_sched_new(*a, nullptr, 1, V_DEFAULT_GRAPH_SIZE, false);
+  auto backend_sched  = v_sched_new(*a, nullptr, V_DEFAULT_GRAPH_SIZE);
   model.backend_sched = backend_sched;
 
   int num_tensors = 10;
@@ -262,8 +262,8 @@ int main() {
     result_train->reset();
     result_val->reset();
     fprintf(stderr, "%s: epoch %04" PRId64 "/%04" PRId64 ":\n", __func__, epoch, 100);
-    v_tensor* inputs = opt_ctx->getInput();
-    v_tensor* labels = opt_ctx->getLabels();
+    v_tensor* inputs = opt_ctx->get_input();
+    v_tensor* labels = opt_ctx->get_labels();
     v_tensor* data   = v_opt_dataset_datas(dataset);
     V_ASSERT(data->ne[0] == inputs->ne[0]);
     const int64_t ndata       = data->ne[1];

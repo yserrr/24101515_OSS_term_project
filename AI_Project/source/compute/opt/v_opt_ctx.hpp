@@ -1,12 +1,10 @@
-//
-// Created by dlwog on 25. 11. 18..
-//
+#pragma once
+/// All code is adapted from ggml for personal educational purposes.(study, clone coding)
+/// Core code under license is sourced from ggml (https://github.com/ggerganov/ggml)
 
-#ifndef MYPROJECT_MML_OPT_CONTEXT_HPP
-#define MYPROJECT_MML_OPT_CONTEXT_HPP
+
 #include "v_opt_common.hpp"
 #include "v_opt_result.hpp"
-
 /// todo:
 ///  class setting
 ///  update setting for ctx
@@ -50,31 +48,13 @@ struct v_opt_ctx {
   v_opt_type optimizer                    = V_OPTIMIZER_TYPE_ADAMW;
   void allocate(bool backward = false);
   void build();
-  v_tensor* getInput() { return inputs; }
-  v_tensor* getOutput() { return outputs; }
-  v_tensor* getLabels() { return labels; }
-  v_tensor* getLoss() { return loss; }
-  bool isStaticGraph() { return static_graphs; }
-  v_opt_type getOptType() { return optimizer; }
-
-  const char* get_opt_name() {
-    switch (optimizer) {
-      case V_OPTIMIZER_TYPE_ADAMW:
-        return "adamw";
-      case V_OPTIMIZER_TYPE_SGD:
-        return "sgd";
-      default:
-        return "undefined";
-    };
-  }
-
-  void free() {
-    v_backend_buffer_free(this->buf_static);
-    v_backend_buffer_free(this->buf_host);
-    v_free_ctx(this->ctx_static);
-    v_free_ctx(this->ctx_gpu);
-    delete this;
-  }
+  v_tensor* get_input() { return inputs; }
+  v_tensor* get_output() { return outputs; }
+  v_tensor* get_labels() { return labels; }
+  v_tensor* get_loss() { return loss; }
+  bool is_static_graph() { return static_graphs; }
+  v_opt_type get_opt_type() { return optimizer; }
+  const char* get_opt_name();
+  void free();
 };
 
-#endif //MYPROJECT_MML_OPT_CONTEXT_HPP

@@ -201,85 +201,6 @@ void v_print_backtrace(void) {
 #include <exception>
 
 
-static v_abort_callback_t g_abort_callback = nullptr;
-
-// Set the abort callback (passing null will restore original abort functionality: printing a message to stdout)
-V_API v_abort_callback_t v_set_abort_callback(v_abort_callback_t callback) {
-  v_abort_callback_t ret_val = g_abort_callback;
-  g_abort_callback           = callback;
-  return ret_val;
-}
-
-void v_abort(const char* file, int line, const char* fmt, ...) {
-  fflush(stdout);
-
-  char message[2048];
-  int offset = snprintf(message, sizeof(message), "%s:%d: ", file, line);
-
-  va_list args;
-  va_start(args, fmt);
-  vsnprintf(message + offset, sizeof(message) - offset, fmt, args);
-  va_end(args);
-
-  if (g_abort_callback) {
-    g_abort_callback(message);
-  } else {
-    // default: print error and backtrace to stderr
-    fprintf(stderr, "%s\n", message);
-    v_print_backtrace();
-  }
-
-  abort();
-}
-
-// v_print_backtrace is registered with std::set_terminate by ggml.cpp
-
-//
-// logging
-//
-
-struct v_logger_state {
-  v_log_callback log_callback;
-  void* log_callback_user_data;
-};
-
-static struct v_logger_state g_logger_state = {v_log_callback_default, nullptr};
-
-static void v_log_internal_v(enum v_log_level level, const char* format, va_list args) {
-  if (format == nullptr) {
-    return;
-  }
-  va_list args_copy;
-  va_copy(args_copy, args);
-  char buffer[128];
-  int len = vsnprintf(buffer, 128, format, args);
-  if (len < 128) {
-    g_logger_state.log_callback(level, buffer, g_logger_state.log_callback_user_data);
-  } else {
-    char* buffer2 = (char*)calloc(len + 1, sizeof(char));
-    vsnprintf(buffer2, len + 1, format, args_copy);
-    buffer2[len] = 0;
-    g_logger_state.log_callback(level, buffer2, g_logger_state.log_callback_user_data);
-    free(buffer2);
-  }
-  va_end(args_copy);
-}
-
-void v_log_internal(v_log_level level, const char* format, ...) {
-  va_list args;
-  va_start(args, format);
-  v_log_internal_v(level, format, args);
-  va_end(args);
-}
-
-void v_log_callback_default(enum v_log_level level, const char* text, void* user_data) {
-  (void)level;
-  (void)user_data;
-  fputs(text, stderr);
-  fflush(stderr);
-}
-
-
 void v_aligned_free(void* ptr, size_t size) {
   V_UNUSED(size);
   _aligned_free(ptr);
@@ -294,151 +215,17 @@ inline static void* v_malloc(size_t size) {
   void* result = malloc(size);
   if (result == nullptr) {
     V_LOG_ERROR("%s: failed to allocate %6.2f MB\n", __func__, size/(1024.0*1024.0));
-    v_ABORT("fatal error");
+    V_ABORT("fatal error");
   }
   return result;
 }
 
-// calloc
-inline static void* v_calloc(size_t num, size_t size) {
-  if (num == 0 || size == 0) {
-    V_LOG_WARN("Behavior may be unexpected when allocating 0 bytes for v_calloc!\n");
-    return nullptr;
-  }
-  void* result = calloc(num, size);
-  if (result == nullptr) {
-    V_LOG_ERROR("%s: failed to allocate %6.2f MB\n", __func__, size/(1024.0*1024.0));
-    v_ABORT("fatal error");
-  }
-  return result;
-}
 
 #define v_MALLOC(size)      v_malloc(size)
 #define v_CALLOC(num, size) v_calloc(num, size)
 
 #define v_FREE(ptr) free(ptr)
 
-const char* v_status_to_string(enum v_status status) {
-  switch (status) {
-    case v_STATUS_ALLOC_FAILED: return "GGML status: error (failed to allocate memory)";
-    case v_STATUS_FAILED: return "GGML status: error (operation failed)";
-    case v_STATUS_SUCCESS: return "GGML status: success";
-    case v_STATUS_ABORTED: return "GGML status: warning (operation aborted)";
-  }
-
-  return "GGML status: unknown";
-}
-
-float v_fp16_to_fp32(v_fp16_t x) {
-  #define v_fp16_to_fp32 do_not_use__v_fp16_to_fp32__in_ggml
-  return v_FP16_TO_FP32(x);
-}
-
-v_fp16_t v_fp32_to_fp16(float x) {
-  #define v_fp32_to_fp16 do_not_use__v_fp32_to_fp16__in_ggml
-  return v_FP32_TO_FP16(x);
-}
-
-float v_bf16_to_fp32(v_bf16_t x) {
-  #define v_bf16_to_fp32 do_not_use__v_bf16_to_fp32__in_ggml
-  return v_BF16_TO_FP32(x); // it just left shifts
-}
-
-v_bf16_t v_fp32_to_bf16(float x) {
-  #define v_fp32_to_bf16 do_not_use__v_fp32_to_bf16__in_ggml
-  return v_FP32_TO_BF16(x);
-}
-
-void v_fp16_to_fp32_row(const v_fp16_t* x, float* y, int64_t n) {
-  for (int64_t i = 0; i < n; i++) {
-    y[i] = v_FP16_TO_FP32(x[i]);
-  }
-}
-
-void v_fp32_to_fp16_row(const float* x, v_fp16_t* y, int64_t n) {
-  int i = 0;
-  for (; i < n; ++i) {
-    y[i] = v_FP32_TO_FP16(x[i]);
-  }
-}
-
-void v_bf16_to_fp32_row(const v_bf16_t* x, float* y, int64_t n) {
-  int i = 0;
-  for (; i < n; ++i) {
-    y[i] = v_BF16_TO_FP32(x[i]);
-  }
-}
-
-void v_fp32_to_bf16_row_ref(const float* x, v_bf16_t* y, int64_t n) {
-  for (int i = 0; i < n; i++) {
-    y[i] = v_compute_fp32_to_bf16(x[i]);
-  }
-}
-
-void v_fp32_to_bf16_row(const float* x, v_bf16_t* y, int64_t n) {
-  int i = 0;
-  #if defined(__AVX512BF16__)
-  // subnormals are flushed to zero on this platform
-  for (; i + 32 <= n; i += 32) {
-    _mm512_storeu_si512(
-      (__m512i*)(y + i),
-      m512i(_mm512_cvtne2ps_pbh(_mm512_loadu_ps(x + i + 16),
-                                _mm512_loadu_ps(x + i))));
-  }
-  #endif
-  for (; i < n; i++) {
-    y[i] = v_FP32_TO_BF16(x[i]);
-  }
-}
-
-
-#if defined(_MSC_VER) || defined(__MINGW32__)
-static int64_t timer_freq, timer_start;
-
-void v_time_init(void) {
-  LARGE_INTEGER t;
-  QueryPerformanceFrequency(&t);
-  timer_freq = t.QuadPart;
-  // The multiplication by 1000 or 1000000 below can cause an overflow if timer_freq
-  // and the uptime is high enough.
-  // We subtract the program start time to reduce the likelihood of that happening.
-  QueryPerformanceCounter(&t);
-  timer_start = t.QuadPart;
-}
-
-int64_t v_time_ms(void) {
-  LARGE_INTEGER t;
-  QueryPerformanceCounter(&t);
-  return ((t.QuadPart - timer_start) * 1000) / timer_freq;
-}
-
-int64_t v_time_us(void) {
-  LARGE_INTEGER t;
-  QueryPerformanceCounter(&t);
-  return ((t.QuadPart - timer_start) * 1000000) / timer_freq;
-}
-#else
-void v_time_init(void) {}
-int64_t v_time_ms(void) {
-  struct timespec ts;
-  clock_gettime(CLOCK_MONOTONIC, &ts);
-  return (int64_t)ts.tv_sec * 1000 + (int64_t)ts.tv_nsec / 1000000;
-}
-
-int64_t v_time_us(void) {
-  struct timespec ts;
-  clock_gettime(CLOCK_MONOTONIC, &ts);
-  return (int64_t)ts.tv_sec * 1000000 + (int64_t)ts.tv_nsec / 1000;
-}
-#endif
-
-int64_t v_cycles(void) {
-  return clock();
-}
-
-int64_t v_cycles_per_ms(void) {
-  return CLOCKS_PER_SEC / 1000;
-}
 
 //
 // cross-platform UTF-8 file paths
@@ -532,11 +319,11 @@ size_t v_row_size(v_data_type type, int64_t ne) {
 
 const char* v_op_desc(const v_tensor* t) {
   if (t->op == v_OP_UNARY) {
-    enum v_unary_op uop = v_get_unary_op(t);
+    v_unary_op uop = v_get_unary_op(t);
     return v_unary_op_name(uop);
   }
   if (t->op == v_OP_GLU) {
-    enum v_glu_op gop = v_get_glu_op(t);
+    v_glu_op gop = v_get_glu_op(t);
     return v_glu_op_name(gop);
   }
   return v_op_name(t->op);
@@ -545,29 +332,6 @@ const char* v_op_desc(const v_tensor* t) {
 
 size_t v_tensor_over_head(void) {
   return V_OBJECT_SIZE + V_TENSOR_SIZE;
-}
-
-
-bool v_is_contiguous_n(const v_tensor* tensor, int n) {
-  size_t next_nb = v_type_size(tensor->type);
-  if (tensor->ne[0] != block_size(tensor->type) && tensor->nb[0] != next_nb) {
-    return false;
-  }
-  next_nb *= tensor->ne[0] / block_size(tensor->type);
-  for (int i = 1; i < V_MAX_DIMS; i++) {
-    if (tensor->ne[i] != 1) {
-      if (i > n) {
-        if (tensor->nb[i] != next_nb) {
-          return false;
-        }
-        next_nb *= tensor->ne[i];
-      } else {
-        // this dimension does not need to be contiguous
-        next_nb = tensor->ne[i] * tensor->nb[i];
-      }
-    }
-  }
-  return true;
 }
 
 
@@ -601,42 +365,6 @@ v_tensor* v_format_name(v_tensor* tensor, const char* fmt, ...) {
   vsnprintf(tensor->name.data(), sizeof(tensor->name.data()), fmt, args);
   va_end(args);
   return tensor;
-}
-
-
-v_tensor* v_acc_imple(v_ctx* ctx,
-                      v_tensor* a, v_tensor* b,
-                      size_t nb1,
-                      size_t nb2,
-                      size_t nb3,
-                      size_t offset,
-                      bool inplace) {
-  V_ASSERT(nelements(b) <= nelements(a));
-  V_ASSERT(v_is_contiguous(a));
-  V_ASSERT(a->type == v_TYPE_F32);
-  V_ASSERT(b->type == v_TYPE_F32);
-  v_tensor* result = inplace ? v_tensor_view(ctx, a) : v_dup_tensor(ctx, a);
-  int32_t params[] = {
-    static_cast<int32_t>(nb1),
-    static_cast<int32_t>(nb2),
-    static_cast<int32_t>(nb3),
-    static_cast<int32_t>(offset),
-    (inplace ? 1 : 0)
-  };
-  v_set_op_params(result, params, sizeof(params));
-
-  result->op     = v_OP_ACC;
-  result->src[0] = a;
-  result->src[1] = b;
-
-  return result;
-}
-
-
-void v_set_mat_mul_precisions(v_tensor* a, v_prec prec) {
-  V_ASSERT(a->op == V_OP_MUL_MAT);
-  const int32_t prec_i32 = prec;
-  v_set_op_params_i32(a, 0, prec_i32);
 }
 
 
@@ -883,7 +611,7 @@ static v_tensor* v_rope_impl(
   bool inplace) {
   V_ASSERT((mode & 1) == 0 && "mode & 1 == 1 is no longer supported");
 
-  V_ASSERT(v_is_vector(b));
+  V_ASSERT(b->is_vector());
   V_ASSERT(b->type == v_TYPE_I32);
 
   bool mrope_used = mode & V_ROPE_TYPE_MROPE;
@@ -1305,7 +1033,7 @@ v_tensor* v_pad_ext(v_ctx* ctx,
 }
 
 // v_pad_reflect_1d
-v_tensor* v_pad_reflect_1d(struct v_ctx* ctx,
+v_tensor* v_pad_reflect_1d(v_ctx* ctx,
                            v_tensor* a,
                            int p0,
                            int p1) {
@@ -1335,8 +1063,7 @@ v_tensor* v_pad_reflect_1d(struct v_ctx* ctx,
 }
 
 // v_roll
-
-v_tensor* v_roll(struct v_ctx* ctx,
+v_tensor* v_roll(v_ctx* ctx,
                  v_tensor* a,
                  int shift0,
                  int shift1,
@@ -1364,9 +1091,7 @@ v_tensor* v_roll(struct v_ctx* ctx,
 // v_arange
 
 v_tensor* v_arange(v_ctx* ctx,
-                   float start,
-                   float stop,
-                   float step) {
+                   float start, float stop, float step) {
   V_ASSERT(stop > start);
 
   const int64_t steps = ceilf((stop - start) / step);
@@ -1415,15 +1140,15 @@ v_tensor* v_top_k(v_ctx* ctx,
 
   v_tensor* result = v_argsort(ctx, a, v_SORT_ORDER_DESC);
   result           = v_view_4d(ctx,
-                               result,
-                               k,
-                               result->ne[1],
-                               result->ne[2],
-                               result->ne[3],
-                               result->nb[1],
-                               result->nb[2],
-                               result->nb[3],
-                               0);
+                     result,
+                     k,
+                     result->ne[1],
+                     result->ne[2],
+                     result->ne[3],
+                     result->nb[1],
+                     result->nb[2],
+                     result->nb[3],
+                     0);
   return result;
 }
 
@@ -1513,7 +1238,7 @@ v_tensor* v_flash_attn_back(struct v_ctx* ctx,
                             v_tensor* v,
                             v_tensor* d,
                             bool masked) {
-  v_ABORT("TODO: adapt to v_flash_attn_ext() changes");
+  V_ABORT("TODO: adapt to v_flash_attn_ext() changes");
 
   V_ASSERT(can_mul_mat(k, q));
   // TODO: check if vT can be multiplied by (k*qT)
@@ -1578,98 +1303,6 @@ v_tensor* v_flash_attn_back(struct v_ctx* ctx,
 
 // v_ssm_conv
 
-v_tensor* v_ssm_conv(
-  struct v_ctx* ctx,
-  v_tensor* sx,
-  v_tensor* c) {
-  V_ASSERT(v_is_3d(sx));
-  V_ASSERT(v_is_matrix(c));
-
-  const int64_t d_conv  = c->ne[0];
-  const int64_t d_inner = c->ne[1];
-  const int64_t n_t     = sx->ne[0] - d_conv + 1; // tokens per sequence
-  const int64_t n_s     = sx->ne[2];
-
-  // TODO: maybe support other strides than 1?
-  V_ASSERT(sx->ne[0] == d_conv - 1 + n_t);
-  V_ASSERT(sx->ne[1] == d_inner);
-  V_ASSERT(n_t >= 0);
-
-  v_tensor* result = v_new_tensor_3d(ctx, v_TYPE_F32, d_inner, n_t, n_s);
-
-  result->op     = v_OP_SSM_CONV;
-  result->src[0] = sx;
-  result->src[1] = c;
-
-  return result;
-}
-
-// v_ssm_scan
-
-v_tensor* v_ssm_scan(
-  struct v_ctx* ctx,
-  v_tensor* s,
-  v_tensor* x,
-  v_tensor* dt,
-  v_tensor* A,
-  v_tensor* B,
-  v_tensor* C,
-  v_tensor* ids) {
-  V_ASSERT(v_is_contiguous(s));
-  V_ASSERT(v_is_contiguous(dt));
-  V_ASSERT(v_is_contiguous(A));
-  V_ASSERT(x->nb[0] == v_type_size(x->type));
-  V_ASSERT(B->nb[0] == v_type_size(B->type));
-  V_ASSERT(C->nb[0] == v_type_size(C->type));
-  V_ASSERT(x->nb[1] == x->ne[0]*x->nb[0]);
-  V_ASSERT(B->nb[1] == B->ne[0]*B->nb[0]);
-  V_ASSERT(C->nb[1] == C->ne[0]*C->nb[0]);
-  V_ASSERT(v_are_same_shape(B, C));
-  V_ASSERT(ids->type == v_TYPE_I32);
-
-  {
-    const int64_t d_state      = s->ne[0];
-    const int64_t head_dim     = x->ne[0];
-    const int64_t n_head       = x->ne[1];
-    const int64_t n_seq_tokens = x->ne[2];
-    const int64_t n_seqs       = x->ne[3];
-
-    V_ASSERT(dt->ne[0] == n_head);
-    V_ASSERT(dt->ne[1] == n_seq_tokens);
-    V_ASSERT(dt->ne[2] == n_seqs);
-    V_ASSERT(v_is_3d(dt));
-    V_ASSERT(s->ne[1] == head_dim);
-    V_ASSERT(s->ne[2] == n_head);
-    V_ASSERT(B->ne[0] == d_state);
-    V_ASSERT(B->ne[2] == n_seq_tokens);
-    V_ASSERT(B->ne[3] == n_seqs);
-    V_ASSERT(ids->ne[0] == n_seqs);
-    V_ASSERT(v_is_vector(ids));
-    V_ASSERT(A->ne[1] == n_head);
-    V_ASSERT(v_is_matrix(A));
-
-    if (A->ne[0] != 1) {
-      // Mamba-1 has more granular decay factors
-      V_ASSERT(A->ne[0] == d_state);
-    }
-  }
-
-  // concatenated y + ssm_states
-  v_tensor* result = v_new_tensor_1d(ctx,
-                                     v_TYPE_F32,
-                                     nelements(x) + s->ne[0] * s->ne[1] * s->ne[2] * ids->ne[0]);
-
-  result->op     = v_OP_SSM_SCAN;
-  result->src[0] = s;
-  result->src[1] = x;
-  result->src[2] = dt;
-  result->src[3] = A;
-  result->src[4] = B;
-  result->src[5] = C;
-  result->src[6] = ids;
-
-  return result;
-}
 
 // v_win_part
 v_tensor* v_win_part(
@@ -1781,29 +1414,24 @@ v_tensor* v_add_rel_pos(
   return v_add_rel_pos_impl(ctx, a, pw, ph, false);
 }
 
-v_tensor* v_add_rel_pos_inplace(
-  struct v_ctx* ctx,
-  v_tensor* a,
-  v_tensor* pw,
-  v_tensor* ph) {
+v_tensor* v_add_rel_pos_inplace(v_ctx* ctx,
+                                v_tensor* a,
+                                v_tensor* pw, v_tensor* ph) {
   return v_add_rel_pos_impl(ctx, a, pw, ph, true);
 }
 
 // v_rwkv_wkv6
-v_tensor* v_rwkv_wkv6(
-  struct v_ctx* ctx,
-  v_tensor* k,
-  v_tensor* v,
-  v_tensor* r,
-  v_tensor* tf,
-  v_tensor* td,
-  v_tensor* state) {
-  V_ASSERT(v_is_contiguous(k));
-  V_ASSERT(v_is_contiguous(v));
-  V_ASSERT(v_is_contiguous(r));
-  V_ASSERT(v_is_contiguous(tf));
-  V_ASSERT(v_is_contiguous(td));
-  V_ASSERT(v_is_contiguous(state));
+v_tensor* v_rwkv_wkv6(v_ctx* ctx,
+                      v_tensor* k, v_tensor* v,
+                      v_tensor* r,
+                      v_tensor* tf, v_tensor* td,
+                      v_tensor* state) {
+  V_ASSERT((k)->is_contiguous());
+  V_ASSERT((v)->is_contiguous());
+  V_ASSERT((r)->is_contiguous());
+  V_ASSERT((tf)->is_contiguous());
+  V_ASSERT((td)->is_contiguous());
+  V_ASSERT((state)->is_contiguous());
 
   const int64_t S        = k->ne[0];
   const int64_t H        = k->ne[1];
@@ -1833,43 +1461,6 @@ v_tensor* v_rwkv_wkv6(
 
 // v_gated_linear_attn
 
-v_tensor* v_gated_linear_attn(
-  struct v_ctx* ctx,
-  v_tensor* k,
-  v_tensor* v,
-  v_tensor* q,
-  v_tensor* g,
-  v_tensor* state,
-  float scale) {
-  V_ASSERT(v_is_contiguous(k));
-  V_ASSERT(v_is_contiguous(v));
-  V_ASSERT(v_is_contiguous(q));
-  V_ASSERT(v_is_contiguous(g));
-  V_ASSERT(v_is_contiguous(state));
-
-  const int64_t S        = k->ne[0];
-  const int64_t H        = k->ne[1];
-  const int64_t n_tokens = k->ne[2];
-  const int64_t n_seqs   = state->ne[1];
-  {
-    V_ASSERT(v->ne[0] == S && v->ne[1] == H && v->ne[2] == n_tokens);
-    V_ASSERT(q->ne[0] == S && q->ne[1] == H && q->ne[2] == n_tokens);
-    V_ASSERT(g->ne[0] == S && g->ne[1] == H && g->ne[2] == n_tokens);
-    V_ASSERT(nelements(state) == S * S * H * n_seqs);
-  }
-
-  // concat output and new_state
-  const int64_t ne[4] = {S * H, n_tokens + S * n_seqs, 1, 1};
-  v_tensor* result    = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
-  v_set_op_params_f32(result, 0, scale);
-  result->op     = v_OP_GATED_LINEAR_ATTN;
-  result->src[0] = k;
-  result->src[1] = v;
-  result->src[2] = q;
-  result->src[3] = g;
-  result->src[4] = state;
-  return result;
-}
 
 // v_rwkv_wkv7
 
@@ -1882,13 +1473,13 @@ v_tensor* v_rwkv_wkv7(
   v_tensor* a,
   v_tensor* b,
   v_tensor* state) {
-  V_ASSERT(v_is_contiguous(r));
-  V_ASSERT(v_is_contiguous(w));
-  V_ASSERT(v_is_contiguous(k));
-  V_ASSERT(v_is_contiguous(v));
-  V_ASSERT(v_is_contiguous(a));
-  V_ASSERT(v_is_contiguous(b));
-  V_ASSERT(v_is_contiguous(state));
+  V_ASSERT((r)->is_contiguous());
+  V_ASSERT((w)->is_contiguous());
+  V_ASSERT((k)->is_contiguous());
+  V_ASSERT((v)->is_contiguous());
+  V_ASSERT((a)->is_contiguous());
+  V_ASSERT((b)->is_contiguous());
+  V_ASSERT((state)->is_contiguous());
 
   const int64_t S        = k->ne[0];
   const int64_t H        = k->ne[1];
@@ -1920,19 +1511,15 @@ v_tensor* v_rwkv_wkv7(
 }
 
 
-v_tensor* v_map_custom1_impl(struct v_ctx* ctx,
+v_tensor* v_map_custom1_impl(v_ctx* ctx,
                              v_tensor* a,
                              const v_custom1_op_t fun,
                              int n_tasks,
                              void* userdata,
                              bool inplace) {
   V_ASSERT(n_tasks == v_N_TASKS_MAX || n_tasks > 0);
-
-  v_tensor* result = inplace
-                       ? v_tensor_view(ctx, a)
-                       : v_dup_tensor(ctx, a);
-
-  struct v_map_custom1_op_params params = {
+  v_tensor* result = inplace ? v_tensor_view(ctx, a) : v_dup_tensor(ctx, a);
+  v_map_custom1_op_params params = {
     /*.fun      =*/ fun,
     /*.n_tasks  =*/ n_tasks,
     /*.userdata =*/ userdata
@@ -2000,12 +1587,9 @@ v_tensor* v_map_custom3_impl(
 }
 
 
-v_tensor* v_custom_4d(struct v_ctx* ctx,
-                      enum v_data_type type,
-                      int64_t ne0,
-                      int64_t ne1,
-                      int64_t ne2,
-                      int64_t ne3,
+v_tensor* v_custom_4d(v_ctx* ctx,
+                      v_data_type type,
+                      int64_t ne0, int64_t ne1, int64_t ne2, int64_t ne3,
                       v_tensor* * args,
                       int n_args,
                       v_custom_op_t fun,
@@ -2064,7 +1648,7 @@ v_tensor* v_cross_entropy_loss(v_ctx* ctx,
 // v_cross_entropy_loss_back
 v_tensor* v_cross_entropy_loss_back(v_ctx* ctx,
                                     v_tensor* a, v_tensor* b, v_tensor* c) {
-  V_ASSERT(v_is_scalar(a));
+  V_ASSERT(a->is_scalar());
   V_ASSERT(v_are_same_shape(b, c));
   v_tensor* result = v_dup_tensor(ctx, b);
 
@@ -2104,7 +1688,7 @@ v_tensor* v_opt_step_sgd(v_ctx* ctx,
   V_ASSERT(a->flags & TENSOR_FLAG_PARAM);
   V_ASSERT(v_are_same_shape(a, grad));
   V_ASSERT(params->type == v_TYPE_F32);
-  V_ASSERT(nelements(params) == 2);
+  V_ASSERT(params->num_elements() == 2);
   v_tensor* result = v_tensor_view(ctx, a);
   result->op       = v_OP_OPT_STEP_SGD;
   result->src[0]   = a;
@@ -2117,26 +1701,6 @@ v_tensor* v_opt_step_sgd(v_ctx* ctx,
 void v_critical_section_start();
 void v_critical_section_end();
 
-void v_quantize_init(v_data_type type) {
-  v_critical_section_start();
-  switch (type) {
-    case v_TYPE_IQ2_XXS:
-    case v_TYPE_IQ2_XS:
-    case v_TYPE_IQ2_S:
-    case v_TYPE_IQ1_S:
-    case v_TYPE_IQ1_M: iq2xs_init_impl(type);
-      break;
-    case v_TYPE_IQ3_XXS: iq3xs_init_impl(256);
-      break;
-    case v_TYPE_IQ3_S: iq3xs_init_impl(512);
-      break;
-    default: // nothing
-      break;
-  }
-
-  v_critical_section_end();
-}
-
 void v_quantize_free(void) {
   v_critical_section_start();
   iq2xs_free_impl(v_TYPE_IQ2_XXS);
@@ -2146,10 +1710,6 @@ void v_quantize_free(void) {
   v_critical_section_end();
 }
 
-void set_log(v_log_callback log_callback, void* user_data) {
-  g_logger_state.log_callback           = log_callback ? log_callback : v_log_callback_default;
-  g_logger_state.log_callback_user_data = user_data;
-}
 
 std::mutex v_critical_section_mutex;
 

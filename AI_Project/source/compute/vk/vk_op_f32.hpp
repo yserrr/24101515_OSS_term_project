@@ -103,7 +103,7 @@ inline void v_vk_op_f32(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor*
     std::cerr << "v_vulkan: Error: Missing op: " << v_op_name(op) << " for " << v_type_name(src0->type);
     if (src1 != nullptr) { std::cerr << " and " << v_type_name(src1->type); }
     std::cerr << " to " << v_type_name(dst->type) << std::endl;
-    v_ABORT("fatal error");
+    V_ABORT("fatal error");
   }
 
   if (dryrun) {
@@ -346,7 +346,7 @@ inline void v_vk_op_f32(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor*
       else { elements = {ne, 1, 1}; }
     }
     break;
-    case v_OP_SSM_CONV: {
+    case V_OP_SSM_CONV: {
       const uint32_t nr  = src0->ne[1];
       const uint32_t n_t = dst->ne[1];
       const uint32_t n_s = dst->ne[2];

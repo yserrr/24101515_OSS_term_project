@@ -80,7 +80,7 @@ V_API v_tensor* v_conv_transpose_1d(
   int s0,
   int p0,
   int d0) {
-  V_ASSERT(v_is_matrix(b));
+  V_ASSERT(b->is_matrix());
   V_ASSERT(a->ne[2] == b->ne[1]);
   V_ASSERT(a->ne[3] == 1);
 
@@ -103,32 +103,32 @@ V_API v_tensor* v_conv_transpose_1d(
   return result;
 }
 
-// v_conv_2d
-
-// a: [OC，IC, KH, KW]
-// b: [N, IC, IH, IW]
-// result: [N, OC, OH, OW]
-v_tensor* v_conv_2d(
-  v_ctx* ctx,
-  v_tensor* a,
-  v_tensor* b,
-  int s0,
-  int s1,
-  int p0,
-  int p1,
-  int d0,
-  int d1) {
+/// v_conv_2d
+/// a: kernel
+/// b: Input Data
+///
+/// a:      [OC，IC, KH, KW]
+/// b:      [N, IC, IH,IW]
+/// result: [N, OC, OH, OW]
+/// OC: parrel kernels
+/// N:  batch size
+/// OH : numbers s.t cover IH with KH
+/// OW : numbers s.t cover IW with KW
+/// Im2Col: [N, OH, OW, IC * KH * KW]
+/// reshape L: [N, OH, OW, IC * KH * KW] => [N*OH*OW, IC * KH * KW]
+/// reshape R: [OC，IC, KH, KW] => [OC, IC * KH * KW]
+/// reshape 4d:[OC, N, OH, OW]
+v_tensor* v_conv_2d(v_ctx* ctx,
+                    v_tensor* a, v_tensor* b,
+                    int s0, int s1,
+                    int p0, int p1,
+                    int d0, int d1) {
   v_tensor* im2col = v_im2col(ctx, a, b, s0, s1, p0, p1, d0, d1, true, a->type);
-  // [N, OH, OW, IC * KH * KW]
-
-  v_tensor* result =
-    v_matmul(ctx,
-             v_reshape_2d(ctx, im2col, im2col->ne[0], im2col->ne[3] * im2col->ne[2] * im2col->ne[1]),
-             // [N, OH, OW, IC * KH * KW] => [N*OH*OW, IC * KH * KW]
-             v_reshape_2d(ctx, a, (a->ne[0] * a->ne[1] * a->ne[2]), a->ne[3]));
-  // [OC，IC, KH, KW] => [OC, IC * KH * KW]
-  result = v_reshape_4d(ctx, result, im2col->ne[1], im2col->ne[2], im2col->ne[3], a->ne[3]); // [OC, N, OH, OW]
-  result = v_cont(ctx, v_permute(ctx, result, 0, 1, 3, 2)); // [N, OC, OH, OW]
+  v_tensor* result = v_matmul(ctx,
+                              v_reshape_2d(ctx, im2col, im2col->ne[0], im2col->ne[3] * im2col->ne[2] * im2col->ne[1]),
+                              v_reshape_2d(ctx, a, (a->ne[0] * a->ne[1] * a->ne[2]), a->ne[3]));
+  result = v_reshape_4d(ctx, result, im2col->ne[1], im2col->ne[2], im2col->ne[3], a->ne[3]);
+  result = v_cont(ctx, v_permute(ctx, result, 0, 1, 3, 2));
   return result;
 }
 
@@ -198,7 +198,7 @@ v_tensor* v_conv_3d(
   int p2, // padding depth
   int d0, // dilation width
   int d1, // dilation height
-  int d2 // dilation depth
+  int d2  // dilation depth
 ) {
   v_tensor* im2col = v_im2col_3d(ctx, a, b, IC, s0, s1, s2, p0, p1, p2, d0, d1, d2, a->type);
   // [N*OD, OH, OW, IC * KD * KH * KW]
@@ -215,7 +215,7 @@ v_tensor* v_conv_3d(
   int64_t OD = im2col->ne[3] / N;
   result     = v_reshape_4d(ctx, result, im2col->ne[1] * im2col->ne[2], OD, N, OC);
   // [OC, N*OD*OH*OW] => [OC, N, OD, OH*OW]
-  result = v_cont(ctx, v_permute(ctx, result, 0, 1, 3, 2)); // [N, OC, OD, OH*OW]
+  result = v_cont(ctx, v_permute(ctx, result, 0, 1, 3, 2));                     // [N, OC, OD, OH*OW]
   result = v_reshape_4d(ctx, result, im2col->ne[1], im2col->ne[2], OD, OC * N); // [N*OC, OD, OH, OW]
 
   return result;
@@ -319,31 +319,27 @@ v_tensor* v_conv_2d_dw_direct(
 v_tensor* v_conv_2d_direct(v_ctx* ctx,
                            v_tensor* a, // convolution kernel [KW, KH, IC, OC]
                            v_tensor* b, // input data [W, H, C, N]
-                           int s0, // stride dimension 0
-                           int s1, // stride dimension 1
-                           int p0, // padding dimension 0
-                           int p1, // padding dimension 1
-                           int d0, // dilation dimension 0
+                           int s0,      // stride dimension 0
+                           int s1,      // stride dimension 1
+                           int p0,      // padding dimension 0
+                           int p1,      // padding dimension 1
+                           int d0,      // dilation dimension 0
                            int d1) {
   // dilation dimension 1
   V_ASSERT(a->ne[2] == b->ne[2]);
   V_ASSERT(a->type == b->type);
-
   int64_t ne[4];
-  ne[0] = v_calc_conv_output_size(b->ne[0], a->ne[0], s0, p0, d0);
-  ne[1] = v_calc_conv_output_size(b->ne[1], a->ne[1], s1, p1, d1);
-  ne[2] = a->ne[3];
-  ne[3] = b->ne[3];
-
+  ne[0]            = v_calc_conv_output_size(b->ne[0], a->ne[0], s0, p0, d0);
+  ne[1]            = v_calc_conv_output_size(b->ne[1], a->ne[1], s1, p1, d1);
+  ne[2]            = a->ne[3];
+  ne[3]            = b->ne[3];
   v_tensor* result = v_new_tensor(ctx, b->type, 4, ne);
-
   v_set_op_params_i32(result, 0, s0);
   v_set_op_params_i32(result, 1, s1);
   v_set_op_params_i32(result, 2, p0);
   v_set_op_params_i32(result, 3, p1);
   v_set_op_params_i32(result, 4, d0);
   v_set_op_params_i32(result, 5, d1);
-
   result->op     = v_OP_CONV_2D;
   result->src[0] = a;
   result->src[1] = b;
@@ -399,7 +395,6 @@ v_tensor* v_conv_3d_direct(
 }
 
 // v_conv_transpose_2d_p0
-
 static int64_t v_calc_conv_transpose_output_size(int64_t ins, int64_t ks, int s, int p) {
   return (ins - 1) * s - 2 * p + ks;
 }
@@ -435,10 +430,10 @@ static int64_t v_calc_pool_output_size(int64_t ins, int ks, int s, float p) {
 
 // v_pool_1d
 
-v_tensor* v_pool_1d(v_ctx* ctx,v_tensor* a,v_op_pool op,
-  int k0,
-  int s0,
-  int p0) {
+v_tensor* v_pool_1d(v_ctx* ctx, v_tensor* a, v_op_pool op,
+                    int k0,
+                    int s0,
+                    int p0) {
   const int64_t ne[4] = {
     v_calc_pool_output_size(a->ne[0], k0, s0, p0),
     a->ne[1],
@@ -549,8 +544,7 @@ v_tensor* v_im2col(v_ctx* ctx,
                    enum v_data_type dst_type) {
   if (is_2D) {
     V_ASSERT(a->ne[2] == b->ne[2]);
-  }
-  else {
+  } else {
     //v_ASSERT(b->ne[1] % a->ne[1] == 0);
     V_ASSERT(b->ne[1] == a->ne[1]);
     V_ASSERT(b->ne[3] == 1);
@@ -618,5 +612,99 @@ v_tensor* v_im2col_back(v_ctx* ctx,
   result->op     = V_OP_IM2COL;
   result->src[0] = t_a;
   result->src[1] = t_b;
+  return result;
+}
+
+///state space model convolution
+///xₜ₊₁ = A xₜ + B uₜ
+///  yₜ = C xₜ
+///선형 SSM은 1D convolution으로 표현 가능하다
+///SSM 파라미터(A, B, C)를 고정
+///이로부터 implicit convolution kernel을 생성
+///입력 시퀀스에 대해 1D conv처럼 계산
+///커널 길이가 이론적으로 무한
+///실제로는 recurrence / FFT / scan으로 계산
+///weight가 직접 저장된 게 아니라 모델에서 유도됨
+v_tensor* v_ssm_conv(v_ctx* ctx,
+                     v_tensor* sx, v_tensor* c) {
+  V_ASSERT(sx->is_3d());
+  V_ASSERT(c->is_matrix());
+  const int64_t d_conv  = c->ne[0];
+  const int64_t d_inner = c->ne[1];
+  const int64_t n_t     = sx->ne[0] - d_conv + 1; // tokens per sequence
+  const int64_t n_s     = sx->ne[2];
+  // TODO: maybe support other strides than 1?
+  V_ASSERT(sx->ne[0] == d_conv - 1 + n_t);
+  V_ASSERT(sx->ne[1] == d_inner);
+  V_ASSERT(n_t >= 0);
+
+  v_tensor* result = v_new_tensor_3d(ctx, v_TYPE_F32, d_inner, n_t, n_s);
+
+  result->op     = V_OP_SSM_CONV;
+  result->src[0] = sx;
+  result->src[1] = c;
+
+  return result;
+}
+
+// v_ssm_scan
+
+v_tensor* v_ssm_scan(v_ctx* ctx,
+                     v_tensor* s, v_tensor* x, v_tensor* dt,
+                     v_tensor* A, v_tensor* B, v_tensor* C,
+                     v_tensor* ids) {
+  V_ASSERT(v_is_contiguous(s));
+  V_ASSERT(v_is_contiguous(dt));
+  V_ASSERT(v_is_contiguous(A));
+  V_ASSERT(x->nb[0] == v_type_size(x->type));
+  V_ASSERT(B->nb[0] == v_type_size(B->type));
+  V_ASSERT(C->nb[0] == v_type_size(C->type));
+  V_ASSERT(x->nb[1] == x->ne[0]*x->nb[0]);
+  V_ASSERT(B->nb[1] == B->ne[0]*B->nb[0]);
+  V_ASSERT(C->nb[1] == C->ne[0]*C->nb[0]);
+  V_ASSERT(v_are_same_shape(B, C));
+  V_ASSERT(ids->type == v_TYPE_I32);
+
+  {
+    const int64_t d_state      = s->ne[0];
+    const int64_t head_dim     = x->ne[0];
+    const int64_t n_head       = x->ne[1];
+    const int64_t n_seq_tokens = x->ne[2];
+    const int64_t n_seqs       = x->ne[3];
+
+    V_ASSERT(dt->ne[0] == n_head);
+    V_ASSERT(dt->ne[1] == n_seq_tokens);
+    V_ASSERT(dt->ne[2] == n_seqs);
+    V_ASSERT(dt->is_3d());
+    V_ASSERT(s->ne[1] == head_dim);
+    V_ASSERT(s->ne[2] == n_head);
+    V_ASSERT(B->ne[0] == d_state);
+    V_ASSERT(B->ne[2] == n_seq_tokens);
+    V_ASSERT(B->ne[3] == n_seqs);
+    V_ASSERT(ids->ne[0] == n_seqs);
+    V_ASSERT(ids->is_vector());
+    V_ASSERT(A->ne[1] == n_head);
+    V_ASSERT(A->is_matrix());
+
+    if (A->ne[0] != 1) {
+      // Mamba-1 has more granular decay factors
+      V_ASSERT(A->ne[0] == d_state);
+    }
+  }
+
+  // concatenated y + ssm_states
+  v_tensor* result = v_new_tensor_1d(ctx,
+                                     v_TYPE_F32,
+                                     nelements(x) + s->ne[0] * s->ne[1] * s->ne[2] * ids->ne[0]);
+
+  result->op     = v_OP_SSM_SCAN;
+  result->src[0] = s;
+  result->src[1] = x;
+  result->src[2] = dt;
+  result->src[3] = A;
+  result->src[4] = B;
+  result->src[5] = C;
+  result->src[6] = ids;
+
   return result;
 }

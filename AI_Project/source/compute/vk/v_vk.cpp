@@ -1065,7 +1065,7 @@ void vk_check_results_0(vk_backend_ctx* ctx, v_cgraph* cgraph, int tensor_idx) {
                               src_clone[5],
                               src_clone[6]);
   }
-  else if (tensor->op == v_OP_SSM_CONV) { tensor_clone = v_ssm_conv(v_ctx, src_clone[0], src_clone[1]); }
+  else if (tensor->op == V_OP_SSM_CONV) { tensor_clone = v_ssm_conv(v_ctx, src_clone[0], src_clone[1]); }
   else {
     std::cerr << "Missing vk_check_results OP: " << v_op_name(tensor->op) << std::endl;
     v_ABORT("fatal error");
@@ -1086,7 +1086,6 @@ void vk_check_results_0(vk_backend_ctx* ctx, v_cgraph* cgraph, int tensor_idx) {
 
   for (int i = 0; i < v_MAX_SRC; i++) { if (src_buffer[i] != nullptr) { free(src_buffer[i]); } }
 
-  v_free_ctx(v_ctx);
 
   VK_LOG_DEBUG("END v_vk_check_results_0(" << tensor->name << ")");
 }
@@ -1104,7 +1103,8 @@ void vk_check_results_1(vk_backend_ctx* ctx, v_cgraph* cgraph, int tensor_idx) {
 
   v_tensor* src0 = tensor->src[0];
   v_tensor* src1 = tensor->src[1];
-  v_tensor* src2 = tensor->src[2];
+  v_tensor* src2
+  v_free_ctx(v_ctx);= tensor->src[2];
   v_tensor* src3 = tensor->src[3];
 
   void* tensor_data = tensor->data;
@@ -1332,7 +1332,7 @@ void vk_check_results_1(vk_backend_ctx* ctx, v_cgraph* cgraph, int tensor_idx) {
     std::cerr << std::endl;
     std::vector<const v_tensor*> done;
     //v_vk_print_graph_origin(tensor, done);
-    //v_ABORT("fatal error");
+    //V_ABORT("fatal error");
   }
   else {
     std::cerr << check_counter << " " << tensor->name << " op=" << v_op_name(tensor->op) << " avg_err=" << avg_err <<

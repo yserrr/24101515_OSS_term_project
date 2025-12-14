@@ -31,7 +31,7 @@ bool v_vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
     case V_OP_VIEW:
     case V_OP_PERMUTE:
     case v_OP_TRANSPOSE:
-    case v_OP_NONE:
+    case V_OP_NONE:
       return false;
     case v_OP_UNARY:
       switch (v_get_unary_op(node)) {
@@ -131,7 +131,7 @@ bool v_vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
     case v_OP_RWKV_WKV6:
     case v_OP_RWKV_WKV7:
     case v_OP_SSM_SCAN:
-    case v_OP_SSM_CONV:
+    case V_OP_SSM_CONV:
     case V_OP_LEAKY_RELU:
     case v_OP_FLASH_ATTN_EXT:
     case v_OP_OPT_STEP_ADAMW:
@@ -139,7 +139,7 @@ bool v_vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
       break;
     default:
       std::cerr << "v_vulkan: Error: Missing op: " << v_op_name(node->op) << std::endl;
-      //v_ABORT("fatal error");
+      //V_ABORT("fatal error");
   }
 
   vk_context compute_ctx;
@@ -549,7 +549,7 @@ bool v_vk_build_graph(vk_backend_ctx* ctx, v_cgraph* cgraph, int node_idx,
 
       break;
 
-    case v_OP_SSM_CONV:
+    case V_OP_SSM_CONV:
       v_vk_ssm_conv(ctx, compute_ctx, node, dryrun);
 
       break;
@@ -610,7 +610,7 @@ void vk_graph_optimize(v_backend_t backend, struct v_cgraph* graph) {
   vk_backend_ctx* ctx = (vk_backend_ctx*)backend->context;
   if (ctx->device->disable_graph_optimize) { return; }
   auto const& is_empty = [](v_tensor* node) -> bool {
-    return node->op == v_OP_NONE || node->op == V_OP_RESHAPE || node->op == v_OP_TRANSPOSE || node->op ==
+    return node->op == V_OP_NONE || node->op == V_OP_RESHAPE || node->op == v_OP_TRANSPOSE || node->op ==
       V_OP_VIEW || node->op == V_OP_PERMUTE;
   };
 

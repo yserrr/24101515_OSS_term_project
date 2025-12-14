@@ -1,3 +1,5 @@
+/// All code is adapted from ggml for personal educational purposes.(study, clone coding)
+/// Core code under license is sourced from ggml (https://github.com/ggerganov/ggml)
 #include "v_header.hpp"
 #include "v_op_unary.hpp"
 #include "ggml-impl.hpp"
@@ -11,9 +13,7 @@ v_tensor* v_sin_impl(v_ctx* ctx, v_tensor* a, bool inplace) {
 }
 
 
-v_tensor* v_cos_impl(v_ctx* ctx,
-                     v_tensor* a,
-                     bool inplace) {
+v_tensor* v_cos_impl(v_ctx* ctx, v_tensor* a, bool inplace) {
   v_tensor* result = inplace ? v_tensor_view(ctx, a) : v_dup_tensor(ctx, a);
   result->op       = V_OP_COS;
   result->src[0]   = a;
@@ -50,7 +50,7 @@ v_tensor* v_cos(v_ctx* ctx,
 }
 
 v_tensor* v_cos_inplace(v_ctx* ctx,
-                      v_tensor* a) {
+                        v_tensor* a) {
   return v_cos_impl(ctx, a, true);
 }
 
@@ -250,74 +250,51 @@ v_tensor* v_trunc_inplace(v_ctx* ctx, v_tensor* a) {
   return v_unary_inplace(ctx, a, v_UNARY_OP_TRUNC);
 }
 
-v_tensor* v_glu(v_ctx* ctx, v_tensor* a, enum v_glu_op op, bool swapped) {
-  return v_glu_impl(ctx, a, nullptr, op, swapped);
-}
-
-v_tensor* v_glu_split(v_ctx* ctx, v_tensor* a, v_tensor* b, v_glu_op op) {
-  return v_glu_impl(ctx, a, b, op, false);
-}
-
-v_tensor* v_reglu(v_ctx* ctx, v_tensor* a) {
-  return v_glu_impl(ctx, a, nullptr, v_GLU_OP_REGLU, false);
-}
-
-v_tensor* v_reglu_swapped(v_ctx* ctx, v_tensor* a) {
-  return v_glu_impl(ctx, a, nullptr, v_GLU_OP_REGLU, true);
-}
-
-v_tensor* v_reglu_split(v_ctx* ctx, v_tensor* a, v_tensor* b) {
-  return v_glu_impl(ctx, a, b, v_GLU_OP_REGLU, false);
-}
-
-v_tensor* v_geglu(v_ctx* ctx, v_tensor* a) {
-  return v_glu_impl(ctx, a, nullptr, v_GLU_OP_GEGLU, false);
-}
-
-v_tensor* v_geglu_swapped(v_ctx* ctx, v_tensor* a) {
-  return v_glu_impl(ctx, a, nullptr, v_GLU_OP_GEGLU, true);
-}
-
-v_tensor* v_geglu_split(v_ctx* ctx, v_tensor* a, v_tensor* b) {
-  return v_glu_impl(ctx, a, b, v_GLU_OP_GEGLU, false);
-}
-
-v_tensor* v_swiglu(v_ctx* ctx, v_tensor* a) {
-  return v_glu_impl(ctx, a, nullptr, v_GLU_OP_SWIGLU, false);
-}
-
-v_tensor* v_swiglu_swapped(v_ctx* ctx, v_tensor* a) {
-  return v_glu_impl(ctx, a, nullptr, v_GLU_OP_SWIGLU, true);
-}
-
-v_tensor* v_swiglu_split(v_ctx* ctx, v_tensor* a, v_tensor* b) {
-  return v_glu_impl(ctx, a, b, v_GLU_OP_SWIGLU, false);
-}
-
-v_tensor* v_geglu_erf(v_ctx* ctx, v_tensor* a) {
-  return v_glu_impl(ctx, a, nullptr, v_GLU_OP_GEGLU_ERF, false);
-}
-
-v_tensor* v_geglu_erf_swapped(v_ctx* ctx, v_tensor* a) {
-  return v_glu_impl(ctx, a, nullptr, v_GLU_OP_GEGLU_ERF, true);
-}
-
-v_tensor* v_geglu_erf_split(v_ctx* ctx, v_tensor* a, v_tensor* b) {
-  return v_glu_impl(ctx, a, b, v_GLU_OP_GEGLU_ERF, false);
-}
-
-v_tensor* v_geglu_quick(v_ctx* ctx, v_tensor* a) {
-  return v_glu_impl(ctx, a, nullptr, v_GLU_OP_GEGLU_QUICK, false);
-}
-
-v_tensor* v_geglu_quick_swapped(v_ctx* ctx, v_tensor* a) {
-  return v_glu_impl(ctx, a, nullptr, v_GLU_OP_GEGLU_QUICK, true);
-}
-
-v_tensor* v_geglu_quick_split(v_ctx* ctx, v_tensor* a, v_tensor* b) {
-  return v_glu_impl(ctx, a, b, v_GLU_OP_GEGLU_QUICK, false);
-}
-
 v_tensor* v_norm_inplace(v_ctx* ctx, v_tensor* a, float eps) {
   return v_norm_impl(ctx, a, eps, true);
+}
+
+v_tensor* v_exp_inplace(v_ctx* ctx,
+                        v_tensor* a) {
+  return v_unary_inplace(ctx, a, v_UNARY_OP_EXP);
+}
+
+v_tensor* v_exp(v_ctx* ctx,
+                v_tensor* a) {
+  return v_unary(ctx, a, v_UNARY_OP_EXP);
+}
+v_tensor* v_silu_back(v_ctx* ctx,
+                      v_tensor* a, v_tensor* b) {
+  v_tensor* result = v_dup_tensor(ctx, a);
+  result->op       = v_OP_SILU_BACK;
+  result->src[0]   = a;
+  result->src[1]   = b;
+  return result;
+}
+
+
+v_tensor* v_diag(v_ctx* ctx,
+                 v_tensor* a) {
+  V_ASSERT(a->ne[1] == 1);
+
+  const int64_t ne[4] = {a->ne[0], a->ne[0], a->ne[2], a->ne[3]};
+  v_tensor* result    = v_new_tensor(ctx, a->type, 4, ne);
+
+  result->op     = V_OP_DIAG;
+  result->src[0] = a;
+
+  return result;
+}
+
+
+v_tensor* v_unary_impl(v_ctx* ctx,
+                       v_tensor* a,
+                       v_unary_op op,
+                       bool inplace) {
+  V_ASSERT((a)->is_contiguous_1());
+  v_tensor* result = inplace ? v_tensor_view(ctx, a) : v_dup_tensor(ctx, a);
+  v_set_op_params_i32(result, 0, op);
+  result->op     = v_OP_UNARY;
+  result->src[0] = a;
+  return result;
 }

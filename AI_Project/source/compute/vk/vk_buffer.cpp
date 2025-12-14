@@ -153,7 +153,7 @@ void v_vk_buffer_write_2d_async(vk_context subctx, vk_buffer& dst, size_t offset
   // Buffer is already mapped
   if (dst->memory_property_flags & vk::MemoryPropertyFlagBits::eHostVisible) {
     std::cerr << "v_vulkan: buffer_write_async dst buffer is host_visible. Use synchronous write." << std::endl;
-    v_ABORT("fatal error");
+    V_ABORT("fatal error");
   }
   // Check if src is pinned memory
   vk_buffer buf     = nullptr;
@@ -184,7 +184,7 @@ void v_vk_buffer_write_2d_async(vk_context subctx, vk_buffer& dst, size_t offset
   }
   VK_LOG_DEBUG("STAGING");
 
-  if (!sync_staging) { v_ABORT("Asynchronous write to non-pinned memory not supported"); }
+  if (!sync_staging) { V_ABORT("Asynchronous write to non-pinned memory not supported"); }
   // Staging buffer required
   const size_t copy_size = width * height;
   vk_ensure_sync_staging_buffer(dst->device, copy_size);
@@ -267,7 +267,7 @@ void v_vk_buffer_write_nc_async(vk_backend_ctx* ctx, vk_context& subctx, vk_buff
   // Buffer is already mapped
   if (dst->memory_property_flags & vk::MemoryPropertyFlagBits::eHostVisible) {
     std::cerr << "v_vulkan: buffer_write_nc_async dst buffer is host_visible. Use synchronous write." << std::endl;
-    v_ABORT("fatal error");
+    V_ABORT("fatal error");
   }
   // Check if src is pinned memory
   vk_buffer buf     = nullptr;
@@ -323,7 +323,7 @@ void v_vk_buffer_write_nc_async(vk_backend_ctx* ctx, vk_context& subctx, vk_buff
     return;
   }
 
-  if (!sync_staging) { v_ABORT("Asynchronous write to non-pinned memory not supported"); }
+  if (!sync_staging) { V_ABORT("Asynchronous write to non-pinned memory not supported"); }
 
   // Staging buffer required
   vk_buffer& staging       = ctx->device->sync_staging;
@@ -569,7 +569,7 @@ void vk_buffer_read2d_async(vk_context subctx,
   }
   VK_LOG_DEBUG("STAGING");
   if (!sync_staging) {
-    v_ABORT("Asynchronous read from non-pinned memory not supported");
+    V_ABORT("Asynchronous read from non-pinned memory not supported");
   }
   // Fall back to staging buffer
   const size_t copy_size = dpitch * height;

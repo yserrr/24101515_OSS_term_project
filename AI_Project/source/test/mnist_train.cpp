@@ -42,15 +42,9 @@ namespace py = pybind11;
 #include <windows.h>
 ////todo:
 ///  object data container
-///  1. hash set -> std::set 으로 변경
-///  2. ctx -> object data container
-///  3. backend simplify
-///  4. allocator-> simplify
 
-struct utf8_console
-{
-  utf8_console()
-  {
+struct utf8_console {
+  utf8_console() {
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
   }
@@ -58,19 +52,16 @@ struct utf8_console
 
 
 #endif
-static void log_callback_default(v_log_level level, const char* text, void* user_data)
-{
+static void log_callback_default(v_log_level level, const char* text, void* user_data) {
   (void)level;
   (void)user_data;
   fputs(text, stderr);
   fflush(stderr);
 }
 
-int main()
-{
+int main() {
   std::vector<v_tensor*> init_tensors;
-  struct
-  {
+  struct {
     std::string arch;
     v_backend_sched_t backend_sched;
     v_backend_t backend;
@@ -90,7 +81,7 @@ int main()
   auto vk         = backend_vk_init(0);
   v_backend_t a[] = {vk};
 
-  auto backend_sched  = v_sched_new(*a, nullptr, 1, V_DEFAULT_GRAPH_SIZE,  true);
+  auto backend_sched  = v_sched_new(*a, nullptr, V_DEFAULT_GRAPH_SIZE);
   model.backend_sched = backend_sched;
 
   int num_tensors = 10;
@@ -129,8 +120,7 @@ int main()
 
   std::vector<std::vector<float>> images;
   std::vector<long> labels;
-  for (auto batch : loader)
-  {
+  for (auto batch : loader) {
     py::tuple pair  = batch.cast<py::tuple>();
     py::object imgs = pair[0];
     py::object lbls = pair[1];
@@ -151,32 +141,28 @@ int main()
   }
   v_time_init();
   v_opt_data_set_t dataset = v_opt_dataset_init(v_TYPE_F32,
-                                              v_TYPE_F32,
-                                              MNIST_NINPUT,
-                                              MNIST_NCLASSES,
-                                              MNIST_NTRAIN,
-                                              /*ndata_shard =*/
-                                              1);
+                                                v_TYPE_F32,
+                                                MNIST_NINPUT,
+                                                MNIST_NCLASSES,
+                                                MNIST_NTRAIN,
+                                                /*ndata_shard =*/
+                                                1);
 
   v_tensor* data  = dataset->get_dataset();
   v_tensor* label = dataset->get_labels();
   float* buf      = v_get_tdata_f32(data);
   float* lbuf     = v_get_tdata_f32(label);
   //#pragma omp parallel for
-  for (int64_t iex = 0; iex < data->ne[1]; ++iex)
-  {
-    for (int64_t i = 0; i < MNIST_NINPUT; ++i)
-    {
+  for (int64_t iex = 0; iex < data->ne[1]; ++iex) {
+    for (int64_t i = 0; i < MNIST_NINPUT; ++i) {
       buf[iex * MNIST_NINPUT + i] = images[iex][i];
     }
   }
   //#pragma omp parallel for
-  for (int64_t iex = 0; iex < label->ne[1]; ++iex)
-  {
+  for (int64_t iex = 0; iex < label->ne[1]; ++iex) {
     long long actual_class = (long long)labels[iex];
     //lbuf[iex * MNIST_NCLASSES] = float(actual_class);
-    for (int64_t i = 0; i < MNIST_NCLASSES; ++i)
-    {
+    for (int64_t i = 0; i < MNIST_NCLASSES; ++i) {
       lbuf[iex * MNIST_NCLASSES + i] = (i == actual_class) ? 1.0f : 0.0f;
     }
   }
@@ -206,13 +192,11 @@ int main()
   (model.images)->set_inputs();
 
   model.buf_static = v_backend_alloc_ctx_tensors(model.ctx_static, vk);
-  for (v_tensor* t : init_tensors)
-  {
+  for (v_tensor* t : init_tensors) {
     V_ASSERT(t->type == v_TYPE_F32);
     const int64_t ne = nelements(t);
     std::vector<float> tmp(ne);
-    for (int64_t i = 0; i < ne; ++i)
-    {
+    for (int64_t i = 0; i < ne; ++i) {
       tmp[i] = nd(gen);
     }
     v_set_backend_tensor(t, tmp.data(), 0, num_bytes(t));
@@ -223,11 +207,11 @@ int main()
   v_set_params(model.fc2_bias);
 
   v_tensor* fc1 = v_relu(model.ctx_compute,
-                          v_add(model.ctx_compute,
-                                v_matmul(model.ctx_compute,
-                                         model.fc1_weight,
-                                         model.images),
-                                model.fc1_bias));
+                         v_add(model.ctx_compute,
+                               v_matmul(model.ctx_compute,
+                                        model.fc1_weight,
+                                        model.images),
+                               model.fc1_bias));
 
   model.logits = v_add(model.ctx_compute,
                        v_matmul(model.ctx_compute,
@@ -235,7 +219,7 @@ int main()
                                 fc1),
                        model.fc2_bias);
 
-  const int64_t ndata      = v_opt_dataset_datas(dataset)->ne[1];
+  const int64_t ndata = v_opt_dataset_datas(dataset)->ne[1];
 
   const int64_t nbatch_physical  = model.images->ne[1];
   const int64_t opt_period       = model.nbatch_logical / nbatch_physical;
@@ -255,7 +239,6 @@ int main()
   v_opt_ctx* opt_ctx          = v_opt_init(loss_parmas);
 
   dataset->shuffle(opt_ctx, -1);
-
   v_opt_result_t result_train = v_opt_result_init();
   v_opt_result_t result_val   = v_opt_result_init();
 
@@ -267,8 +250,8 @@ int main()
     result_train->reset();
     result_val->reset();
     fprintf(stderr, "%s: epoch %04" PRId64 "/%04" PRId64 ":\n", __func__, epoch, 60);
-    v_tensor* inputs = opt_ctx->getInput();
-    v_tensor* labels = opt_ctx->getLabels();
+    v_tensor* inputs = opt_ctx->get_input();
+    v_tensor* labels = opt_ctx->get_labels();
     v_tensor* data   = v_opt_dataset_datas(dataset);
 
     V_ASSERT(data->ne[0] == inputs->ne[0]);
@@ -301,7 +284,7 @@ int main()
       opt_ctx->allocate(/*backward =*/ false);
       dataset->get_batch(inputs, labels, batch_idx);
       v_opt_evaluate(opt_ctx, result_val);
-      v_opt_epoch_callback_progress_bar(false ,
+      v_opt_epoch_callback_progress_bar(false,
                                         opt_ctx,
                                         dataset,
                                         result_val,
@@ -326,5 +309,4 @@ int main()
   opt_ctx->free();
   result_train->reset();
   result_val->reset();
-
 }

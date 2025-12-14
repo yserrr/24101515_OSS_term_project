@@ -125,5 +125,5 @@ vk_pipeline v_vk_get_cpy_pipeline(vk_backend_ctx* ctx, const v_tensor* src,
   }
 
   std::cerr << "Missing CPY op for types: " << v_type_name(src->type) << " " << v_type_name(to) << std::endl;
-  v_ABORT("fatal error");
+  V_ABORT("fatal error");
 }

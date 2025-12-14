@@ -260,7 +260,7 @@ void v_vk_flash_attn(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* q,
   const uint64_t split_k_size = split_k > 1
                                   ? (HSV * ne1 * sizeof(float) + ne1 * sizeof(float) * 2) * split_k * ne3
                                   : 0;
-  if (split_k_size > ctx->device->properties.limits.maxStorageBufferRange) { v_ABORT("Requested preallocation size is too large"); }
+  if (split_k_size > ctx->device->properties.limits.maxStorageBufferRange) { V_ABORT("Requested preallocation size is too large"); }
   if (ctx->prealloc_size_split_k < split_k_size) { ctx->prealloc_size_split_k = split_k_size; }
 
   if (dryrun) {

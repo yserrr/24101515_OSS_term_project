@@ -5,18 +5,7 @@
 #include "v_hash.hpp"
 #include "v_util.hpp"
 
-v_tensor* v_add_imple(v_ctx* ctx,
-                      v_tensor* a, v_tensor* b,
-                      bool inplace) {
-  V_ASSERT(v_can_repeat(b, a));
-  v_tensor* result = inplace
-                       ? v_tensor_view(ctx, a)
-                       : v_dup_tensor(ctx, a);
-  result->op     = v_OP_ADD;
-  result->src[0] = a;
-  result->src[1] = b;
-  return result;
-}
+
 
 v_tensor* v_set_zero(v_tensor* tensor) {
   if (tensor->is_empty()) {
@@ -31,17 +20,6 @@ v_tensor* v_set_zero(v_tensor* tensor) {
   return tensor;
 }
 
-v_tensor* v_unary_impl(v_ctx* ctx,
-                       v_tensor* a,
-                       v_unary_op op,
-                       bool inplace) {
-  V_ASSERT(v_is_contiguous_1(a));
-  v_tensor* result = inplace ? v_tensor_view(ctx, a) : v_dup_tensor(ctx, a);
-  v_set_op_params_i32(result, 0, op);
-  result->op     = v_OP_UNARY;
-  result->src[0] = a;
-  return result;
-}
 
 v_tensor* v_get_rows(v_ctx* ctx,
                      v_tensor* a, v_tensor* b) {
@@ -58,94 +36,6 @@ v_tensor* v_get_rows(v_ctx* ctx,
   result->src[1]   = b;
   return result;
 }
-
-v_tensor* v_get_rows_back(v_ctx* ctx,
-                          v_tensor* a, v_tensor* b, v_tensor* c) {
-  V_ASSERT(v_is_matrix(a) && v_is_vector(b) && b->type == v_TYPE_I32);
-  V_ASSERT(v_is_matrix(c) && (a->ne[0] == c->ne[0]));
-  // TODO: implement non F32 return
-  //struct v_tensor * result = v_new_tensor_2d(ctx, a->type, a->ne[0], b->ne[0]);
-  v_tensor* result = v_new_tensor_2d(ctx, v_TYPE_F32, c->ne[0], c->ne[1]);
-  result->op       = V_OP_GET_ROWS_BACK;
-  result->src[0]   = a;
-  result->src[1]   = b;
-  return result;
-}
-
-v_tensor* v_diag(v_ctx* ctx,
-                 v_tensor* a) {
-  V_ASSERT(a->ne[1] == 1);
-
-  const int64_t ne[4] = {a->ne[0], a->ne[0], a->ne[2], a->ne[3]};
-  v_tensor* result    = v_new_tensor(ctx, a->type, 4, ne);
-
-  result->op     = V_OP_DIAG;
-  result->src[0] = a;
-
-  return result;
-}
-
-// a is broadcastable to b for ne[2] and ne[3] -> use b->ne[2] and b->ne[3]
-// not used now.
-v_tensor* v_out_prod(v_ctx* ctx,
-                     v_tensor* a, v_tensor* b) {
-  V_ASSERT(v_can_out_prod(a, b));
-  V_ASSERT(!(a)->is_transposed());
-  const int64_t ne[4] = {a->ne[0], b->ne[0], b->ne[2], b->ne[3]};
-  v_tensor* result    = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
-  result->op          = V_OP_OUT_PROD;
-  result->src[0]      = a;
-  result->src[1]      = b;
-  return result;
-}
-
-
-v_tensor* v_silu_back(v_ctx* ctx,
-                      v_tensor* a, v_tensor* b) {
-  v_tensor* result = v_dup_tensor(ctx, a);
-  result->op       = v_OP_SILU_BACK;
-  result->src[0]   = a;
-  result->src[1]   = b;
-  return result;
-}
-
-v_tensor* v_glu_impl(v_ctx* ctx,
-                     v_tensor* a, v_tensor* b,
-                     v_glu_op op,
-                     bool swapped) {
-  V_ASSERT(v_is_contiguous_1(a));
-  if (b) {
-    V_ASSERT(v_is_contiguous_1(b));
-    V_ASSERT(v_are_same_shape(a, b));
-    V_ASSERT(a->type == b->type);
-  }
-  int64_t ne[V_MAX_DIMS] = {a->ne[0] / 2};
-  for (int i = 1; i < V_MAX_DIMS; i++) ne[i] = a->ne[i];
-  v_tensor* result = v_new_tensor_impl(ctx, a->type, V_MAX_DIMS, b ? a->ne.data() : ne, NULL, 0);
-  v_set_op_params_i32(result, 0, op);
-  v_set_op_params_i32(result, 1, swapped);
-  result->op     = v_OP_GLU;
-  result->src[0] = a;
-  result->src[1] = b;
-  return result;
-}
-
-v_tensor* v_repeat_4d(v_ctx* ctx,
-                      v_tensor* a,
-                      int64_t ne0,
-                      int64_t ne1,
-                      int64_t ne2,
-                      int64_t ne3) {
-  const bool can_repeat = a->is_empty() || (
-    (ne0 % a->ne[0] == 0) && (ne1 % a->ne[1] == 0) &&
-    (ne2 % a->ne[2] == 0) && (ne3 % a->ne[3] == 0));
-  V_ASSERT(can_repeat);
-  v_tensor* result = v_new_tensor_4d(ctx, a->type, ne0, ne1, ne2, ne3);
-  result->op       = v_OP_REPEAT;
-  result->src[0]   = a;
-  return result;
-}
-
 
 
 v_tensor* v_set_rows(v_ctx* ctx,
@@ -172,18 +62,6 @@ v_tensor* v_set_rows(v_ctx* ctx,
   return result;
 }
 
-
-
-v_tensor* v_div_impl(v_ctx* ctx,
-                     v_tensor* a, v_tensor* b,
-                     bool inplace) {
-  V_ASSERT(v_can_repeat(b, a));
-  v_tensor* result = inplace ? v_tensor_view(ctx, a) : v_dup_tensor(ctx, a);
-  result->op       = v_OP_DIV;
-  result->src[0]   = a;
-  result->src[1]   = b;
-  return result;
-}
 
 v_tensor* v_sqr_impl(v_ctx* ctx,
                      v_tensor* a,
@@ -243,22 +121,6 @@ v_tensor* v_sum(v_ctx* ctx,
   return result;
 }
 
-v_tensor* v_sub_impl(struct v_ctx* ctx,
-                     v_tensor* a,
-                     v_tensor* b,
-                     bool inplace) {
-  V_ASSERT(v_can_repeat(b, a));
-
-  v_tensor* result = inplace
-                       ? v_tensor_view(ctx, a)
-                       : v_dup_tensor(ctx, a);
-
-  result->op     = v_OP_SUB;
-  result->src[0] = a;
-  result->src[1] = b;
-
-  return result;
-}
 
 
 v_tensor* v_add_cast_impl(struct v_ctx* ctx,
@@ -283,38 +145,12 @@ v_tensor* v_add_cast_impl(struct v_ctx* ctx,
   return result;
 }
 
-v_tensor* v_mul_impl(v_ctx* ctx,
-                     v_tensor* a, v_tensor* b,
-                     bool inplace) {
-  V_ASSERT(v_can_repeat(b, a));
-  v_tensor* result = inplace
-                       ? v_tensor_view(ctx, a)
-                       : v_dup_tensor(ctx, a);
-  result->op     = v_OP_MUL;
-  result->src[0] = a;
-  result->src[1] = b;
-  return result;
-}
 
-v_tensor* v_matmul(v_ctx* ctx,
-                   v_tensor* a, v_tensor* b) {
-  V_ASSERT(can_mul_mat(a, b));
-  V_ASSERT(!(a)->is_transposed());
-  const int64_t ne[4] = {a->ne[1], b->ne[1], b->ne[2], b->ne[3]};
-  v_tensor* result    = v_new_tensor(ctx, v_TYPE_F32, 4, ne);
-  result->op          = V_OP_MUL_MAT;
-  result->src[0]      = a;
-  result->src[1]      = b;
-  return result;
-}
-
-v_tensor* v_l2_norm_impl(struct v_ctx* ctx,
+v_tensor* v_l2_norm_impl(v_ctx* ctx,
                          v_tensor* a,
                          float eps,
                          bool inplace) {
-  v_tensor* result = inplace
-                       ? v_tensor_view(ctx, a)
-                       : v_dup_tensor(ctx, a);
+  v_tensor* result = inplace ? v_tensor_view(ctx, a) : v_dup_tensor(ctx, a);
 
   v_set_op_params_f32(result, 0, eps);
 
@@ -325,52 +161,9 @@ v_tensor* v_l2_norm_impl(struct v_ctx* ctx,
 }
 
 
-v_tensor* v_dup_impl(struct v_ctx* ctx,
-                     v_tensor* a,
-                     bool inplace) {
-  v_tensor* result = inplace
-                       ? v_tensor_view(ctx, a)
-                       : v_dup_tensor(ctx, a);
-
-  result->op     = v_OP_DUP;
-  result->src[0] = a;
-
-  return result;
-}
-
-v_tensor* v_add_id(v_ctx* ctx,
-                   v_tensor* a,
-                   v_tensor* b,
-                   v_tensor* ids) {
-  V_ASSERT(a->ne[0] == b->ne[0]);
-  V_ASSERT(a->ne[1] == ids->ne[0]);
-  V_ASSERT(a->ne[2] == ids->ne[1]);
-  V_ASSERT(ids->type == v_TYPE_I32);
-  v_tensor* result = v_dup_tensor(ctx, a);
-  result->op       = v_OP_ADD_ID;
-  result->src[0]   = a;
-  result->src[1]   = b;
-  result->src[2]   = ids;
-  return result;
-}
-
-v_tensor* v_add1_impl(v_ctx* ctx,
-                      v_tensor* a, v_tensor* b,
-                      bool inplace) {
-  V_ASSERT(v_is_scalar(b));
-  V_ASSERT(v_is_padded_1d(a));
-  v_tensor* result = inplace ? v_tensor_view(ctx, a) : v_dup_tensor(ctx, a);
-
-  result->op     = v_OP_ADD1;
-  result->src[0] = a;
-  result->src[1] = b;
-  return result;
-}
-
-
 v_tensor* v_argmax(v_ctx* ctx,
                    v_tensor* a) {
-  V_ASSERT(v_is_matrix(a));
+  V_ASSERT(a->is_matrix());
   V_ASSERT(a->ne[0] <= INT32_MAX);
 
   v_tensor* result = v_new_tensor_1d(ctx, v_TYPE_I32, a->ne[1]);
@@ -449,17 +242,6 @@ v_tensor* v_concat(
   return result;
 }
 
-
-v_tensor* v_swiglu_oai(v_ctx* ctx,
-                       v_tensor* a,
-                       v_tensor* b,
-                       float alpha,
-                       float limit) {
-  v_tensor* result = v_glu_impl(ctx, a, b, v_GLU_OP_SWIGLU_OAI, false);
-  v_set_op_params_f32(result, 2, alpha);
-  v_set_op_params_f32(result, 3, limit);
-  return result;
-}
 
 v_tensor* v_norm_impl(v_ctx* ctx,
                       v_tensor* a,

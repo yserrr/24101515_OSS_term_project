@@ -255,8 +255,8 @@ int main() {
     result_train->reset();
     result_val->reset();
     fprintf(stderr, "%s: epoch %04" PRId64 "/%04" PRId64 ":\n", __func__, epoch, 10000);
-    v_tensor* inputs = opt_ctx->getInput();
-    v_tensor* labels = opt_ctx->getLabels();
+    v_tensor* inputs = opt_ctx->get_input();
+    v_tensor* labels = opt_ctx->get_labels();
     v_tensor* data   = v_opt_dataset_datas(dataset);
 
     V_ASSERT(data->ne[0] == inputs->ne[0]);

@@ -201,7 +201,7 @@ v_status vk_buffer_init_tensor(v_backend_buffer_t buffer, const v_tensor* tensor
   V_ASSERT(buffer);
   VK_LOG_DEBUG("v_backend_vk_buffer_init_tensor(" << buffer << " (" << buffer->context << "), " << tensor << ")");
   if (tensor->view_src != nullptr) { V_ASSERT(tensor->view_src->buffer->buft == buffer->buft); }
-  return v_STATUS_SUCCESS;
+  return V_STATUS_SUCCESS;
 }
 
 void vk_device_buffer_set_tensor(v_backend_buffer_t buffer, v_tensor* tensor, const void* data, size_t offset, size_t size) {

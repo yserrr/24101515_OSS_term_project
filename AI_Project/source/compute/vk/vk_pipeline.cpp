@@ -383,7 +383,7 @@ vk_pipeline v_vk_get_quantize_pipeline(vk_backend_ctx* ctx, v_data_type type, bo
                : ctx->device->pipeline_quantize_q8_1;
     default:
       std::cerr << "Missing quantize pipeline for type: " << v_type_name(type) << std::endl;
-      v_ABORT("fatal error");
+      V_ABORT("fatal error");
   }
 }
 
@@ -690,7 +690,7 @@ vk_pipeline v_vk_op_get_pipeline(vk_backend_ctx* ctx, const v_tensor* src0,
         else if (d_state == 256) { return ctx->device->pipeline_ssm_scan_f32_d256; }
       }
       return nullptr;
-    case v_OP_SSM_CONV:
+    case V_OP_SSM_CONV:
       if (src0->type == v_TYPE_F32 && dst->type == v_TYPE_F32) { return ctx->device->pipeline_ssm_conv_f32; }
       return nullptr;
     case v_OP_OPT_STEP_ADAMW:

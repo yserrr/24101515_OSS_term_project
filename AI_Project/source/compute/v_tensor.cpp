@@ -2,6 +2,13 @@
 #include "v_header.hpp"
 #include "v.hpp"
 
+
+void v_tensor::set_mat_mul_precision(v_prec prec) {
+  V_ASSERT(this->op == V_OP_MUL_MAT);
+  const int32_t prec_i32 = prec;
+  v_set_op_params_i32(this, 0, prec_i32);
+}
+
 void v_tensor::set_inputs() {
   flags |= TENSOR_FLAG_INPUT;
 }
@@ -11,7 +18,7 @@ void v_tensor::set_outputs() {
 }
 
 void v_tensor::set_params() {
-  V_ASSERT(this->op == v_OP_NONE);
+  V_ASSERT(this->op == V_OP_NONE);
   flags |= TENSOR_FLAG_PARAM;
 }
 
@@ -33,14 +40,106 @@ bool v_tensor::is_empty() const {
   return false;
 }
 
-bool v_tensor::is_transposed() {
+int64_t v_tensor::num_elements() const {
+  return ne[0] * ne[1] * ne[2] * ne[3];
+}
+
+int64_t v_tensor::num_bytes() const {
+  for (int i = 0; i < V_MAX_DIMS; ++i) {
+    if (ne[i] <= 0) {
+      return 0;
+    }
+  }
+  size_t nbytes;
+  const size_t blck_size = block_size(type);
+  if (blck_size == 1) {
+    nbytes = v_type_size(type);
+    for (int i = 0; i < V_MAX_DIMS; ++i) {
+      nbytes += (ne[i] - 1) * nb[i];
+    }
+  } else {
+    nbytes = ne[0] * nb[0] / blck_size;
+    for (int i = 1; i < V_MAX_DIMS; ++i) {
+      nbytes += (ne[i] - 1) * nb[i];
+    }
+  }
+
+  return nbytes;
+}
+
+int64_t v_tensor::num_rows() const {
+  return ne[1] * ne[2] * ne[3];
+}
+
+bool v_tensor::is_transposed() const {
   return nb[0] > nb[1];
+}
+
+bool v_tensor::is_permuted() const {
+  return nb[0] > nb[1] || nb[1] > nb[2] || nb[2] > nb[3];
+}
+
+bool v_tensor::is_scalar() const {
+  return ne[0] == 1 && ne[1] == 1 && ne[2] == 1 && ne[3] == 1;
+}
+
+bool v_tensor::is_vector() const {
+  return ne[1] == 1 && ne[2] == 1 && ne[3] == 1;
+}
+
+bool v_tensor::is_matrix() const {
+  return ne[2] == 1 && ne[3] == 1;
+}
+
+bool v_tensor::is_3d() const {
+  return ne[3] == 1;
+}
+
+bool v_tensor::is_contiguous_n(int n) const {
+  size_t next_nb = v_type_size(type);
+  if (ne[0] != block_size(type) && nb[0] != next_nb) {
+    return false;
+  }
+  next_nb *= ne[0] / block_size(type);
+  for (int i = 1; i < V_MAX_DIMS; i++) {
+    if (ne[i] != 1) {
+      if (i > n) {
+        if (nb[i] != next_nb) {
+          return false;
+        }
+        next_nb *= ne[i];
+      } else {
+        // this dimension does not need to be contiguous
+        next_nb = ne[i] * nb[i];
+      }
+    }
+  }
+  return true;
+}
+
+bool v_tensor::is_contiguous() const {
+  return is_contiguous_n(0);
+}
+
+bool v_tensor::is_contiguous_0() const {
+  return is_contiguous_n(0);
+}
+
+bool v_tensor::is_contiguous_1() const {
+  return is_contiguous_n(1);
+}
+
+bool v_tensor::is_contiguous_2() const {
+  return is_contiguous_n(2);
+}
+
+bool v_tensor::is_contiguously_allocated() const {
+  return num_bytes() == num_elements() * v_type_size(type) / block_size(type);
 }
 
 v_tensor* v_new_tensor(v_ctx* ctx,
                        v_data_type type,
-                       int n_dims,
-                       const int64_t* ne) {
+                       int n_dims, const int64_t* ne) {
   return v_new_tensor_impl(ctx, type, n_dims, ne, nullptr, 0);
 }
 
@@ -112,7 +211,7 @@ v_tensor* v_new_tensor_impl(v_ctx* ctx,
   result->nb[1]     = 0;
   result->nb[2]     = 0;
   result->nb[3]     = 0;
-  result->op        = v_OP_NONE;
+  result->op        = V_OP_NONE;
   result->flags     = 0;
   result->view_src  = view_src;
   result->view_offs = view_offs;
@@ -134,6 +233,17 @@ v_tensor* v_new_tensor_impl(v_ctx* ctx,
 
 v_tensor* v_dup_tensor(v_ctx* ctx, const v_tensor* src) {
   return v_new_tensor(ctx, src->type, V_MAX_DIMS, src->ne.data());
+}
+
+v_tensor* v_dup_impl(v_ctx* ctx,
+                     v_tensor* a,
+                     bool inplace) {
+  v_tensor* result = inplace ? v_tensor_view(ctx, a) : v_dup_tensor(ctx, a);
+
+  result->op     = v_OP_DUP;
+  result->src[0] = a;
+
+  return result;
 }
 
 
@@ -164,8 +274,7 @@ v_tensor* v_reshape_1d(v_ctx* ctx,
 
 v_tensor* v_reshape_2d(v_ctx* ctx,
                        v_tensor* a,
-                       int64_t ne0,
-                       int64_t ne1) {
+                       int64_t ne0, int64_t ne1) {
   V_ASSERT(v_is_contiguous(a));
   V_ASSERT(nelements(a) == ne0*ne1);
 
@@ -181,9 +290,7 @@ v_tensor* v_reshape_2d(v_ctx* ctx,
 
 v_tensor* v_reshape_3d(v_ctx* ctx,
                        v_tensor* a,
-                       int64_t ne0,
-                       int64_t ne1,
-                       int64_t ne2) {
+                       int64_t ne0, int64_t ne1, int64_t ne2) {
   V_ASSERT(v_is_contiguous(a));
   V_ASSERT(nelements(a) == ne0*ne1*ne2);
 

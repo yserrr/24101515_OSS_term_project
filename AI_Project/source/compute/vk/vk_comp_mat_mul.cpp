@@ -119,9 +119,9 @@ vk_pipeline v_vk_guess_matmul_id_pipeline(vk_backend_ctx* ctx, vk_matmul_pipelin
            ? mmp->a_l
            : mmp->l;
 }
+
 bool v_vk_should_use_mmvq(const vk_device& device, uint32_t m, uint32_t n, uint32_t k, v_data_type src0_type) {
-  if (device->mmvq_mode == 1) { return true; }
-  else if (device->mmvq_mode == -1) { return false; }
+  if (device->mmvq_mode == 1) { return true; } else if (device->mmvq_mode == -1) { return false; }
 
   // MMVQ is generally good for batches
   if (n > 1) { return true; }
@@ -129,25 +129,25 @@ bool v_vk_should_use_mmvq(const vk_device& device, uint32_t m, uint32_t n, uint3
   switch (device->vendor_id) {
     case VK_VENDOR_ID_NVIDIA:
       switch (src0_type) {
-      case v_TYPE_Q8_0:
+        case v_TYPE_Q8_0:
           return device->architecture == vk_device_architecture::NVIDIA_PRE_TURING;
-      default:
+        default:
           return true;
       }
     case VK_VENDOR_ID_AMD:
       switch (src0_type) {
-      case v_TYPE_Q8_0:
+        case v_TYPE_Q8_0:
           return device->architecture == vk_device_architecture::AMD_GCN;
-      default:
+        default:
           return true;
       }
     case VK_VENDOR_ID_INTEL:
       switch (src0_type) {
         // From tests on A770 Linux, may need more tuning
-      case v_TYPE_Q4_0:
-      case v_TYPE_Q5_1:
+        case v_TYPE_Q4_0:
+        case v_TYPE_Q5_1:
           return false;
-      default:
+        default:
           return true;
       }
     default:
@@ -166,9 +166,8 @@ uint32_t v_vk_guess_matmul_id_pipeline_align(vk_backend_ctx* ctx, vk_matmul_pipe
 }
 
 
-
 uint32_t v_vk_fuse_multi_add(vk_backend_ctx* ctx, const struct v_cgraph* cgraph,
-           int node_idx) {
+                             int node_idx) {
   const v_tensor* first_node = cgraph->nodes[node_idx];
   if (first_node->op != v_OP_ADD) { return 0; }
 
@@ -204,6 +203,7 @@ uint32_t v_vk_fuse_multi_add(vk_backend_ctx* ctx, const struct v_cgraph* cgraph,
   if (num_adds == 1) { return 0; }
   return num_adds;
 }
+
 void v_vk_quantize_q8_1(vk_backend_ctx* ctx, vk_context& subctx, vk_sub_buffer&& in,
                         vk_sub_buffer&& out, uint32_t ne, bool use_x4_blocks = false) {
   VK_LOG_DEBUG(
@@ -232,7 +232,7 @@ void v_vk_mul_mat_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor*
     ", nb1=" << dst->nb[1] << ", nb2=" << dst->nb[2] << ", nb3=" << dst->nb[3];
     std::cerr << "), " << (dryrun ? "dryrun" : "") << ")");
   V_ASSERT(v_vk_dim01_contiguous(src0) || src0->type == v_TYPE_F32 || src0->type == v_TYPE_F16 || src0->type == v_TYPE_BF16); // NOLINT
-  V_ASSERT(v_vk_dim01_contiguous(src1) || src1->type == v_TYPE_F32 || src1->type == v_TYPE_F16); // NOLINT
+  V_ASSERT(v_vk_dim01_contiguous(src1) || src1->type == v_TYPE_F32 || src1->type == v_TYPE_F16);                              // NOLINT
 
   const uint64_t ne00 = src0->ne[0];
   const uint64_t ne01 = src0->ne[1];
@@ -368,8 +368,8 @@ void v_vk_mul_mat_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor*
   const uint64_t qx_sz = v_type_size(src0->type) * x_ne / block_size(src0->type);
   const uint64_t qy_sz = v_type_size(src1->type) * y_ne / block_size(src1->type);
   const uint64_t x_sz  = !qx_needs_dequant
-                           ? qx_sz
-                           : sizeof(v_fp16_t) * x_ne;
+                          ? qx_sz
+                          : sizeof(v_fp16_t) * x_ne;
   const uint64_t y_sz = quantize_y
                           ? (y_ne * v_type_size(v_TYPE_Q8_1) / block_size(v_TYPE_Q8_1))
                           : (y_f32_kernel
@@ -381,10 +381,8 @@ void v_vk_mul_mat_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor*
   vk_pipeline to_fp16_vk_1 = nullptr;
   vk_pipeline to_q8_1      = nullptr;
 
-  if (x_non_contig) { to_fp16_vk_0 = v_vk_get_cpy_pipeline(ctx, src0, nullptr, f16_type); }
-  else { to_fp16_vk_0 = v_vk_get_to_fp16(ctx, src0->type); }
-  if (y_non_contig) { to_fp16_vk_1 = v_vk_get_cpy_pipeline(ctx, src1, nullptr, f16_type); }
-  else { to_fp16_vk_1 = v_vk_get_to_fp16(ctx, src1->type); }
+  if (x_non_contig) { to_fp16_vk_0 = v_vk_get_cpy_pipeline(ctx, src0, nullptr, f16_type); } else { to_fp16_vk_0 = v_vk_get_to_fp16(ctx, src0->type); }
+  if (y_non_contig) { to_fp16_vk_1 = v_vk_get_cpy_pipeline(ctx, src1, nullptr, f16_type); } else { to_fp16_vk_1 = v_vk_get_to_fp16(ctx, src1->type); }
   V_ASSERT(!qx_needs_dequant || to_fp16_vk_0 != nullptr); // NOLINT
   V_ASSERT(!qy_needs_dequant || to_fp16_vk_1 != nullptr); // NOLINT
 
@@ -400,7 +398,7 @@ void v_vk_mul_mat_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor*
     if (
       (qx_needs_dequant && x_sz_upd > ctx->device->properties.limits.maxStorageBufferRange) ||
       (qy_needs_dequant && y_sz_upd > ctx->device->properties.limits.maxStorageBufferRange) ||
-      (split_k > 1 && split_k_size > ctx->device->properties.limits.maxStorageBufferRange)) { v_ABORT("Requested preallocation size is too large"); }
+      (split_k > 1 && split_k_size > ctx->device->properties.limits.maxStorageBufferRange)) { V_ABORT("Requested preallocation size is too large"); }
     if (qx_needs_dequant && ctx->prealloc_size_x < x_sz_upd) { ctx->prealloc_size_x = x_sz_upd; }
     if ((qy_needs_dequant || quantize_y) && ctx->prealloc_size_y < y_sz_upd) { ctx->prealloc_size_y = y_sz_upd; }
     if (split_k > 1 && ctx->prealloc_size_split_k < split_k_size) { ctx->prealloc_size_split_k = split_k_size; }
@@ -435,8 +433,7 @@ void v_vk_mul_mat_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor*
   if (qx_needs_dequant) {
     d_X = ctx->prealloc_x;
     V_ASSERT(d_X->size >= x_sz * ne02 * ne03);
-  }
-  else {
+  } else {
     d_X          = d_Qx;
     x_buf_offset = qx_buf_offset;
     V_ASSERT(qx_sz == x_sz);
@@ -444,12 +441,10 @@ void v_vk_mul_mat_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor*
   if (qy_needs_dequant) {
     d_Y = ctx->prealloc_y;
     V_ASSERT(d_Y->size >= y_sz * ne12 * ne13);
-  }
-  else if (quantize_y) {
+  } else if (quantize_y) {
     d_Y = ctx->prealloc_y;
     V_ASSERT(d_Y->size >= CEIL_DIV(y_sz * ne12 * ne13, 144) * 144);
-  }
-  else {
+  } else {
     d_Y          = d_Qy;
     y_buf_offset = qy_buf_offset;
     V_ASSERT(qy_sz == y_sz);
@@ -464,8 +459,7 @@ void v_vk_mul_mat_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor*
                            src0,
                            v_vk_subbuffer(ctx, d_Qx, qx_buf_offset),
                            v_vk_subbuffer(ctx, d_X, 0));
-  }
-  else if (qx_needs_dequant) {
+  } else if (qx_needs_dequant) {
     const std::vector<uint32_t> pc = {
       (uint32_t)ne01, (uint32_t)ne10, (uint32_t)ne10, (uint32_t)ne10, (uint32_t)(nelements(src0))
     };
@@ -587,7 +581,7 @@ void v_vk_mul_mat_vec_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_ten
     ] << ", nb2=" << dst->nb[2] << ", nb3=" << dst->nb[3];
     std::cerr << "), " << (dryrun ? "dryrun" : "") << "),)");
   V_ASSERT(v_vk_dim01_contiguous(src0) || src0->type == v_TYPE_F32 || src0->type == v_TYPE_F16 || src0->type == v_TYPE_BF16); // NOLINT
-  V_ASSERT(v_vk_dim01_contiguous(src1) || src1->type == v_TYPE_F32 || src1->type == v_TYPE_F16); // NOLINT
+  V_ASSERT(v_vk_dim01_contiguous(src1) || src1->type == v_TYPE_F32 || src1->type == v_TYPE_F16);                              // NOLINT
 
   const uint64_t ne00 = src0->ne[0];
   const uint64_t ne01 = src0->ne[1];
@@ -642,8 +636,7 @@ void v_vk_mul_mat_vec_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_ten
   vk_pipeline to_fp16_vk_0 = nullptr;
   vk_pipeline to_fp16_vk_1 = nullptr;
   if (x_non_contig) { to_fp16_vk_0 = v_vk_get_cpy_pipeline(ctx, src0, nullptr, src0->type); }
-  if (y_non_contig) { to_fp16_vk_1 = v_vk_get_cpy_pipeline(ctx, src1, nullptr, src1->type); }
-  else { to_fp16_vk_1 = v_vk_get_to_fp16(ctx, src1->type); }
+  if (y_non_contig) { to_fp16_vk_1 = v_vk_get_cpy_pipeline(ctx, src1, nullptr, src1->type); } else { to_fp16_vk_1 = v_vk_get_to_fp16(ctx, src1->type); }
 
   // Check for mmq first
   vk_pipeline dmmv = quantize_y
@@ -677,9 +670,9 @@ void v_vk_mul_mat_vec_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_ten
                                        ctx->device->properties.limits.minStorageBufferOffsetAlignment);
   const uint64_t qy_sz = v_type_size(src1->type) * y_ne / block_size(src1->type);
   const uint64_t x_sz  = x_non_contig
-                           ? vk_align_size(v_type_size(src0->type) * x_ne,
-                                           ctx->device->properties.limits.minStorageBufferOffsetAlignment)
-                           : qx_sz;
+                          ? vk_align_size(v_type_size(src0->type) * x_ne,
+                                          ctx->device->properties.limits.minStorageBufferOffsetAlignment)
+                          : qx_sz;
   const uint64_t y_sz = quantize_y
                           ? (y_ne * v_type_size(v_TYPE_Q8_1) / block_size(v_TYPE_Q8_1))
                           : (f16_f32_kernel
@@ -693,7 +686,7 @@ void v_vk_mul_mat_vec_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_ten
     if (quantize_y) { y_sz_upd = CEIL_DIV(y_sz_upd, 144) * 144; }
     if (
       (qx_needs_dequant && x_sz_upd > ctx->device->properties.limits.maxStorageBufferRange) ||
-      (qy_needs_dequant && y_sz_upd > ctx->device->properties.limits.maxStorageBufferRange)) { v_ABORT("Requested preallocation size is too large"); }
+      (qy_needs_dequant && y_sz_upd > ctx->device->properties.limits.maxStorageBufferRange)) { V_ABORT("Requested preallocation size is too large"); }
     if (qx_needs_dequant && ctx->prealloc_size_x < x_sz_upd) { ctx->prealloc_size_x = x_sz_upd; }
     if ((qy_needs_dequant || quantize_y) && ctx->prealloc_size_y < y_sz_upd) { ctx->prealloc_size_y = y_sz_upd; }
 
@@ -722,18 +715,15 @@ void v_vk_mul_mat_vec_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_ten
     qy_buf_offset = vk_tensor_offset(src1) + src1->view_offs;
     V_ASSERT(d_Qy != nullptr);
   }
-  if (qx_needs_dequant) { d_X = ctx->prealloc_x; }
-  else {
+  if (qx_needs_dequant) { d_X = ctx->prealloc_x; } else {
     d_X          = d_Qx;
     x_buf_offset = qx_buf_offset;
     V_ASSERT(qx_sz == x_sz);
   }
-  if (qy_needs_dequant) { d_Y = ctx->prealloc_y; }
-  else if (quantize_y) {
+  if (qy_needs_dequant) { d_Y = ctx->prealloc_y; } else if (quantize_y) {
     d_Y = ctx->prealloc_y;
     V_ASSERT(d_Y->size >= CEIL_DIV(y_sz * ne12 * ne13, 144) * 144);
-  }
-  else {
+  } else {
     d_Y          = d_Qy;
     y_buf_offset = qy_buf_offset;
     V_ASSERT(qy_sz == y_sz);
@@ -845,7 +835,7 @@ void v_vk_mul_mat_vec_p021_f16_f32(vk_backend_ctx* ctx, vk_context& subctx, cons
     << dst->ne[1] << ", ne2=" << dst->ne[2] << ", ne3=" << dst->ne[3] << ", nb0=" << dst->nb[0] << ", nb1=" << dst->nb[1
     ] << ", nb2=" << dst->nb[2] << ", nb3=" << dst->nb[3];
     std::cerr << "), " << (dryrun ? "dryrun" : "") << ")");
-  V_ASSERT(v_is_permuted(src0) && v_is_permuted(src1));
+  V_ASSERT((src0)->is_permuted() && (src1)->is_permuted());
   V_ASSERT(src0->nb[0] <= src0->nb[1] && src0->nb[2] <= src0->nb[3]); // NOLINT
   V_ASSERT(src1->nb[0] <= src1->nb[1] && src1->nb[2] <= src1->nb[3]); // NOLINT
   V_ASSERT(src0->type == v_TYPE_F16);
@@ -958,7 +948,7 @@ void v_vk_mul_mat_vec_nc_f16_f32(vk_backend_ctx* ctx, vk_context& subctx, v_tens
     std::cerr << "), " << (dryrun ? "dryrun" : "") << ")");
   V_ASSERT(!src0->is_transposed());
   V_ASSERT(!src1->is_transposed());
-  V_ASSERT(!v_is_permuted(src0));
+  V_ASSERT(!src0->is_permuted());
   V_ASSERT(src0->type == v_TYPE_F16);
   V_ASSERT(src1->type == v_TYPE_F32);
 
@@ -1091,8 +1081,7 @@ void v_vk_mul_mat(vk_backend_ctx* ctx, vk_context& subctx, v_tensor* src0, v_ten
 
       m_offset += cur_M_size;
     }
-  }
-  else if (src0->type == v_TYPE_F16 && v_is_permuted(src0) && v_is_permuted(src1) && dst->ne[1] == 1 &&
+  } else if (src0->type == v_TYPE_F16 && src0->is_permuted() && src1->is_permuted() && dst->ne[1] == 1 &&
     // detect 0213 permutation, and batch size of 1
     src0->nb[0] <= src0->nb[2] &&
     src0->nb[2] <= src0->nb[1] &&
@@ -1101,17 +1090,14 @@ void v_vk_mul_mat(vk_backend_ctx* ctx, vk_context& subctx, v_tensor* src0, v_ten
     src1->nb[2] <= src1->nb[1] &&
     src1->nb[1] <= src1->nb[3] &&
     src0->ne[3] == 1 &&
-    src1->ne[3] == 1) { v_vk_mul_mat_vec_p021_f16_f32(ctx, subctx, src0, src1, dst, dryrun); }
-  else if (src0->type == v_TYPE_F16 && !v_is_contiguous(src0) && !src1->is_transposed() && dst->ne[1] == 1 &&
-    !v_is_permuted(src0) && !v_is_permuted(src1)) {
+    src1->ne[3] == 1) { v_vk_mul_mat_vec_p021_f16_f32(ctx, subctx, src0, src1, dst, dryrun); } else if (src0->type == v_TYPE_F16 && !v_is_contiguous(src0) && !src1->is_transposed() && dst->ne[1] == 1 &&
+    !(src0)->is_permuted() && !(src1)->is_permuted()) {
     v_vk_mul_mat_vec_nc_f16_f32(ctx, subctx, src0, src1, dst, dryrun);
     // mul_mat_vec supports batching ne12*ne13 when ne11==1, or treating ne11 as the batch size (up to four)
     // when ne12 and ne13 are one.
-  }
-  else if ((dst->ne[1] == 1 || (dst->ne[1] <= mul_mat_vec_max_cols && src1->ne[2] * src1->ne[3] == 1)) &&
+  } else if ((dst->ne[1] == 1 || (dst->ne[1] <= mul_mat_vec_max_cols && src1->ne[2] * src1->ne[3] == 1)) &&
     (src0->type == v_TYPE_F32 || src0->type == v_TYPE_F16 || src0->type == v_TYPE_BF16 ||
-      v_is_quantized(src0->type))) { v_vk_mul_mat_vec_q_f16(ctx, subctx, src0, src1, dst, dryrun); }
-  else { v_vk_mul_mat_q_f16(ctx, subctx, src0, src1, dst, false, dryrun); }
+      v_is_quantized(src0->type))) { v_vk_mul_mat_vec_q_f16(ctx, subctx, src0, src1, dst, dryrun); } else { v_vk_mul_mat_q_f16(ctx, subctx, src0, src1, dst, false, dryrun); }
 }
 
 void v_vk_mul_mat_id_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* src0,
@@ -1244,8 +1230,8 @@ void v_vk_mul_mat_id_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_tens
   const uint64_t qx_sz = v_type_size(src0->type) * x_ne / block_size(src0->type);
   const uint64_t qy_sz = v_type_size(src1->type) * y_ne / block_size(src1->type);
   const uint64_t x_sz  = !qx_needs_dequant
-                           ? qx_sz
-                           : sizeof(v_fp16_t) * x_ne;
+                          ? qx_sz
+                          : sizeof(v_fp16_t) * x_ne;
   const uint64_t y_sz = y_f32_kernel
                           ? sizeof(float) * y_ne
                           : sizeof(v_fp16_t) * y_ne;
@@ -1255,10 +1241,8 @@ void v_vk_mul_mat_id_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_tens
   vk_pipeline to_fp16_vk_0 = nullptr;
   vk_pipeline to_fp16_vk_1 = nullptr;
 
-  if (x_non_contig) { to_fp16_vk_0 = v_vk_get_cpy_pipeline(ctx, src0, nullptr, f16_type); }
-  else { to_fp16_vk_0 = v_vk_get_to_fp16(ctx, src0->type); }
-  if (y_non_contig) { to_fp16_vk_1 = v_vk_get_cpy_pipeline(ctx, src1, nullptr, f16_type); }
-  else { to_fp16_vk_1 = v_vk_get_to_fp16(ctx, src1->type); }
+  if (x_non_contig) { to_fp16_vk_0 = v_vk_get_cpy_pipeline(ctx, src0, nullptr, f16_type); } else { to_fp16_vk_0 = v_vk_get_to_fp16(ctx, src0->type); }
+  if (y_non_contig) { to_fp16_vk_1 = v_vk_get_cpy_pipeline(ctx, src1, nullptr, f16_type); } else { to_fp16_vk_1 = v_vk_get_to_fp16(ctx, src1->type); }
   V_ASSERT(!qx_needs_dequant || to_fp16_vk_0 != nullptr); // NOLINT
   V_ASSERT(!qy_needs_dequant || to_fp16_vk_1 != nullptr); // NOLINT
 
@@ -1267,7 +1251,7 @@ void v_vk_mul_mat_id_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_tens
     const uint64_t y_sz_upd = y_sz * ne12 * ne13;
     if (
       (qx_needs_dequant && x_sz_upd > ctx->device->properties.limits.maxStorageBufferRange) ||
-      (qy_needs_dequant && y_sz_upd > ctx->device->properties.limits.maxStorageBufferRange)) { v_ABORT("Requested preallocation size is too large"); }
+      (qy_needs_dequant && y_sz_upd > ctx->device->properties.limits.maxStorageBufferRange)) { V_ABORT("Requested preallocation size is too large"); }
     if (qx_needs_dequant && ctx->prealloc_size_x < x_sz_upd) { ctx->prealloc_size_x = x_sz_upd; }
     if (qy_needs_dequant && ctx->prealloc_size_y < y_sz_upd) { ctx->prealloc_size_y = y_sz_upd; }
 
@@ -1303,8 +1287,7 @@ void v_vk_mul_mat_id_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_tens
   if (qx_needs_dequant) {
     d_X = ctx->prealloc_x;
     V_ASSERT(d_X->size >= x_sz * ne02 * ne03);
-  }
-  else {
+  } else {
     d_X          = d_Qx;
     x_buf_offset = qx_buf_offset;
     V_ASSERT(qx_sz == x_sz);
@@ -1312,8 +1295,7 @@ void v_vk_mul_mat_id_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_tens
   if (qy_needs_dequant) {
     d_Y = ctx->prealloc_y;
     V_ASSERT(d_Y->size >= y_sz * ne12 * ne13);
-  }
-  else {
+  } else {
     d_Y          = d_Qy;
     y_buf_offset = qy_buf_offset;
     V_ASSERT(qy_sz == y_sz);
@@ -1328,8 +1310,7 @@ void v_vk_mul_mat_id_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_tens
                            src0,
                            v_vk_subbuffer(ctx, d_Qx, qx_buf_offset),
                            v_vk_subbuffer(ctx, d_X, 0));
-  }
-  else if (qx_needs_dequant) {
+  } else if (qx_needs_dequant) {
     const std::vector<uint32_t> pc = {
       (uint32_t)ne01, (uint32_t)ne10, (uint32_t)ne10, (uint32_t)ne10, (uint32_t)(nelements(src0))
     };
@@ -1414,7 +1395,7 @@ void v_vk_mul_mat_vec_id_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_
     ] << ", nb2=" << dst->nb[2] << ", nb3=" << dst->nb[3];
     std::cerr << "), " << (dryrun ? "dryrun" : "") << ")");
   V_ASSERT(v_vk_dim01_contiguous(src0) || src0->type == v_TYPE_F32 || src0->type == v_TYPE_F16 || src0->type == v_TYPE_BF16); // NOLINT
-  V_ASSERT(v_vk_dim01_contiguous(src1) || src1->type == v_TYPE_F32 || src1->type == v_TYPE_F16); // NOLINT
+  V_ASSERT(v_vk_dim01_contiguous(src1) || src1->type == v_TYPE_F32 || src1->type == v_TYPE_F16);                              // NOLINT
   V_ASSERT(ids->type == v_TYPE_I32);
 
   const uint64_t ne00 = src0->ne[0];
@@ -1483,9 +1464,9 @@ void v_vk_mul_mat_vec_id_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_
                                        ctx->device->properties.limits.minStorageBufferOffsetAlignment);
   const uint64_t qy_sz = v_type_size(src1->type) * y_ne / block_size(src1->type);
   const uint64_t x_sz  = x_non_contig
-                           ? vk_align_size(v_type_size(src0->type) * x_ne,
-                                           ctx->device->properties.limits.minStorageBufferOffsetAlignment)
-                           : qx_sz;
+                          ? vk_align_size(v_type_size(src0->type) * x_ne,
+                                          ctx->device->properties.limits.minStorageBufferOffsetAlignment)
+                          : qx_sz;
   const uint64_t y_sz = f16_f32_kernel
                           ? sizeof(float) * y_ne
                           : sizeof(v_fp16_t) * y_ne;
@@ -1495,8 +1476,7 @@ void v_vk_mul_mat_vec_id_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_
   vk_pipeline to_fp16_vk_0 = nullptr;
   vk_pipeline to_fp16_vk_1 = nullptr;
   if (x_non_contig) { to_fp16_vk_0 = v_vk_get_cpy_pipeline(ctx, src0, nullptr, src0->type); }
-  if (y_non_contig) { to_fp16_vk_1 = v_vk_get_cpy_pipeline(ctx, src1, nullptr, src1->type); }
-  else { to_fp16_vk_1 = v_vk_get_to_fp16(ctx, src1->type); }
+  if (y_non_contig) { to_fp16_vk_1 = v_vk_get_cpy_pipeline(ctx, src1, nullptr, src1->type); } else { to_fp16_vk_1 = v_vk_get_to_fp16(ctx, src1->type); }
   vk_pipeline dmmv = v_vk_get_dequantize_mul_mat_vec_id(ctx, src0->type, src1->type);
   V_ASSERT(!qx_needs_dequant || to_fp16_vk_0 != nullptr); // NOLINT
   V_ASSERT(!qy_needs_dequant || to_fp16_vk_1 != nullptr); // NOLINT
@@ -1507,7 +1487,7 @@ void v_vk_mul_mat_vec_id_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_
     const uint64_t y_sz_upd = y_sz * ne12 * ne13;
     if (
       (qx_needs_dequant && x_sz_upd > ctx->device->properties.limits.maxStorageBufferRange) ||
-      (qy_needs_dequant && y_sz_upd > ctx->device->properties.limits.maxStorageBufferRange)) { v_ABORT("Requested preallocation size is too large"); }
+      (qy_needs_dequant && y_sz_upd > ctx->device->properties.limits.maxStorageBufferRange)) { V_ABORT("Requested preallocation size is too large"); }
     if (qx_needs_dequant && ctx->prealloc_size_x < x_sz_upd) { ctx->prealloc_size_x = x_sz_upd; }
     if (qy_needs_dequant && ctx->prealloc_size_y < y_sz_upd) { ctx->prealloc_size_y = y_sz_upd; }
 
@@ -1540,14 +1520,12 @@ void v_vk_mul_mat_vec_id_q_f16(vk_backend_ctx* ctx, vk_context& subctx, const v_
     ids_buf_offset = vk_tensor_offset(ids) + ids->view_offs;
     V_ASSERT(d_ids != nullptr);
   }
-  if (qx_needs_dequant) { d_X = ctx->prealloc_x; }
-  else {
+  if (qx_needs_dequant) { d_X = ctx->prealloc_x; } else {
     d_X          = d_Qx;
     x_buf_offset = qx_buf_offset;
     V_ASSERT(qx_sz == x_sz);
   }
-  if (qy_needs_dequant) { d_Y = ctx->prealloc_y; }
-  else {
+  if (qy_needs_dequant) { d_Y = ctx->prealloc_y; } else {
     d_Y          = d_Qy;
     y_buf_offset = qy_buf_offset;
     V_ASSERT(qy_sz == y_sz);
@@ -1622,6 +1600,5 @@ void v_vk_mul_mat_id(vk_backend_ctx* ctx, vk_context& subctx, const v_tensor* sr
                      const v_tensor* src1, const v_tensor* src2, v_tensor* dst, bool dryrun) {
   VK_LOG_DEBUG("v_vk_mul_mat_id(" << src0 << ", " << src1 << ", " << src2 << ", " << dst << ")");
   if (src2->ne[1] == 1 && (src0->type == v_TYPE_F32 || src0->type == v_TYPE_F16 ||
-    v_is_quantized(src0->type))) { v_vk_mul_mat_vec_id_q_f16(ctx, subctx, src0, src1, src2, dst, dryrun); }
-  else { v_vk_mul_mat_id_q_f16(ctx, subctx, src0, src1, src2, dst, dryrun); }
+    v_is_quantized(src0->type))) { v_vk_mul_mat_vec_id_q_f16(ctx, subctx, src0, src1, src2, dst, dryrun); } else { v_vk_mul_mat_id_q_f16(ctx, subctx, src0, src1, src2, dst, dryrun); }
 }

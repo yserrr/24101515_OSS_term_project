@@ -426,7 +426,7 @@ void v_vk_ssm_conv(vk_backend_ctx* ctx, vk_context& subctx, v_tensor* dst, bool 
                                              src1,
                                              nullptr,
                                              dst,
-                                             v_OP_SSM_CONV,
+                                             V_OP_SSM_CONV,
                                              {
                                                (uint32_t)src0->nb[1], (uint32_t)src0->nb[2],
                                                (uint32_t)src1->nb[1],
@@ -1391,7 +1391,7 @@ void v_vk_multi_add(vk_backend_ctx* ctx, vk_context& subctx, v_cgraph* cgraph, i
 
   if (pipeline == nullptr) {
     std::cerr << "v_vulkan: Error: Missing multi_add";
-    v_ABORT("fatal error");
+    V_ABORT("fatal error");
   }
 
   if (dryrun) {

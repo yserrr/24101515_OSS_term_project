@@ -45,8 +45,8 @@ v_type_trait::v_type_trait() {
       .blck_size = 1,
       .type_size = sizeof(v_fp16_t),
       .is_quantized = false,
-      .to_float = (v_to_float_t)v_fp16_to_fp32_row,
-      .from_float_ref = (v_from_float_t)v_fp32_to_fp16_row,
+      .to_float = nullptr,
+      .from_float_ref = nullptr,
     },
     traits[v_TYPE_Q4_0] = {
       .type_name = "q4_0",
@@ -240,8 +240,8 @@ v_type_trait::v_type_trait() {
       .blck_size = 1,
       .type_size = sizeof(v_bf16_t),
       .is_quantized = false,
-      .to_float = (v_to_float_t)v_bf16_to_fp32_row,
-      .from_float_ref = (v_from_float_t)v_fp32_to_bf16_row_ref,
+      .to_float = nullptr,
+      .from_float_ref = nullptr,
     },
     traits[31] = {
       // v_TYPE_Q4_0_4_4
@@ -667,8 +667,6 @@ size_t v_quantize_chunk(enum v_data_type type,
   //MML_ASSERT(start % type_traits[type].blck_size == 0);
   V_ASSERT(start % n_per_row == 0);
 
-  v_quantize_init(type); // this is noop if already initialized
-
   const size_t start_row = start / n_per_row;
   const size_t row_size  = v_row_size(type, n_per_row);
 
@@ -779,14 +777,12 @@ size_t v_quantize_chunk(enum v_data_type type,
       break;
     case v_TYPE_F16: {
       size_t elemsize = sizeof(v_fp16_t);
-      v_fp32_to_fp16_row(src + start, (v_fp16_t*)dst + start, n);
-      result = n * elemsize;
+      result          = n * elemsize;
     }
     break;
     case v_TYPE_BF16: {
       size_t elemsize = sizeof(v_bf16_t);
-      v_fp32_to_bf16_row_ref(src + start, (v_bf16_t*)dst + start, n);
-      result = n * elemsize;
+      result          = n * elemsize;
     }
     break;
     case v_TYPE_F32: {

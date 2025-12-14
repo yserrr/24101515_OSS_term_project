@@ -1,6 +1,6 @@
 #include "v.hpp"
 #include "v_allocator.hpp"
-#include "v-backend.hpp"
+#include "v_backend.hpp"
 #include "v_vk.hpp"
 #include <cassert>
 #include <cmath>
@@ -12,17 +12,10 @@
 #include <vector>
 #include "extern/pybind11/pybind11.h"
 #include "pybind11/embed.h"
-#include "pybind11/stl.h"
 #include "pybind11/numpy.h"
 #include <algorithm>
-#include <cmath>
-#include <cstdio>
-#include <cstring>
-#include <cstdint>
-#include "v_util.hpp"
-#include <fstream>
+
 #include <random>
-#include <string>
 #include <utility>
 #include "v_opt_common.hpp"
 #include "v_opt_ctx.hpp"
@@ -51,8 +44,6 @@ struct utf8_console {
     SetConsoleCP(CP_UTF8);
   }
 } _utf8_console_init;
-
-
 #endif
 static void log_callback_default(v_log_level level, const char* text, void* user_data) {
   (void)level;
@@ -86,7 +77,7 @@ int main() {
   auto vk         = backend_vk_init(0);
   v_backend_t a[] = {vk};
 
-  auto backend_sched  = v_sched_new(*a, nullptr, 1, V_DEFAULT_GRAPH_SIZE, false, true);
+  auto backend_sched  = v_sched_new(*a, nullptr, V_DEFAULT_GRAPH_SIZE);
   model.backend_sched = backend_sched;
 
   int num_tensors = 10;
@@ -97,6 +88,7 @@ int main() {
   };
   const size_t size_meta = V_DEFAULT_GRAPH_SIZE * v_tensor_over_head() + 10 * graph_overhead();
   model.ctx_compute      = v_ctx_init(params);
+
   py::scoped_interpreter guard{};
   py::module_ torch      = py::module_::import("torch");
   py::module_ datasets   = py::module_::import("torchvision.datasets");
@@ -106,21 +98,25 @@ int main() {
     transforms.attr("ToTensor")(),
     transforms.attr("Normalize")(
       py::make_tuple(0.5f, 0.5f, 0.5f), // mean
-      py::make_tuple(0.5f, 0.5f, 0.5f) // std
+      py::make_tuple(0.5f, 0.5f, 0.5f)  // std
     )
   ));
+
+
   auto cifar_train = datasets.attr("CIFAR10")(
     "./data",
     py::arg("train")     = true,
     py::arg("download")  = true,
     py::arg("transform") = transform
   );
+
   py::object DataLoader = torch.attr("utils").attr("data").attr("DataLoader");
   auto loader           = DataLoader(
     cifar_train,
     py::arg("batch_size") = 1,
     py::arg("shuffle")    = true
   );
+
   std::vector<std::vector<float>> images;
   std::vector<long> labels;
   for (auto batch : loader) {
@@ -135,7 +131,6 @@ int main() {
     float* ptr  = static_cast<float*>(buf.ptr);
     size_t size = 1;
     for (auto s : buf.shape) size *= s;
-
     std::vector<float> data(ptr, ptr + size);
     images.push_back(std::move(data));
 
@@ -184,12 +179,11 @@ int main() {
     model.ctx_static = v_ctx_init(params);
   }
   model.kernel_1 = v_new_tensor_4d(model.ctx_static, v_TYPE_F32, 3, 3, 3, 8);
-  model.bias_1   = v_new_tensor_3d(model.ctx_static, v_TYPE_F32, 1, 1, 8);
-  model.kernel_2 = v_new_tensor_4d(model.ctx_static, v_TYPE_F32, 3, 3, 8, 16);
-  model.bias_2   = v_new_tensor_3d(model.ctx_static, v_TYPE_F32, 1, 1, 16);
+  model.bias_1   = v_new_tensor_3d(model.ctx_static, v_TYPE_F32, 3, 3, 8);
+  model.kernel_2 = v_new_tensor_4d(model.ctx_static, v_TYPE_F32, 3, 3, 8, 8);
+  model.bias_2   = v_new_tensor_3d(model.ctx_static, v_TYPE_F32, 3, 3, 16);
   model.dense_w  = v_new_tensor_2d(model.ctx_static, v_TYPE_F32, 8 * 8 * 16, 10);
   model.dense_b  = v_new_tensor_1d(model.ctx_static, v_TYPE_F32, 10);
-
 
   init_tensors.push_back(model.kernel_1);
   init_tensors.push_back(model.bias_1);
@@ -198,7 +192,7 @@ int main() {
   init_tensors.push_back(model.dense_w);
   init_tensors.push_back(model.dense_b);
 
-  model.images = v_new_tensor_2d(model.ctx_static, v_TYPE_F32, CIFAR_NINPUT,CIFAR_NBATCH_PHYSICAL);
+  model.images         = v_new_tensor_2d(model.ctx_static, v_TYPE_F32, CIFAR_NINPUT,CIFAR_NBATCH_PHYSICAL);
   v_tensor* conv_input = v_reshape_4d(model.ctx_compute, model.images, 32, 32, 3, model.images->ne[1]);
   v_set_name(model.images, "images");
   (model.images)->set_inputs();
@@ -222,30 +216,24 @@ int main() {
                                v_add(model.ctx_compute,
                                      v_conv_2d(model.ctx_compute,
                                                model.kernel_1,
-                                               conv_input, 1, 1, 1, 1, 1, 1),
+                                               conv_input, 1, 1, 0, 0, 1, 1),
                                      model.bias_1));
-  v_tensor* conv_in2  = v_pool_2d(model.ctx_compute, conv_out1, V_OP_POOL_MAX, 2, 2, 2, 2, 0, 0);
+
   v_tensor* conv_out2 = v_relu(model.ctx_compute,
                                v_add(model.ctx_compute,
-                                     v_conv_2d(model.ctx_compute, model.kernel_2, conv_in2, 1, 1, 1, 1, 1, 1),
+                                     v_conv_2d(model.ctx_compute, model.kernel_2, conv_out1, 1, 1, 0, 0, 1, 1),
                                      model.bias_2));
-  v_tensor* dense_in = v_pool_2d(model.ctx_compute, conv_out2, V_OP_POOL_MAX, 2, 2, 2, 2, 0, 0);
-  dense_in           = v_reshape_2d(model.ctx_compute,
-                          v_cont(model.ctx_compute, v_permute(model.ctx_compute, dense_in, 1, 2, 0, 3))
-                          ,64 * 16,CIFAR_NBATCH_PHYSICAL);
+
+  auto out = v_reshape_2d(model.ctx_compute,
+                          v_cont(model.ctx_compute, v_permute(model.ctx_compute, conv_out2, 1, 2, 0, 3))
+                          , 64 * 16,CIFAR_NBATCH_PHYSICAL);
 
 
   model.logits = v_add(model.ctx_compute,
                        v_matmul(model.ctx_compute,
                                 model.dense_w,
-                                dense_in),
+                                out),
                        model.dense_b);
-
-  ///not impled yet, need:
-  /// im2col :
-  ///   backpropagation check
-  ///   pool2d_back_check
-  ///   not impled back_propagation kernels yet
 
 
   v_opt_fit(model.backend_sched,

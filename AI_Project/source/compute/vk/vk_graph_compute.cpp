@@ -11,7 +11,7 @@
 #include "vk_comp.hpp"
 
 bool vk_is_empty(v_tensor* node) {
-  return node->is_empty() || node->op == v_OP_NONE ||
+  return node->is_empty() || node->op == V_OP_NONE ||
     node->op == V_OP_RESHAPE || node->op == v_OP_TRANSPOSE ||
     node->op == V_OP_VIEW || node->op == V_OP_PERMUTE;
 }
@@ -313,7 +313,7 @@ v_status vk_graph_compute(v_backend_t backend, v_cgraph* cgraph) {
 
   vk_graph_cleanup(ctx);
 
-  return v_STATUS_SUCCESS;
+  return V_STATUS_SUCCESS;
 
   UNUSED(backend);
 }
@@ -323,7 +323,6 @@ bool v_vk_compute_forward(vk_backend_ctx* ctx, v_cgraph* cgraph, v_tensor* tenso
                           int tensor_idx, bool use_fence = true, bool almost_ready = false) {
   V_UNUSED(cgraph);
   v_backend_buffer* buf = nullptr;
-
   switch (tensor->op) {
     case v_OP_ADD:
     case v_OP_ACC:
@@ -361,7 +360,7 @@ bool v_vk_compute_forward(vk_backend_ctx* ctx, v_cgraph* cgraph, v_tensor* tenso
     case V_OP_VIEW:
     case V_OP_PERMUTE:
     case v_OP_TRANSPOSE:
-    case v_OP_NONE:
+    case V_OP_NONE:
     case v_OP_ARGSORT:
     case v_OP_SUM:
     case v_OP_SUM_ROWS:
@@ -380,7 +379,7 @@ bool v_vk_compute_forward(vk_backend_ctx* ctx, v_cgraph* cgraph, v_tensor* tenso
     case v_OP_RWKV_WKV6:
     case v_OP_RWKV_WKV7:
     case v_OP_SSM_SCAN:
-    case v_OP_SSM_CONV:
+    case V_OP_SSM_CONV:
     case V_OP_LEAKY_RELU:
     case v_OP_REPEAT:
     case v_OP_REPEAT_BACK:
@@ -425,14 +424,11 @@ bool v_vk_compute_forward(vk_backend_ctx* ctx, v_cgraph* cgraph, v_tensor* tenso
     case v_OP_MUL_MAT_ID:
     case v_OP_FLASH_ATTN_EXT:
       buf = tensor->buffer;
-
       break;
     default:
       return false;
   }
-
-  if (buf == nullptr) { return false; }
-
+  if (buf == nullptr) return false;
   VK_LOG_DEBUG(
     "v_vk_compute_forward(" << tensor << ", name=" << tensor->name << ", op=" << op_name(tensor->op) <<
     ", type=" << tensor->type << ", ne0=" << tensor->ne[0] << ", ne1=" << tensor->ne[1] << ", ne2=" << tensor->ne[2] <<
@@ -441,30 +437,25 @@ bool v_vk_compute_forward(vk_backend_ctx* ctx, v_cgraph* cgraph, v_tensor* tenso
 
   vk_context subctx = ctx->tensor_ctxs[tensor_idx].lock();
   // always wait for the GPU work to be done for the last submit
-  if (tensor_idx == subctx->exit_tensor_idx) { use_fence = true; }
-
+  if (tensor_idx == subctx->exit_tensor_idx) use_fence = true;
   // Only run if ctx hasn't been submitted yet
   if (!subctx->seqs.empty()) {
     #ifdef v_VULKAN_CHECK_RESULTS
     vk_check_results_0(ctx, cgraph, tensor_idx);
     use_fence = true;
     #endif
-
     // Do staging buffer copies
-    for (auto& cpy : subctx->in_memcpys) { memcpy(cpy.dst, cpy.src, cpy.n); }
-
-    for (auto& mset : subctx->memsets) { memset(mset.dst, mset.val, mset.n); }
+    for (auto& cpy : subctx->in_memcpys) memcpy(cpy.dst, cpy.src, cpy.n);
+    for (auto& mset : subctx->memsets) memset(mset.dst, mset.val, mset.n);
 
     if (almost_ready && !ctx->almost_ready_fence_pending && !use_fence) {
       vk_submit(subctx, ctx->almost_ready_fence);
       ctx->almost_ready_fence_pending = true;
     } else {
-      vk_submit(subctx, use_fence
-                          ? ctx->fence
-                          : vk::Fence{});
+      vk_submit(subctx, use_fence ? ctx->fence : vk::Fence{});
     }
 
-    if (use_fence) { v_vk_wait_for_fence(ctx); }
+    if (use_fence) v_vk_wait_for_fence(ctx);
     #ifdef v_VULKAN_CHECK_RESULTS
     vk_check_results_1(ctx, cgraph, tensor_idx);
     #endif

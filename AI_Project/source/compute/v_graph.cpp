@@ -27,7 +27,7 @@ void v_copy_graph(v_cgraph* src, v_cgraph* dst) {
   for (int i = 0; i < src->n_nodes; ++i) dst->nodes[i] = src->nodes[i];
   for (size_t i = 0; i < src->visited_hash_set.size; ++i) {
     // copy all hashset keys__ (tensors) that are in use
-    if (src->visited_hash_set.get_bitset(src->visited_hash_set.used_bits__.data(), i)) {
+    if (src->visited_hash_set.is_contains(i)) {
       size_t new_hash_pos        = dst->visited_hash_set.insert(src->visited_hash_set.keys__[i]);
       dst->use_cnt[new_hash_pos] = src->use_cnt[i];
     }
@@ -45,9 +45,9 @@ void v_copy_graph(v_cgraph* src, v_cgraph* dst) {
       const size_t igrad_src = src->visited_hash_set.find_hash(src->nodes[i]);
       const size_t igrad_dst = dst->visited_hash_set.find_hash(dst->nodes[i]);
       V_ASSERT(igrad_src != V_HASHSET_FULL);
-      //V_ASSERT(get_bitset(src->visited_hash_set.used_bits__, igrad_src));
+      //V_ASSERT(is_contains(src->visited_hash_set.used_bits__, igrad_src));
       V_ASSERT(igrad_dst != V_HASHSET_FULL);
-      //V_ASSERT(get_bitset(dst->visited_hash_set.used_bits__, igrad_dst));
+      //V_ASSERT(is_contains(dst->visited_hash_set.used_bits__, igrad_dst));
       dst->grads[igrad_dst]     = src->grads[igrad_src];
       dst->grad_accs[igrad_dst] = src->grad_accs[igrad_src];
     }
@@ -72,7 +72,7 @@ void v_graph_reset(v_cgraph* cgraph) {
     if (grad_acc) {
       if (node->flags & TENSOR_FLAG_LOSS) {
         V_ASSERT(grad_acc->type == v_TYPE_F32);
-        V_ASSERT(v_is_scalar(grad_acc));
+        V_ASSERT(grad_acc->is_scalar());
         const float onef = 1.0f;
         if (grad_acc->buffer) {
           v_set_backend_tensor(grad_acc, &onef, 0, sizeof(float));
@@ -133,6 +133,7 @@ void v_print_graph(const v_cgraph* cgraph) {
   }
   V_LOG_INFO("========================================\n");
 }
+
 // check if node is part of the graph
 static bool v_graph_find(const v_cgraph* cgraph, const v_tensor* node) {
   if (cgraph == nullptr) {
@@ -232,7 +233,7 @@ void v_graph_dump_dot(const v_cgraph* gb, const v_cgraph* gf, const char* filena
       fprintf(fp, "(%s)|", v_type_name(node->type));
     }
 
-    if (v_is_matrix(node)) {
+    if (node->is_matrix()) {
       fprintf(fp, "%d [%" PRId64 ", %" PRId64 "] | <x>%s", i, node->ne[0], node->ne[1], v_op_symbol(node->op));
     } else {
       fprintf(fp,
@@ -325,6 +326,7 @@ void v_graph_dump_dot(const v_cgraph* gb, const v_cgraph* gf, const char* filena
 
   V_LOG_INFO("%s: dot -Tpng %s -o %s.png && open %s.png\n", __func__, filename, filename, filename);
 }
+
 static int v_node_list_find_tensor(const v_cgraph* cgraph,
                                    const int* idxs,
                                    int count,
@@ -395,5 +397,3 @@ bool v_can_fuse_subgraph_ext(const v_cgraph* cgraph,
 
   return true;
 }
-
-
